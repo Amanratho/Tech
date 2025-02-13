@@ -15,9 +15,7 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-// @desc    Update user profile by UID
-// @route   PUT /api/users/:uid
-// @access  Private
+
 const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findOne({ uid: req.params.uid });
@@ -29,16 +27,16 @@ const updateUserProfile = async (req, res) => {
     user.mobileNo = mobileNo || user.mobileNo;
     user.companyName = companyName || user.companyName;
 
-    // Handle QR Code Upload
+   
     if (req.file) {
-      // Upload QR code to Cloudinary
+     
       const uploadResult = await cloudinary.uploader.upload(req.file.path);
       const qrImageUrl = uploadResult.secure_url;
 
-      // Save QR Code URL to user profile
+     
       user.qrCodeUrl = qrImageUrl;
 
-      // Delete the uploaded file from the local filesystem
+      
       fs.unlinkSync(req.file.path);
     }
 
