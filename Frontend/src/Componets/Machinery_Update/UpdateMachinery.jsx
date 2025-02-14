@@ -19,7 +19,7 @@ const MachineryUpdate = () => {
       try {
         const uid = localStorage.getItem("uid");
         const response = await axios.post(
-          "http://localhost:3000/api/machines",
+          `${import.meta.env.VITE_BACKEND_URL}/api/machines`,
           { uid }
         );
         console.log("client data :", response);
@@ -61,7 +61,7 @@ const MachineryUpdate = () => {
               onClick={async () => {
                 try {
                   const response = await axios.delete(
-                    `http://localhost:3000/api/machine/machines/${Machine_id}`
+                    `${import.meta.env.VITE_BACKEND_URL}/api/machine/machines/${Machine_id}`
                   );
                   if (response.status === 200) {
                     setMachines((machines) =>
@@ -93,22 +93,7 @@ const MachineryUpdate = () => {
     );
   };
   
-  // const handleDeleteConfirmed = async (Machine_id) => {
-  //   try {
-  //     const response = await axios.delete(
-  //       `http://localhost:3000/api/machine/machines/${Machine_id}`
-  //     );
-  //     if (response.status === 200) {
-  //       setMachines(
-  //         machines.filter((machine) => machine.Machine_id !== Machine_id)
-  //       );
-  //       toast.success("Machine deleted successfully!");
-  //     }
-  //   } catch (error) {
-  //     console.log("Error deleting machine:", error);
-  //     toast.error("Error deleting machine.");
-  //   }
-  // };
+
 
 
   return (

@@ -103,7 +103,7 @@ const StartEntry = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/rentals/add-entry",
+        `${import.meta.env.VITE_BACKEND_URL}/api/rentals/add-entry`,
         entryData
       );
       toast.success("Entry added successfully!");
@@ -138,7 +138,7 @@ const StartEntry = () => {
       // Mobile number complete hone par fetch karega
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/rentals/customer/${mobile}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/rentals/customer/${mobile}`
         );
         if (response.data) {
           setCustomerName(response.data.customerName);

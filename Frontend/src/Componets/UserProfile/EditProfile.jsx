@@ -48,7 +48,7 @@ const EditProfile = () => {
         formData.append("qrImage", qrCode);
       }
 
-      await axios.put(`http://localhost:3000/api/users/${uid}`, formData, {
+      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/users/${uid}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -80,7 +80,7 @@ const EditProfile = () => {
               className="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700"
               onClick={async () => {
                 try {
-                  await axios.delete(`http://localhost:3000/api/user/delete/${uid}`);
+                  await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/user/delete/${uid}`);
                   toast.success("Your account has been deleted successfully.");
                   localStorage.removeItem("uid");
                   closeToast();

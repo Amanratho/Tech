@@ -25,7 +25,7 @@ const Contact = () => {
     setSuccess(null);
 
     try {
-      const response = await fetch("http://localhost:3000/api/otp/contact", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/otp/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

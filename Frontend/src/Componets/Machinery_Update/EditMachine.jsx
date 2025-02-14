@@ -14,7 +14,7 @@ const EditMachine = () => {
   const [error, setError] = useState(null);
   const { id } = useParams(); // Machine ID from URL
   const navigate = useNavigate();
-  const url = "http://localhost:3000";
+  
 
   useEffect(() => {
     console.log("Machine ID from URL:", id);
@@ -54,7 +54,7 @@ const EditMachine = () => {
     }
 
     try {
-      const response = await axios.put(`${url}/api/machine/machines/${id}`, formDataToSend, {
+      const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/machine/machines/${id}`, formDataToSend, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

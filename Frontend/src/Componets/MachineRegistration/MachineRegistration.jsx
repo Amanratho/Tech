@@ -39,7 +39,7 @@ function MachineRegistration() {
   const [image, setImage] = useState(null); // File object
   const [preview, setPreview] = useState(null); // Image preview URL
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const url = "http://localhost:3000";
+  
 
   const handleChange = (e) => {
     const name = e.target.name;
@@ -92,7 +92,7 @@ function MachineRegistration() {
 
     try {
       const response = await axios.post(
-        `${url}/api/machine/addMachine`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/machine/addMachine`,
         formDataToSend,
         {
           headers: {

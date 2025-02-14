@@ -59,7 +59,7 @@ const MachineMaintenanceApp = () => {
     try {
       const uid = localStorage.getItem("uid");
       
-      const response = await axios.post("http://localhost:3000/api/machines", { uid });
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/machines`, { uid });
       if (response.data && Array.isArray(response.data)) {
         setMachines(response.data);
       } else {
@@ -76,7 +76,7 @@ const MachineMaintenanceApp = () => {
     try {
       if (rentalData[machineId]) return;
   
-      const response = await axios.post("http://localhost:3000/api/rentals-by-machine-id", { machineId });
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/rentals-by-machine-id`, { machineId });
   
       // ✅ Ensure rentalData is always an array
       setRentalData((prevData) => ({

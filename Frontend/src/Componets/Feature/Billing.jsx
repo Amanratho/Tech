@@ -20,7 +20,7 @@ const Billing = () => {
       try {
         const uid = localStorage.getItem("uid");
     
-        const response = await axios.post("http://localhost:3000/api/rentals", { uid });
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/rentals`, { uid });
         
  
         if (!response || response.status !== 200 || !response.data) {

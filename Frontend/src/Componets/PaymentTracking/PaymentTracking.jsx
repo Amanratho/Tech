@@ -17,7 +17,7 @@ const PaymentTracking = () => {
     const uid = localStorage.getItem("uid");
     const fetchData = async () => {
       try {
-        const response = await axios.post("http://localhost:3000/api/rentals", {
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/rentals`, {
           uid: uid,
         });
 
@@ -114,7 +114,7 @@ const PaymentTracking = () => {
       setIsModalOpen(false);
 
       try {
-        await axios.put("http://localhost:3000/api/update-payment", {
+        await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/update-payment`, {
           _id: selectedEntry._id,
           pendingAmount: newPendingAmount,
           paidAmount: newPaidAmount,

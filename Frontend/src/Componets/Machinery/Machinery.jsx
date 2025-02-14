@@ -26,7 +26,7 @@ function Machinery() {
         const uid = localStorage.getItem("uid");
         if (uid) {
           const response = await axios.post(
-            "http://localhost:3000/api/machines",
+            `${import.meta.env.VITE_BACKEND_URL}/api/machines`,
             { uid }
           );
           console.log("client data :", response);

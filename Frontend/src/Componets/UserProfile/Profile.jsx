@@ -28,7 +28,7 @@ const Profile = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/users/${uid}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/users/${uid}`
         );
         setUser(response.data);
       } catch (error) {

@@ -5,7 +5,7 @@ import {
   FaUser,
   FaPhone,
   FaImage,
-  FaBuilding,FaEye, FaEyeSlash
+  FaBuilding, FaEye, FaEyeSlash
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { auth } from "../../firebase";
@@ -31,7 +31,6 @@ const Welcome = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const navigate = useNavigate();
@@ -39,60 +38,48 @@ const Welcome = () => {
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     if (password !== confirmPassword) {
       toast.error("Passwords do not match!");
       return;
     }
+
     setError("");
     handleOtpSend();
 
-    const otpres = await axios.post(
-      "http://localhost:3000/api/otp/verify-otp",
-      {
-        otp,
-        email,
-      }
-    );
-
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/auth/signup",
-        {
-          email,
-          password,
-          username,
-          mobileNo,
-          companyName,
-        }
+      const otpres = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/otp/verify-otp`,
+        { otp, email }
       );
 
-      if (otpres.response.data.success) {
+      if (otpres.data.success) {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`,
+          { email, password, username, mobileNo, companyName }
+        );
+
         if (response.data.success) {
           toast.success("Signup successful! Please verify your email.");
           setOtpSent(true);
-          setLoading(false);
         } else {
-          toast.error(
-            "Signup failed. Please try again."
-          );
+          toast.error("Signup failed. Please try again.");
         }
       } else {
         toast.error("Invalid OTP. Please try again.");
       }
     } catch (error) {
-      toast.error(
-        "Signup failed. Please try again later."
-      );
+      toast.error("Signup failed. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleOtpSend = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/otp/send-otp",
-        {
-          email,
-        }
+        `${import.meta.env.VITE_BACKEND_URL}/api/otp/send-otp`,
+        { email }
       );
 
       if (response.data.success) {
@@ -111,11 +98,8 @@ const Welcome = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/otp/verify-otp",
-        {
-          otp,
-          email,
-        }
+        `${import.meta.env.VITE_BACKEND_URL}/api/otp/verify-otp`,
+        { otp, email }
       );
 
       if (response.data.success) {
@@ -132,14 +116,8 @@ const Welcome = () => {
   const handleCompleteAccountCreation = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/complete-signup",
-        {
-          email,
-          password,
-          username,
-          mobileNo,
-          companyName,
-        }
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/complete-signup`,
+        { email, password, username, mobileNo, companyName }
       );
 
       if (response.data.success) {
@@ -150,7 +128,7 @@ const Welcome = () => {
       }
     } catch (error) {
       toast.error("This Email is already in use.");
-      useNavigate("/welcome");
+      navigate("/welcome");
     }
   };
 
@@ -158,22 +136,18 @@ const Welcome = () => {
     e.preventDefault();
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await userCredential.user.getIdToken();
 
+      
       const response = await axios.post(
-        "http://localhost:3000/api/auth/login",
-        {
-          idToken,
-        }
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
+        { idToken }
       );
 
       if (response.status === 200) {
         toast.success("Logged in successfully!");
+        
         const userData = response.data.user;
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("uid", userData.uid);
@@ -181,12 +155,10 @@ const Welcome = () => {
 
         window.location.href = "/";
       } else {
-        toast.error(`Login Failed `);
+        toast.error("Login Failed");
       }
     } catch (error) {
-      toast.error(
-        `Please Enter Right Information `
-      );
+      toast.error("Please Enter Right Information");
     }
   };
 
@@ -200,7 +172,7 @@ const Welcome = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/auth/check-email",
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/check-email`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -219,9 +191,7 @@ const Welcome = () => {
       setIsEmailSent(true);
       toast.success("A reset link has been sent to your email.");
     } catch (error) {
-      toast.error(
-         "Error sending reset email. Please try again."
-      );
+      toast.error("Error sending reset email. Please try again.");
     }
   };
 
