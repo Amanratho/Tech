@@ -7,7 +7,7 @@ import qrcode from './qrcod.jpg'
 import bill6 from './bill6.png'
 import amanPitcher from './aman.jpg'
 import kuldeepPitcher from './kuldeep.jpeg'
-import AzharSirPitcher from './azhar_sir.jpeg'
+import AzharSirPitcher from './azharSir.jpeg'
 
 export const assets ={
   nice,
