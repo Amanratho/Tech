@@ -1,7 +1,7 @@
 {
     "name": "Tech Diary - Machinery Rental",
     "short_name": "TechDiary",
-    "id": "/",
+    "id": "com.techdiary.app",
     "start_url": "/",
     "display": "standalone",
     "theme_color": "#000000",
