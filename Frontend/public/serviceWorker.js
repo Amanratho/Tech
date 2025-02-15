@@ -5,7 +5,8 @@ const urlsToCache = [
   "/manifest.json",
   "/icons/app.png",
   "/icons/app2.png",
-  "/screenshots/app2.png"
+  "/screenshots/app2.png",
+  "/screenshots/app2.png"   
 ];
 
 // Install event: Caching assets
