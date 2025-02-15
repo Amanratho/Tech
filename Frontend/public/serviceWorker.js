@@ -6,7 +6,7 @@ const urlsToCache = [
   "/icons/app.png",
   "/icons/app2.png",
   "/screenshots/app2.png",
-  "/screenshots/app2.png"   
+  "/screenshots/app.png"   
 ];
 
 // Install event: Caching assets
