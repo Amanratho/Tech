@@ -3,12 +3,12 @@
     "name": "Tech Diary - Machinery Rental",
     "icons": [
       {
-        "src": "/icons/icon-192x192.png",
+        "src": "/icons/Harvestore2.webp",
         "type": "image/png",
         "sizes": "192x192"
       },
       {
-        "src": "/icons/icon-512x512.png",
+        "src": "/icons/Harvestore2.webp",
         "type": "image/png",
         "sizes": "512x512"
       }
