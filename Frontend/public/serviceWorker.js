@@ -3,8 +3,8 @@ const urlsToCache = [
   "/",
   "/index.html",
   "/manifest.json",
-  "/icons/icon-192x192.png",
-  "/icons/icon-512x512.png"
+  "/icons/Harvestore2-192x192.webp",
+  "/icons/Harvestore2-512x512.webp"
 ];
 
 self.addEventListener("install", (event) => {
