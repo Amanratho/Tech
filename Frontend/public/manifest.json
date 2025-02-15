@@ -15,16 +15,10 @@
         "type": "image/png"
       },
       {
-        "src": "/icons/app-512x512.png",
+        "src": "/icons/app2-512x512.png",
         "sizes": "512x512",
         "type": "image/png"
       }
-    ],
-    "screenshots": [
-      {
-        "src": "/screenshots/home.png",
-        "type": "image/png",
-        "sizes": "1080x1920"
-      }
     ]
+  
 }
