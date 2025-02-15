@@ -20,10 +20,10 @@
     ],
     "screenshots": [
       {
-        "src": "/icons/Harvestore2.webp",
-        "sizes": "1280x720",
+        "src": "/screenshots/trolley.webp",
+        "sizes": "1000x671",
         "type": "image/webp",
         "form_factor": "wide"
       }
-    ]
+    ]   
   }
