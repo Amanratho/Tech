@@ -17,3 +17,9 @@ createRoot(document.getElementById("root")).render(
     </Provider>
   </StrictMode>
 );
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/serviceWorker.js')
+    .then(() => console.log("Service Worker Registered"))
+    .catch((err) => console.log("Service Worker Failed", err));
+}
