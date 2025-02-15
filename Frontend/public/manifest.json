@@ -8,22 +8,15 @@
     "background_color": "#ffffff",
     "icons": [
       {
-        "src": "/icons/Harvestore2-192x192.webp",
+        "src": "/icons/app-192x192.webp",
         "sizes": "192x192",
         "type": "image/webp"
       },
       {
-        "src": "/icons/Harvestore2-512x512.webp",
+        "src": "/icons/app-512x512.webp",
         "sizes": "512x512",
         "type": "image/webp"
       }
-    ],
-    "screenshots": [
-      {
-        "src": "/screenshots/trolley.webp",
-        "sizes": "1000x671",
-        "type": "image/webp",
-        "form_factor": "wide"
-      }
-    ]   
+    ]
+
   }
