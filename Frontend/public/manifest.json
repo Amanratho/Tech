@@ -19,6 +19,15 @@
         "sizes": "512x512",
         "type": "image/png"
       }
-    ]
+    ],
+
+    "screenshots": [
+        {
+          "src": "/screenshots/app2.png",
+          "sizes": "512x512",
+          "type": "image/png",
+          "form_factor": "wide"
+        }
+      ]
   
 }
