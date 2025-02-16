@@ -78,8 +78,8 @@ const Welcome = () => {
       }
     } catch (error) {
       // ✅ Proper error handling
-      toast.error(error.response?.data?.message || "Signup failed. Please try again later.");
-      console.error("Signup error:", error);
+      // toast.error(error.response?.data?.message || "Signup failed. Please try again later.");
+      // console.error("Signup error:", error);
     } finally {
       setLoading(false); // ✅ Ensure loading state reset ho
     }
