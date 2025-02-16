@@ -38,53 +38,42 @@ const Welcome = () => {
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
-    // ✅ Password match check (Loading reset fix)
+
     if (password !== confirmPassword) {
       toast.error("Passwords do not match!");
-      setLoading(false);
       return;
     }
-  
-    setError(""); // Yeh assume kar raha hoon ki setError state me hai
-  
+
+    setError("");
+    handleOtpSend();
+
     try {
-      // ✅ Step 1: Pehle OTP bhejo
-      await handleOtpSend(); // Pehle OTP bhejna chahiye, phir user enter karega
-  
-      // ✅ Step 2: OTP Verify karo
-      const otpRes = await axios.post(
+      const otpres = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/otp/verify-otp`,
         { otp, email }
       );
-  
-      if (!otpRes.data.success) {
-        toast.error("Invalid OTP. Please try again.");
-        setLoading(false);
-        return; // ❌ Aage signup request nahi bhejenge
-      }
-  
-      // ✅ Step 3: OTP verify hone ke baad signup request bhejo
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`,
-        { email, password, username, mobileNo, companyName }
-      );
-  
-      if (response.data.success) {
-        toast.success("Signup successful! Please verify your email.");
-        setOtpSent(true);
+
+      if (otpres.data.success) {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`,
+          { email, password, username, mobileNo, companyName }
+        );
+
+        if (response.data.success) {
+          toast.success("Signup successful! Please verify your email.");
+          setOtpSent(true);
+        } else {
+          toast.error("Signup failed. Please try again.");
+        }
       } else {
-        toast.error(response.data.message || "Signup failed. Please try again.");
+        toast.error("Invalid OTP. Please try again.");
       }
     } catch (error) {
-      // ✅ Proper error handling
-      toast.error(error.response?.data?.message || "Signup failed. Please try again later.");
-      console.error("Signup error:", error);
+      toast.error("Signup failed. Please try again later.");
     } finally {
-      setLoading(false); // ✅ Ensure loading state reset ho
+      setLoading(false);
     }
   };
-  
 
   const handleOtpSend = async () => {
     try {
