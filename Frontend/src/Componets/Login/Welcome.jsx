@@ -78,7 +78,7 @@ const Welcome = () => {
       }
     } catch (error) {
       // ✅ Proper error handling
-      toast.error(error.response?.data?.message || "Signup failed. Please try again later.");
+      toast.error(error.response?.data?.message || "Cheack Your Email");
       console.error("Signup error:", error);
     } finally {
       setLoading(false); // ✅ Ensure loading state reset ho
