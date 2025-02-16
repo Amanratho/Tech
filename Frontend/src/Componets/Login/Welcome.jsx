@@ -74,7 +74,7 @@ const Welcome = () => {
         toast.success("Signup successful! Please verify your email.");
         setOtpSent(true);
       } else {
-        toast.error(response.data.message || "Signup failed. Please try again.");
+        toast.error(response.data.message || "Signup failed. Please try again  ha m.");
       }
     } catch (error) {
       // ✅ Proper error handling
