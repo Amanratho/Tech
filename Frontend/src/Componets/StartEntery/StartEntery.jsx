@@ -241,7 +241,7 @@ const StartEntry = () => {
             <div>
               <label
                 htmlFor="OperatorName"
-                className="block text-sm ps-2 font-medium text-white"
+                className="block text-sm ps-2 font-medium text-white "
               >
                 Job Work
               </label>
