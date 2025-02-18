@@ -41,10 +41,11 @@ const Welcome = () => {
 
     if (password !== confirmPassword) {
       toast.error("Passwords do not match!");
+      setLoading(false);
       return;
     }
 
-    setError("");
+    // setError("");
     handleOtpSend();
 
     try {
@@ -63,13 +64,14 @@ const Welcome = () => {
           toast.success("Signup successful! Please verify your email.");
           setOtpSent(true);
         } else {
-          toast.error("Signup failed. Please try again.");
+          toast.error("Signup failed. Please try again 11.");
         }
       } else {
         toast.error("Invalid OTP. Please try again.");
       }
     } catch (error) {
-      toast.error("Signup failed. Please try again later.");
+
+      
     } finally {
       setLoading(false);
     }
