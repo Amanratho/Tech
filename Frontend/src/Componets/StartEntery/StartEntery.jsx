@@ -17,6 +17,7 @@ const StartEntry = () => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [address, setAddress] = useState("");
   const [operatorName, setOperatorName] = useState("");
+  const [JobWork, setJobWork] = useState("");
 
   // UseEffect to calculate based on rentType
   useEffect(() => {
@@ -99,6 +100,7 @@ const StartEntry = () => {
       rentType: rentType,
       uid: uid,
       machineId: machineId,
+      JobWork,
     };
 
     try {
@@ -123,6 +125,7 @@ const StartEntry = () => {
     setMobileNumber("");
     setAddress("");
     setOperatorName("");
+    setJobWork("");
     setPrice("");
     setQuantity("");
     setTotal(null);
@@ -232,6 +235,22 @@ const StartEntry = () => {
                 placeholder="Enter operator's name"
                 required
                 onChange={(e) => setOperatorName(e.target.value)}
+                className="mt-1 block w-full border border-[#4C4C4D] rounded-md shadow-sm p-1  focus:ring-[#FEC111] focus:border-[#FEC111]"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="OperatorName"
+                className="block text-sm ps-2 font-medium text-white"
+              >
+                Job Work
+              </label>
+              <input
+                type="text"
+                id="JobWork"
+                placeholder="Enter Job Work"
+                required
+                onChange={(e) => setJobWork(e.target.value)}
                 className="mt-1 block w-full border border-[#4C4C4D] rounded-md shadow-sm p-1  focus:ring-[#FEC111] focus:border-[#FEC111]"
               />
             </div>

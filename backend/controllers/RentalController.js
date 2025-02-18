@@ -14,7 +14,8 @@ exports.addRentalEntry = async (req, res) => {
       pendingAmount,
       uid,
       machineId,
-      rentType
+      rentType,
+      jobWork,
     } = req.body;
     const totalAmount = price * quantity;
     const newRental = new Rental({
@@ -29,7 +30,8 @@ exports.addRentalEntry = async (req, res) => {
       pendingAmount,
       uid,
       machineId,
-      rentType
+      rentType,
+      jobWork,
     });
     await newRental.save();
 

@@ -63,6 +63,7 @@ const Invoice = () => {
       paid: entryData.paidAmount,
       pending: entryData.pendingAmount,
       rentType: entryData.rentType,
+      jobwork : entryData.jobwork,
     },
   ];
 
@@ -91,6 +92,7 @@ const Invoice = () => {
     doc.text(`Phone No.: +91 ${user.mobileNo}`, margin, margin + 40);
     entryData.operatorName &&
       doc.text(`Operator Name: ${entryData.operatorName}`, margin, margin + 50);
+      doc.text(`Job Work: ${entryData.jobwork}`, margin, margin + 60);
 
       let qrCodeImage;
 
@@ -293,6 +295,7 @@ const Invoice = () => {
             <tr>
               <th className="p-2">Machine Name</th>
               <th className="p-2">Operator</th>
+              <th className="p-2">Job Work</th>
               <th className="p-2">{entryData.rentType}</th>
               <th className="p-2">Price</th>
               <th className="p-2 text-red-500">Pending</th>
@@ -304,6 +307,7 @@ const Invoice = () => {
               <tr key={index} className="border-b text-center">
                 <td className="p-2">{machineName || "---"}</td>
                 <td className="p-2">{item.operatorName || "---"}</td>
+                <td className="p-2">{item.jobwork || "---"}</td>
                 <td className="p-2">{item.quantity || "0"}</td>
                 <td className="p-2">₹ {item.price || "0"}</td>
                 <td className="p-2 text-red-600">₹ {item.pending || "0"}</td>

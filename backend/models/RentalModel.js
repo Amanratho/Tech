@@ -7,6 +7,7 @@ const RentalSchema = new mongoose.Schema({
   rentType: { type: String, required: true },
   address: { type: String },
   operatorName: { type: String, required: true },
+  jobWork: { type: String, required: false },
   price: { type: Number, required: true },
   quantity: { type: Number, required: true },
   totalAmount: { type: Number, required: true },
