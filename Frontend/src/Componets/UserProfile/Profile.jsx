@@ -124,7 +124,7 @@ const Profile = () => {
                     />
                   ) : (
                     <p className="text-[#F5F5F5] text-sm">
-                      No QR uploaded yet.
+                      Please Upload QR Code
                     </p>
                   )}
                 </div>
