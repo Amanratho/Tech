@@ -80,7 +80,7 @@ const Invoice = () => {
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(234, 179, 8); // Yellow-400
-    doc.text("Bill", pageWidth / 2, margin, { align: "center" });
+    doc.text(`${user.companyName}`, pageWidth / 2, margin, { align: "center" });
 
     // Company Info Section
     doc.setFontSize(12);
