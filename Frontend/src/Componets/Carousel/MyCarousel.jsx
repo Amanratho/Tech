@@ -6,7 +6,7 @@ function MyCarousel() {
   return (
     <Carousel
       controls={false} 
-      indicators={true}
+      indicators={false}
       interval={3000}
       pause="hover"
       className="w-full max-w-screen-2xl mx-auto mt-16"
