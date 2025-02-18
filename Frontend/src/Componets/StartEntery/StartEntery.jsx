@@ -17,7 +17,7 @@ const StartEntry = () => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [address, setAddress] = useState("");
   const [operatorName, setOperatorName] = useState("");
-  const [JobWork, setJobWork] = useState("");
+  const [jobWork, setJobWork] = useState("");
 
   // UseEffect to calculate based on rentType
   useEffect(() => {
@@ -100,7 +100,7 @@ const StartEntry = () => {
       rentType: rentType,
       uid: uid,
       machineId: machineId,
-      JobWork,
+      jobWork,
     };
 
     try {
@@ -247,8 +247,8 @@ const StartEntry = () => {
               </label>
               <input
                 type="text"
-                id="JobWork"
-                placeholder="Enter Job Work"
+                id="jobWork"
+                placeholder="Enter Job Work (Optional)"
                 required
                 onChange={(e) => setJobWork(e.target.value)}
                 className="mt-1 block w-full border border-[#4C4C4D] rounded-md shadow-sm p-1  focus:ring-[#FEC111] focus:border-[#FEC111]"

@@ -64,7 +64,7 @@ const Invoice = () => {
       pending: entryData.pendingAmount,
       rentType: entryData.rentType,
       jobwork : entryData.jobwork,
-    },
+    },  
   ];
 
   const generatePDF = async () => {
