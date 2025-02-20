@@ -19,7 +19,13 @@ createRoot(document.getElementById("root")).render(
 );
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/serviceWorker.js')
-    .then(() => console.log("Service Worker Registered"))
-    .catch((err) => console.log("Service Worker Failed", err));
+  const registerServiceWorker = async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/serviceWorker.js');
+      console.log("Service Worker Registered with scope:", registration.scope);
+    } catch (err) {
+      console.error("Service Worker Registration Failed", err);
+    }
+  };
+  registerServiceWorker();
 }
