@@ -1,4 +1,4 @@
-const CACHE_NAME = "tech-diary-cache-v2"; // Updated cache version
+const CACHE_NAME = "tech-diary-cache-v3"; // Updated cache version
 const urlsToCache = [
   "/",
   "/index.html",
@@ -6,7 +6,7 @@ const urlsToCache = [
   "/icons/app.png",
   "/icons/app2.png",
   "/screenshots/app2.png",
-  "/screenshots/app.png"   
+  "/screenshots/app.png"
 ];
 
 // Install event: Caching assets
@@ -15,35 +15,26 @@ self.addEventListener("install", (event) => {
     caches.open(CACHE_NAME).then(async (cache) => {
       console.log("Service Worker: Opening cache and adding files...");
       try {
-        await Promise.all(urlsToCache.map(url => cache.add(url)));
+        await cache.addAll(urlsToCache);
         console.log("Service Worker: All assets cached successfully!");
       } catch (error) {
         console.error("Service Worker: Error caching assets", error);
       }
     })
   );
+  self.skipWaiting(); // Activate immediately
 });
 
-// Fetch event: Serving from cache & handling navigation
+// Fetch event: Serve from cache or fetch from network
 self.addEventListener("fetch", (event) => {
-  if (event.request.mode === "navigate") {
-    // Serve index.html for navigation requests
-    event.respondWith(
-      caches.match("/index.html").then((cachedResponse) => {
-        return cachedResponse || fetch(event.request);
-      })
-    );
-  } else {
-    // Serve from cache if available
-    event.respondWith(
-      caches.match(event.request).then((response) => {
-        return response || fetch(event.request);
-      })
-    );
-  }
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      return cachedResponse || fetch(event.request);
+    })
+  );
 });
 
-// Activate event: Remove old caches
+// Activate event: Remove old caches and reload
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -55,7 +46,14 @@ self.addEventListener("activate", (event) => {
           }
         })
       );
+    }).then(() => {
+      console.log("Service Worker: Activated & updated!");
+      return self.clients.claim(); // Ensure clients are controlled immediately
     })
   );
-  console.log("Service Worker: Activated & updated!");
+});
+
+// Force refresh when new service worker is activated
+self.addEventListener("controllerchange", () => {
+  window.location.reload();
 });
