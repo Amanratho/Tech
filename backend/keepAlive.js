@@ -4,7 +4,7 @@ import axios from "axios";
 export const keepAlive = () => {
   setInterval(async () => {
     try {
-      await axios.get("https://your-backend-url.com/ping");
+      await axios.get(`${import.meta.env.VITE_BACKEND_URL}/ping`);
       console.log("🔄 Keep-alive request sent");
     } catch (error) {
       console.error("❌ Keep-alive request failed:", error.message);
