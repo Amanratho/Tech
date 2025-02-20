@@ -5,7 +5,9 @@ import {
   FaUser,
   FaPhone,
   FaImage,
-  FaBuilding, FaEye, FaEyeSlash
+  FaBuilding,
+  FaEye,
+  FaEyeSlash,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { auth } from "../../firebase";
@@ -64,14 +66,12 @@ const Welcome = () => {
           toast.success("Signup successful! Please verify your email.");
           setOtpSent(true);
         } else {
-          toast.error("Signup failed. Please try again 11.");
+          toast.error("Signup failed. Please try again.");
         }
       } else {
         toast.error("Invalid OTP. Please try again.");
       }
     } catch (error) {
-
-      
     } finally {
       setLoading(false);
     }
@@ -119,29 +119,41 @@ const Welcome = () => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/auth/complete-signup`,
-        { email, password, username, mobileNo, companyName }
+        { email, password, username, mobileNo, companyName },
+        { timeout: 10000 } // 10-second timeout
       );
-
+  
       if (response.data.success) {
         toast.success("Account created Successfully, Please Login");
         setView("login");
       } else {
-        toast.error("Failed to create account after OTP verification.");
+        toast.error(response.data.message || "Failed to create account.");
       }
     } catch (error) {
-      toast.error("This Email is already in use.");
-      navigate("/welcome");
+      console.error("Signup Error:", error);
+  
+      if (error.code === "ECONNABORTED") {
+        toast.error("Server took too long to respond. Please try again.");
+      } else if (error.response && error.response.data) {
+        toast.error(error.response.data.message || "This Email is already in use.");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     }
   };
+  
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const idToken = await userCredential.user.getIdToken();
 
-      
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
         { idToken }
@@ -149,7 +161,7 @@ const Welcome = () => {
 
       if (response.status === 200) {
         toast.success("Logged in successfully!");
-        
+
         const userData = response.data.user;
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("uid", userData.uid);

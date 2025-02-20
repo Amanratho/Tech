@@ -15,12 +15,12 @@ self.addEventListener("install", async (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
-      console.log("Service Worker: Caching assets...");
+      // console.log("Service Worker: Caching assets...");
       try {
         await cache.addAll(urlsToCache);
-        console.log("Service Worker: All assets cached successfully!");
+        // console.log("Service Worker: All assets cached successfully!");
       } catch (error) {
-        console.error("Service Worker: Error caching assets", error);
+        // console.error("Service Worker: Error caching assets", error);
       }
     })()
   );

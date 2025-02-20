@@ -33,14 +33,14 @@ function Feature() {
           title="Bills History"
           bgImage={assets.BillHistory}
           link="/bill-history"
-          Button="Show Bills"
+          Button="See Bills"
         />
 
         <FeatureCard
           title="Machine Status "
           bgImage={assets.MachineMaintenance}
           link="/machine-maintenance"
-          Button="Show Status"
+          Button="See Status"
         />
       </div>
     </div>
@@ -66,7 +66,7 @@ function FeatureCard({ title, Button, bgImage, link }) {
         >
           {title}
         </h3>
-        {/* <p className="text-[#F5F5F5] mb-4">{description}</p> */}
+        {/* <p className="text-[#F5F5F5] mb-4">{description}</p>  */}
         <Link
           to={link}
           className="bg-[#F8981D] no-underline text-black 
