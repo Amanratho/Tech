@@ -20,30 +20,34 @@ function Feature() {
           title="Add Machinery"
           bgImage={assets.AddMachinery}
           link="/add-machinery"
+          Button="Add Machine"
         />
         <FeatureCard
           title="Payment Tracking"
           bgImage={assets.PaymentTracking}
           link="/payment-tracking"
+          Button="Explore"
         />
 
         <FeatureCard
           title="Bills History"
           bgImage={assets.BillHistory}
           link="/bill-history"
+          Button="Show Bills"
         />
 
         <FeatureCard
           title="Machine Status "
           bgImage={assets.MachineMaintenance}
           link="/machine-maintenance"
+          Button="Show Status"
         />
       </div>
     </div>
   );
 }
 
-function FeatureCard({ title, description, bgImage, link }) {
+function FeatureCard({ title, Button, bgImage, link }) {
   return (
     <div
       className="relative bg-[#333333] rounded-lg shadow-lg overflow-hidden hover:scale-105 transition-transform duration-300"
@@ -70,7 +74,7 @@ function FeatureCard({ title, description, bgImage, link }) {
              hover:bg-[#D9781A] self-start 
              transition-colors duration-300"
         >
-          <button className="w-full">Explore</button>
+          <button className="w-full">{Button}</button>
         </Link>
       </div>
     </div>
