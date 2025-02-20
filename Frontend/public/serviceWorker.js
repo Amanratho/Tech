@@ -29,7 +29,17 @@ self.addEventListener("install", (event) => {
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request);
+      return cachedResponse || fetch(event.request).then((response) => {
+        // Clone the response and cache it dynamically
+        return caches.open(CACHE_NAME).then((cache) => {
+          if (event.request.method === "GET" && response.status === 200) {
+            cache.put(event.request, response.clone());
+          }
+          return response;
+        });
+      }).catch(() => {
+        console.warn("Service Worker: Fetch failed, serving fallback if available.");
+      });
     })
   );
 });
@@ -53,7 +63,9 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Force refresh when new service worker is activated
+// Notify clients when new service worker takes control
 self.addEventListener("controllerchange", () => {
-  window.location.reload();
+  self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => client.navigate(client.url));
+  });
 });
