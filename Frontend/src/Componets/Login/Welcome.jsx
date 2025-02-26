@@ -46,6 +46,7 @@ const Welcome = () => {
       setLoading(false);
       return;
     }
+    
 
     // setError("");
     handleOtpSend();
@@ -123,24 +124,30 @@ const Welcome = () => {
         { timeout: 10000 } // 10-second timeout
       );
   
-      if (response.data.success) {
+      console.log("Backend Response:", response.data); // Debugging log
+  
+      if (response.data?.success) {
         toast.success("Account created Successfully, Please Login");
         setView("login");
       } else {
-        toast.error(response.data.message || "Failed to create account.");
+        toast.error(response.data?.message || "Failed to create account.");
       }
     } catch (error) {
       console.error("Signup Error:", error);
   
       if (error.code === "ECONNABORTED") {
         toast.error("Server took too long to respond. Please try again.");
-      } else if (error.response && error.response.data) {
-        toast.error(error.response.data.message || "This Email is already in use.");
+      } else if (error?.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else if (error.response) {
+        console.error("Unexpected Backend Error:", error.response.data);
+        toast.error(error.response.data?.message || "Failed to create account. Please try again.");
       } else {
-        toast.error("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please check your internet connection and try again.");
       }
     }
   };
+    
   
 
   const handleLogin = async (e) => {
@@ -285,6 +292,7 @@ const Welcome = () => {
                   state: password,
                   setState: setPassword,
                   type: "password",
+                  minLength: 6,
                 },
                 {
                   label: "Confirm Password",
@@ -292,6 +300,7 @@ const Welcome = () => {
                   state: confirmPassword,
                   setState: setConfirmPassword,
                   type: "password",
+                  minLength: 6,
                 },
                 {
                   label: "Company Name",
