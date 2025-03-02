@@ -142,7 +142,7 @@ const Billing = () => {
   }, []);
 
   return (
-    <div className="p-4 mt-12 bg-[#4C4C4D] min-h-screen">
+    <div className="pt-4 mt-12 bg-[#4C4C4D] min-h-screen">
     <h2 className="text-[#FEC111] text-xl font-bold text-center py-2 px-4 rounded-lg mb-6">
       Billing History
     </h2>
@@ -165,7 +165,7 @@ const Billing = () => {
               className="absolute top-12 left-0 bg-white border border-[#F5F5F5] rounded-md shadow-lg w-full z-10"
             >
               <div
-                className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                className=" cursor-pointer hover:bg-gray-200"
                 onClick={() => handleSearchFieldChange("customerName")}
               >
                 Customer Name

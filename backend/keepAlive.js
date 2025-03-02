@@ -4,10 +4,14 @@ import axios from "axios";
 export const keepAlive = () => {
   setInterval(async () => {
     try {
-      await axios.get(`${import.meta.env.VITE_BACKEND_URL}/ping`);
-      console.log("🔄 Keep-alive request sent");
+      const backendUrl = process.env.VITE_BACKEND_URL || "http://localhost:3000";
+
+      // Backend pe hi direct API call
+      const response = await axios.get(`${backendUrl}/ping`);
+      console.log("🔄 Keep-alive request sent to:", backendUrl);
+      console.log("✅ Server Response:", response.data);
     } catch (error) {
       console.error("❌ Keep-alive request failed:", error.message);
     }
-  }, 600000); // Every 10 minutes (600,000 ms)
+  }, 1200000); // Every 10 minutes (600,000 ms)
 };

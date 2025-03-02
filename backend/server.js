@@ -14,20 +14,13 @@ const path = require("path");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes.js");
 const maintenanceRoutes = require("./routes/machineMaintenanceRoutes.js");
-import { keepAlive } from "./keepAlive.js";
-
-// const invoiceRoutes = require('./routes/invoiceRoutes.js')
+const { keepAlive } = require("./keep.js");
 
 const app = express();
 
 dotenv.config();
 
-// const corsOptions = {
-
-// };
-
 app.use(cors());
-
 app.use(bodyParser.json());
 
 app.get("/ping", (req, res) => {
@@ -51,7 +44,7 @@ app.use("/api/otp", otpRoutes);
 // Connect to MongoDB and start the server
 connectDB();
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>{
-  console.log(`Server running on port ${PORT}`)
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
   keepAlive();
 });
