@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const Contact = () => {
+
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,12 +39,12 @@ const Contact = () => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("Message sent successfully!");
-        setSuccess("Message sent successfully!");
+        toast.success(t('messageSuccess'));
+        setSuccess(t('messageSuccess'));
         setFormData({ name: "", email: "", message: "" }); // Reset form
       } else {
-        toast.error(data.error || "Failed to send message.");
-        setSuccess(data.error || "Failed to send message.");
+        toast.error(data.error ||  t('messageFailure'));
+        setSuccess(data.error ||  t('messageFailure'));
       }
     } catch (error) {
       // console.error("Error:", error);
@@ -59,31 +62,24 @@ const Contact = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
-        <h1
-          className="text-[#FEC111] text-center text-base sm:text-lg md:text-3xl font-extrabold mb-6"
-        >
-          Contact Us
+        <h1 className="text-[#FEC111] text-center text-base sm:text-lg md:text-3xl font-extrabold mb-6">
+          {t('contactUs')}
         </h1>
 
         {success && (
           <p
             className={`text-center text-lg ${
-              success.includes("successfully")
-                ? "text-[#FEC111]"
-                : "text-[#F5F5F5]"
+              success.includes('successfully') ? 'text-[#FEC111]' : 'text-[#F5F5F5]'
             } mb-4`}
           >
-            {success}
+            {success.includes('successfully') ? t('successMessage') : t('errorMessage')}
           </p>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-[#F5F5F5]"
-            >
-              Full Name
+            <label htmlFor="name" className="block text-sm font-medium text-[#F5F5F5]">
+              {t('fullName')}
             </label>
             <input
               type="text"
@@ -93,16 +89,13 @@ const Contact = () => {
               onChange={handleChange}
               required
               className="mt-1 block w-full rounded-md border-[#F5F5F5] shadow-sm p-1 focus:ring-[#FEC111] focus:border-[#FEC111]"
-              placeholder="Enter your name"
+              placeholder={t('fullNamePlaceholder')}
             />
           </div>
 
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-[#F5F5F5]"
-            >
-              Email Address
+            <label htmlFor="email" className="block text-sm font-medium text-[#F5F5F5]">
+              {t('emailAddress')}
             </label>
             <input
               type="email"
@@ -112,16 +105,13 @@ const Contact = () => {
               onChange={handleChange}
               required
               className="mt-1 block w-full rounded-md border-[#F5F5F5] shadow-sm p-1 focus:ring-[#FEC111] focus:border-[#FEC111]"
-              placeholder="Enter your email"
+              placeholder={t('emailPlaceholder')}
             />
           </div>
 
           <div>
-            <label
-              htmlFor="message"
-              className="block text-sm font-medium text-[#F5F5F5]"
-            >
-              Message
+            <label htmlFor="message" className="block text-sm font-medium text-[#F5F5F5]">
+              {t('message')}
             </label>
             <textarea
               id="message"
@@ -131,7 +121,7 @@ const Contact = () => {
               required
               rows="6"
               className="mt-1 block w-full rounded-md border-[#F5F5F5] shadow-sm p-1 focus:ring-[#FEC111] focus:border-[#FEC111]"
-              placeholder="Write your message"
+              placeholder={t('messagePlaceholder')}
             />
           </div>
 
@@ -141,12 +131,10 @@ const Contact = () => {
               type="submit"
               disabled={loading}
               className={`w-full bg-[#F8981D] text-[#F5F5F5] py-1 rounded-md font-semibold transition-all ${
-                loading
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-[#D9781A]"
+                loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#D9781A]'
               }`}
             >
-              {loading ? "Sending..." : "Send Message"}
+              {loading ? t('sending') : t('sendMessage')}
             </motion.button>
           </div>
         </form>

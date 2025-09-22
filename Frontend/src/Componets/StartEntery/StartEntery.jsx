@@ -2,8 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useTranslation } from 'react-i18next';
+
 
 const StartEntry = () => {
+  const { t } = useTranslation();
+  // console.log(t('addNewEntry'))
+
   const navigate = useNavigate();
   const location = useLocation();
   const { rentType, machineId, machineName } = location.state || {};
@@ -160,12 +165,12 @@ const StartEntry = () => {
 
   return (
     <div className="bg-[#4C4C4D] min-h-screen flex flex-col my-12 items-center py-10 px-4">
-      <h1 className="text-3xl font-bold text-[#F5F5F5] mb-8">Add New Entry</h1>
+      <h1 className="text-3xl font-bold text-[#F5F5F5] mb-8"> {t('addNewEntry')}</h1>
 
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-[#333333] shadow-md rounded-lg p-6">
           <h2 className="text-xl font-semibold text-white mb-4">
-            Rental Details
+           {t('rentalDetails')}
           </h2>
           <form className="space-y-4">
             <div>
@@ -173,12 +178,12 @@ const StartEntry = () => {
                 htmlFor="Number"
                 className="block text-sm ps-2 font-medium text-white"
               >
-                Mobile Number
+                {t('mobileNumber')}
               </label>
               <input
                 type="tel"
                 id="Number"
-                placeholder="Enter mobile number"
+                placeholder={t('enterMobileNumber')}
                 maxLength={10}
                 pattern="\d{10}"
                 required
@@ -192,12 +197,12 @@ const StartEntry = () => {
                 htmlFor="CustomerName"
                 className="block text-sm ps-2 font-medium text-white"
               >
-                Customer Name
+                {t('customerName')}
               </label>
               <input
                 type="text"
                 id="CustomerName"
-                placeholder="Enter customer's name"
+                placeholder={t('enterCustomerName')}
                 required
                 value={customerName} // 🆕 Auto-fill ke liye value set ki
                 onChange={(e) => setCustomerName(e.target.value)}
@@ -210,12 +215,12 @@ const StartEntry = () => {
                 htmlFor="Address"
                 className="block text-sm ps-2 font-medium text-white"
               >
-                Customer Address
+                {t('customerAddress')}
               </label>
               <input
                 type="text"
                 id="Address"
-                placeholder="Client Address"
+                placeholder={t('clientAddress')}
                 value={address} // 🆕 Auto-fill ke liye value set ki
                 onChange={(e) => setAddress(e.target.value)}
                 className="mt-1 block w-full border border-[#4C4C4D] rounded-md shadow-sm p-1 focus:ring-[#FEC111] focus:border-[#FEC111]"
@@ -227,12 +232,12 @@ const StartEntry = () => {
                 htmlFor="OperatorName"
                 className="block text-sm ps-2 font-medium text-white"
               >
-                Operator Name
+                {t('operatorName')}
               </label>
               <input
                 type="text"
                 id="OperatorName"
-                placeholder="Enter operator's name"
+                placeholder={t('enterOperatorName')}
                 required
                 onChange={(e) => setOperatorName(e.target.value)}
                 className="mt-1 block w-full border border-[#4C4C4D] rounded-md shadow-sm p-1  focus:ring-[#FEC111] focus:border-[#FEC111]"
@@ -240,15 +245,15 @@ const StartEntry = () => {
             </div>
             <div>
               <label
-                htmlFor="OperatorName"
+                htmlFor="jobWork"
                 className="block text-sm ps-2 font-medium text-white "
               >
-                Job Work
+                {t('jobWork')}
               </label>
               <input
                 type="text"
                 id="jobWork"
-                placeholder="Enter Job Work (Optional)"
+                placeholder={t('enterJobWork')}
                 required
                 onChange={(e) => setJobWork(e.target.value)}
                 className="mt-1 block w-full border border-[#4C4C4D] rounded-md shadow-sm p-1  focus:ring-[#FEC111] focus:border-[#FEC111]"
@@ -259,13 +264,13 @@ const StartEntry = () => {
 
         <div className="w-full max-w-6xl space-y-6">
           <div className="bg-[#FEC111] text-[#4C4C4D] shadow-md rounded-lg p-1">
-            <h2 className="text-lg font-bold mb-2">Rental Calculator</h2>
+            <h2 className="text-lg font-bold mb-2">{t('rentalCalculator')}</h2>
             <div className="Calculate bg-[#333333] rounded-lg pb-2">
               <label
                 htmlFor="price"
                 className="block text-sm font-medium text-[#FEC111] p-2"
               >
-                Rent Price
+               {t('rentPrice')}
               </label>
               <input
                 type="number"
@@ -281,7 +286,8 @@ const StartEntry = () => {
                 htmlFor="quantity"
                 className="block text-sm font-medium text-[#FEC111] p-2"
               >
-                Enter {rentType}
+               {rentType} 
+                {t('enterRentType')} 
               </label>
               <input
                 type="number"
@@ -306,14 +312,14 @@ const StartEntry = () => {
           <div className="bg-white shadow-md rounded-lg p-6 text-[#4C4C4D]">
             {total !== null ? (
               <div className="font-bold text-[#4C4C4D]">
-                <p className="text-[20px] font-semibold">Total: ₹{total}</p>
+                <p className="text-[20px] font-semibold">{t('total')} ₹ {total}</p>
                 <div className="flex gap-4 mt-4">
                   <div>
                     <label
                       htmlFor="pending_amount"
                       className="block text-red-600 font-semibold"
                     >
-                      Pending Amount
+                     {t('pendingAmount')}
                     </label>
                     <input
                       type="number"
@@ -332,7 +338,7 @@ const StartEntry = () => {
                       htmlFor="pay"
                       className="block text-green-600 font-semibold"
                     >
-                      Paid Amount
+                      {t('paidAmount')}
                     </label>
                     <input
                       type="number"
@@ -349,14 +355,14 @@ const StartEntry = () => {
               </div>
             ) : (
               <div className="font-bold text-[#4C4C4D]">
-                Total: ₹{total}
+                {t('total')} ₹{total}
                 <div className="flex gap-4 mt-4">
                   <div>
                     <label
                       htmlFor="pending_amount"
                       className="block text-red-600 font-semibold"
                     >
-                      Pending Amount
+                      {t('pendingAmount')}
                     </label>
                     <input
                       type="number"
@@ -375,7 +381,7 @@ const StartEntry = () => {
                       htmlFor="pay"
                       className="block text-green-600 font-semibold"
                     >
-                      Paid Amount
+                     {t('paidAmount')}
                     </label>
                     <input
                       type="number"
@@ -399,7 +405,7 @@ const StartEntry = () => {
               onClick={handleSubmit}
               className="w-full bg-[#FEC111] text-[#4C4C4D] font-bold py-2 rounded-md shadow hover:bg-[#D9781A] focus:outline-none focus:ring-2 focus:ring-[#FEC111]"
             >
-              Submit Entry
+             {t('submitEntry')}
             </button>
           </div>
         </div>

@@ -3,10 +3,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 // import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 const EditProfile = () => {
+  const { t } = useTranslation();
   const [profileData, setProfileData] = useState({
     username: "",
     mobileNo: "",
@@ -122,15 +124,15 @@ const EditProfile = () => {
         className="bg-[#333333] shadow-lg rounded-lg p-6 w-full max-w-5xl"
       >
         <h1 className="text-3xl font-bold text-[#FEC111] text-center mb-8">
-          Edit Profile
+        {t('editProfileTitle')}
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Left Section */}
           <div className="space-y-6">
             {[
-              { key: "username", label: "Name" },
-              { key: "mobileNo", label: "Mobile No" },
-              { key: "companyName", label: "Company Name" },
+              { key: "username", label: t('nameLabel') },
+              { key: "mobileNo", label: t('mobileLabel') },
+              { key: "companyName", label:t('companyNameLabel') },
             ].map(({ key, label }) => (
               <div key={key}>
                 <label
@@ -146,7 +148,7 @@ const EditProfile = () => {
                   value={profileData[key] || ""}
                   onChange={handleInputChange}
                   className="mt-1 block w-full px-4 py-2 border border-[#F5F5F5] rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder={`Enter your ${label}`}
+                  placeholder={label}
                 />
               </div>
             ))}
@@ -173,7 +175,7 @@ const EditProfile = () => {
                 htmlFor="qrCode"
                 className="block text-sm font-medium text-[#F5F5F5]"
               >
-                Upload QR Code
+                {t('qrCodeLabel')}
               </label>
               <input
                 type="file"
@@ -203,16 +205,16 @@ const EditProfile = () => {
                   : "bg-[#F8981D] hover:bg-[#D9781A]"
               } text-white font-semibold rounded-lg shadow-md transition duration-300`}
             >
-              {isLoading ? "Updating..." : "Update "}
+              {isLoading ? t('updatingButton') : t('updateButton')}
             </button>
           </motion.div>
 
-          <button
+          {/* <button
             onClick={handleDeleteAccount}
             className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-300"
           >
             Delete
-          </button>
+          </button> */}
         </div>
       </motion.div>
     </motion.div>

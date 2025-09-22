@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
+
 import {
   FaInstagram,
   FaLinkedin,
@@ -8,8 +9,10 @@ import {
   FaPhone,
   FaMapMarkerAlt,
 } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+   const { t } = useTranslation();
   return (
     <footer className="bg-[#4C4C4D] text-white py-10 relative">
       <div className="container mx-auto px-6 text-center">
@@ -17,43 +20,39 @@ const Footer = () => {
           {/* Logo and Tagline */}
           <div className="flex flex-col items-center">
             <h2 className="text-lg font-extrabold text-yellow-500 mb-2">
-              Tech Diary
+              {t("tech_diary")}
             </h2>
             <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-              Revolutionizing machinery rentals with simplicity and efficiency.
-              Your success, our priority.
+              {t("tagline")}
             </p>
           </div>
 
           {/* Navigation Links */}
-           <div className="items-center flex flex-col">
-            {/* <h3 className="text-xl font-semibold text-yellow-500 mb-4">Explore</h3> */}
-            <ul className="text-lg font-semibold text-yellow-500  flex flex-col items-start ">
-              {" "}
-              Explore
+          <div className="items-center flex flex-col">
+            <ul className="text-lg font-semibold text-yellow-500 flex flex-col items-start">
+              {t("explore")}
               <li>
                 <Link
                   to="/contact"
-                  className="text-gray-400 hover:text-yellow-400 no-underline transition duration-300 text-sm font-medium "
+                  className="text-gray-400 hover:text-yellow-400 no-underline transition duration-300 text-sm font-medium"
                 >
-                  Contact Us
+                  {t("contact_us")}
                 </Link>
               </li>
               <li>
                 <Link
                   to="/about"
-                  className="text-gray-400 hover:text-yellow-400 no-underline transition duration-300 text-sm font-medium text-left"
+                  className="text-gray-400 hover:text-yellow-400 no-underline transition duration-300 text-sm font-medium"
                 >
-                  About Us
+                  {t("about_us")}
                 </Link>
               </li>
-              {/* <li><Link to="/feature" className="text-white hover:text-yellow-400 no-underline transition duration-300 text-sm font-medium text-left">Features</Link></li> */}
               <li>
                 <Link
                   to="/machinery"
-                  className="text-gray-400 hover:text-yellow-400 no-underline transition duration-300 text-sm font-medium text-left"
+                  className="text-gray-400 hover:text-yellow-400 no-underline transition duration-300 text-sm font-medium"
                 >
-                  Explore Machinery
+                  {t("explore_machinery")}
                 </Link>
               </li>
             </ul>
@@ -62,51 +61,38 @@ const Footer = () => {
           {/* Contact Section */}
           <div className="flex flex-col items-center">
             <h3 className="text-lg font-semibold text-yellow-500 mb-1">
-              Contact Us
+              {t("contact_us")}
             </h3>
             <div className="flex gap-1 text-gray-400">
-            <FaEnvelope 
-                size={12}
-               
-                className="mt-2"
-              ></FaEnvelope >
-            <p className="">
-              techdiary562@gmail.com
-            </p>
+              <FaEnvelope size={12} className="mt-2" />
+              <p>techdiary562@gmail.com</p>
             </div>
             <div className="flex gap-1 text-gray-400">
               <FaPhone
                 size={12}
                 style={{ transform: "scaleX(-1)" }}
                 className="mt-1"
-              ></FaPhone>
-              <p className=" text-sm m"> +91 7879686558</p>
+              />
+              <p className="text-sm">+91 7879686558</p>
             </div>
-            <div className="flex gap-1 text-gray-400 ">
+            <div className="flex gap-1 text-gray-400">
               <FaPhone
                 size={12}
                 style={{ transform: "scaleX(-1)" }}
                 className="mt-1"
-              ></FaPhone>
-              <p className=" text-sm m"> +91 9109124564</p>
+              />
+              <p className="text-sm">+91 9109124564</p>
             </div>
             <div className="flex gap-1 text-gray-400">
-            <FaMapMarkerAlt
-                size={12}
-                
-                className="mt-1"
-              ></FaMapMarkerAlt>
-              <p className=" text-sm">
-                Address: Khal,Khategaon,Dewas,MP
-              </p>
-              
+              <FaMapMarkerAlt size={12} className="mt-1" />
+              <p className="text-sm">{t("address")}</p>
             </div>
           </div>
 
           {/* Social Media and Newsletter */}
           <div className="flex flex-col items-center">
             <h3 className="text-lg font-semibold text-yellow-500 mb-3">
-              Stay Connected
+              {t("stay_connected")}
             </h3>
             <div className="mt-4 flex justify-center space-x-4">
               <a
@@ -119,12 +105,10 @@ const Footer = () => {
               </a>
               <NavLink
                 to={"/contact"}
-                rel="noopener noreferrer"
                 className="text-gray-400 hover:text-yellow-500"
               >
                 <FaEnvelope size={20} />
               </NavLink>
-
               <a
                 href="https://www.linkedin.com"
                 target="_blank"
@@ -148,7 +132,8 @@ const Footer = () => {
         <hr className="border-gray-700 my-6" />
 
         <div className="text-center text-gray-500 text-sm animate-slide-up">
-          &copy; {new Date().getFullYear()} Tech Diary. All Rights Reserved.
+          &copy; {new Date().getFullYear()} {t("tech_diary")}.{" "}
+          {t("all_rights_reserved")}
         </div>
       </div>
     </footer>
