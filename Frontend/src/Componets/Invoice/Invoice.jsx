@@ -4,9 +4,11 @@ import { useLocation } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 // import { b } from "framer-motion/client";
 
 const Invoice = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -236,7 +238,8 @@ const Invoice = () => {
 
       // Cloudinary se PNG ka URL mil gaya
       let pdfUrl = response.data.secure_url;
-      let pngUrl = pdfUrl
+      let downloadUrl = pdfUrl.replace("/upload/", "/upload/fl_attachment/");
+      let pngUrl = downloadUrl
         .replace("/upload/", "/upload/f_auto,q_auto/")
         .replace(".pdf", ".png");
 
@@ -265,114 +268,98 @@ const Invoice = () => {
 
   return (
     <div className="p-4 sm:p-6 mt-6 sm:mt-12 bg-gray-100 flex justify-center">
-      <div className="w-full max-w-2xl bg-white shadow-md rounded-lg p-4 sm:p-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-red-600">
-              INVOICE
-            </h1>
-            <p className="text-gray-500 text-sm sm:text-base">
-              Date: {formattedDate}
-            </p>
-          </div>
-          <div className="text-left sm:text-right mt-2 sm:mt-0">
-            <h2 className="text-base sm:text-lg font-bold text-gray-700">
-              {user?.companyName || "Company Name"}
-            </h2>
-            <p className="text-gray-500 text-sm">
-              Owner: {user?.username || "Loading..."}
-            </p>
-            <p className="text-gray-500 text-sm">
-              Contact: +91 {user?.mobileNo || "Loading..."}
-            </p>
-          </div>
+    <div className="w-full max-w-2xl bg-white shadow-md rounded-lg p-4 sm:p-6">
+     
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-red-600">{t("invoice")}</h1>
+          <p className="text-gray-500 text-sm sm:text-base">{t("date")}: {formattedDate}</p>
         </div>
-
-        {/* Bill To */}
-        <div className="mt-4">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-700">
-            Bill To:
+        <div className="text-left sm:text-right mt-2 sm:mt-0">
+          <h2 className="text-base sm:text-lg font-bold text-gray-700">
+            {user?.companyName || t("companyName")}
           </h2>
-          <p className="text-gray-600 text-sm sm:text-base">
-            Name: <b>{entryData.customerName}</b>
-          </p>
-          <p className="text-gray-600 text-sm sm:text-base">
-            Address: <b>{entryData.address}</b>
-          </p>
-          <p className="text-gray-600 text-sm sm:text-base">
-            Contact: <b>{entryData.mobileNumber}</b>
-          </p>
-        </div>
-
-        {/* Table */}
-        <div className="mt-4 sm:mt-6 border rounded-lg overflow-auto">
-          <table className="w-full border-collapse text-xs sm:text-sm">
-            <thead className="bg-gray-800 text-white">
-              <tr>
-                <th className="p-2">Machine Name</th>
-                <th className="p-2">Operator</th>
-                <th className="p-2">Job Work</th>
-                <th className="p-2">{entryData.rentType}</th>
-                <th className="p-2">Price</th>
-                <th className="p-2 text-red-500">Pending</th>
-                <th className="p-2 text-green-500">Paid</th>
-              </tr>
-            </thead>
-            <tbody>
-              {billData.map((item, index) => (
-                <tr key={index} className="border-b text-center">
-                  <td className="p-2">{machineName || "---"}</td>
-                  <td className="p-2">{item.operatorName || "---"}</td>
-                  <td className="p-2">{item.jobwork || "---"}</td>
-                  <td className="p-2">{item.quantity || "0"}</td>
-                  <td className="p-2">₹ {item.price || "0"}</td>
-                  <td className="p-2 text-red-600">₹ {item.pending || "0"}</td>
-                  <td className="p-2 text-green-600">₹ {item.paid || "0"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Payment Info */}
-        <div className="mt-4 sm:mt-6">
-          <h2 className="text-base sm:text-lg font-bold">Payment Details:</h2>
-          {user?.qrCodeUrl ? (
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-              <img
-                src={user.qrCodeUrl}
-                alt="QR Code"
-                className="w-20 h-20 sm:w-24 sm:h-24 object-cover border border-gray-300 rounded-lg"
-              />
-              <p className="text-gray-600 text-sm">Scan to Pay</p>
-            </div>
-          ) : (
-            <p className="text-gray-500 text-sm">No QR Code Uploaded</p>
-          )}
-        </div>
-
-        {/* Total Amount */}
-        <div className="mt-4 sm:mt-6 flex justify-end">
-          <div>
-            <h3 className="text-base sm:text-lg font-bold">Total Amount:</h3>
-            <p className="text-xl sm:text-2xl text-black font-bold">
-              ₹ {entryData.pendingAmount + entryData.paidAmount}
-            </p>
-          </div>
-        </div>
-
-        {/* Button */}
-        <div className="mt-4 sm:mt-6 flex justify-center">
-          <button
-            onClick={generatePDF}
-            className="bg-gray-800 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-yellow-400 transition-all text-sm sm:text-base"
-          >
-            Download & Share PDF
-          </button>
+          <p className="text-gray-500 text-sm">{t("owner")}: {user?.username || "Loading..."}</p>
+          <p className="text-gray-500 text-sm">{t("contact")}: +91 {user?.mobileNo || "Loading..."}</p>
         </div>
       </div>
+
+     
+      <div className="mt-4">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-700">{t("billTo")}:</h2>
+        <p className="text-gray-600 text-sm sm:text-base">{t("name")}: <b>{entryData.customerName}</b></p>
+        <p className="text-gray-600 text-sm sm:text-base">{t("address")}: <b>{entryData.address}</b></p>
+        <p className="text-gray-600 text-sm sm:text-base">{t("contact")}: <b>{entryData.mobileNumber}</b></p>
+      </div>
+
+     
+      <div className="mt-4 sm:mt-6 border rounded-lg overflow-auto">
+        <table className="w-full border-collapse text-xs sm:text-sm">
+          <thead className="bg-gray-800 text-white">
+            <tr>
+              <th className="p-2">{t("machineName")}</th>
+              <th className="p-2">{t("operator")}</th>
+              <th className="p-2">{t("jobWork")}</th>
+              <th className="p-2">{entryData.rentType}</th>
+              <th className="p-2">{t("price")}</th>
+              <th className="p-2 text-red-500">{t("pending")}</th>
+              <th className="p-2 text-green-500">{t("paid")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {billData.map((item, index) => (
+              <tr key={index} className="border-b text-center">
+                <td className="p-2">{machineName || "---"}</td>
+                <td className="p-2">{item.operatorName || "---"}</td>
+                <td className="p-2">{item.jobwork || "---"}</td>
+                <td className="p-2">{item.quantity || "0"}</td>
+                <td className="p-2">₹ {item.price || "0"}</td>
+                <td className="p-2 text-red-600">₹ {item.pending || "0"}</td>
+                <td className="p-2 text-green-600">₹ {item.paid || "0"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+   
+      <div className="mt-4 sm:mt-6">
+        <h2 className="text-base sm:text-lg font-bold">{t("paymentDetails")}:</h2>
+        {user?.qrCodeUrl ? (
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+            <img
+              src={user.qrCodeUrl}
+              alt="QR Code"
+              className="w-20 h-20 sm:w-24 sm:h-24 object-cover border border-gray-300 rounded-lg"
+            />
+            <p className="text-gray-600 text-sm">{t("scanToPay")}</p>
+          </div>
+        ) : (
+          <p className="text-gray-500 text-sm">{t("noQRCode")}</p>
+        )}
+      </div>
+
+
+      <div className="mt-4 sm:mt-6 flex justify-end">
+        <div>
+          <h3 className="text-base sm:text-lg font-bold">{t("totalAmount")}:</h3>
+          <p className="text-xl sm:text-2xl text-black font-bold">
+            ₹ {entryData.pendingAmount + entryData.paidAmount}
+          </p>
+        </div>
+      </div>
+
+
+      <div className="mt-4 sm:mt-6 flex justify-center">
+        <button
+          onClick={generatePDF}
+          className="bg-gray-800 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-yellow-400 transition-all text-sm sm:text-base"
+        >
+          {t("downloadSharePDF")}
+        </button>
+      </div>
     </div>
+  </div>
   );
 };
 

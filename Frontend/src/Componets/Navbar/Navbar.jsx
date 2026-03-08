@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { ToastContainer } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 function Navbar() {
   const dispatch = useDispatch();
@@ -10,10 +11,33 @@ function Navbar() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const uid = localStorage.getItem("uid");
 
+  const { i18n, t } = useTranslation();
+
+  // const changeLanguage = (lng) => {
+  //   i18n.changeLanguage(lng);
+  //   localStorage.setItem("selectedLanguage", lng);
+  // };
+  useEffect(() => {
+    initializeLanguage();
+  }, []);
+  
+  const initializeLanguage = () => {
+    const savedLanguage = localStorage.getItem("selectedLanguage") || "en";
+    i18n.changeLanguage(savedLanguage);
+  };
+  
+  const toggleLanguage = () => {
+    const newLang = i18n.language === "en" ? "hi" : "en";
+    i18n.changeLanguage(newLang);
+    localStorage.setItem("selectedLanguage", newLang);
+  };
+  
+  
+
   useEffect(() => {
     const storedLoginState = localStorage.getItem("isLoggedIn");
     if (storedLoginState === "true" && !isLoggedIn) {
-      dispatch({ type: "LOGIN" }); // Sync Redux state with localStorage
+      dispatch({ type: "LOGIN" });
     }
   }, [dispatch, isLoggedIn]);
 
@@ -31,10 +55,10 @@ function Navbar() {
               <NavLink
                 to="/"
                 className={
-                  "block no-underline py-2 px-4  font-bold text-white  mx-auto"
+                  "block no-underline py-2 px-4 font-bold text-white mx-auto"
                 }
-                >
-                TECH DIARY
+              >
+               Tech Diary
               </NavLink>
             </h2>
           </div>
@@ -74,12 +98,12 @@ function Navbar() {
                   to="/"
                   className={({ isActive }) =>
                     isActive
-                      ? "block no-underline py-2 px-4  font-semibold text-white  mx-auto"
-                      : "block no-underline py-2 px-4 text-gray-600 font-semibold hover:text-white lg:hover:bg-transparent  transition-all duration-300 transform hover:scale-110"
+                      ? "block no-underline py-2 px-4 font-semibold text-white mx-auto"
+                      : "block no-underline py-2 px-4 text-gray-600 font-semibold hover:text-white lg:hover:bg-transparent transition-all duration-300 transform hover:scale-110"
                   }
                   onClick={closeMenu}
                 >
-                  HOME
+                  {t("home")}
                 </NavLink>
               </li>
               <li>
@@ -87,12 +111,12 @@ function Navbar() {
                   to="/contact"
                   className={({ isActive }) =>
                     isActive
-                      ? "block no-underline py-2 px-4 font-semibold text-white  mx-auto"
-                      : "block no-underline py-2 px-4 text-gray-600 font-semibold hover:text-white lg:hover:bg-transparent  transition-all duration-300 transform hover:scale-110"
+                      ? "block no-underline py-2 px-4 font-semibold text-white mx-auto"
+                      : "block no-underline py-2 px-4 text-gray-600 font-semibold hover:text-white lg:hover:bg-transparent transition-all duration-300 transform hover:scale-110"
                   }
                   onClick={closeMenu}
                 >
-                  CONTACT
+                  {t("contact")}
                 </NavLink>
               </li>
               <li>
@@ -100,19 +124,32 @@ function Navbar() {
                   to="/about"
                   className={({ isActive }) =>
                     isActive
-                      ? "block no-underline py-2 px-4  font-semibold text-white    mx-auto"
-                      : "block no-underline py-2 px-4 text-gray-600 font-semibold hover:text-white lg:hover:bg-transparent  transition-all duration-300 transform hover:scale-110"
+                      ? "block no-underline py-2 px-4 font-semibold text-white mx-auto"
+                      : "block no-underline py-2 px-4 text-gray-600 font-semibold hover:text-white lg:hover:bg-transparent transition-all duration-300 transform hover:scale-110"
                   }
                   onClick={closeMenu}
                 >
-                  ABOUT US
+                  {t("about")}
                 </NavLink>
               </li>
+
+              {/* Language Switcher */}
+              <li>
+                <button
+                  onClick={toggleLanguage}
+                  className={ 
+                    "block no-underline py-2 px-4 text-gray-600 font-semibold hover:text-white lg:hover:bg-transparent transition-all duration-300 transform hover:scale-110"
+                  }
+                >
+                  {i18n.language === "en" ? "हिन्दी" : "English"}
+                </button>
+              </li>
+
               <li>
                 {uid ? (
                   <div className="font-semibold text-4xl flex flex-row gap-4 items-center justify-start ml-7">
                     <NavLink to="/profile" onClick={closeMenu}>
-                      <FaUserCircle className="border-2 rounded-full border-slate-500 p-1  transform transition-all duration-300  text-slate-700" />
+                      <FaUserCircle className="border-2 rounded-full border-slate-500 p-1 transform transition-all duration-300 text-slate-700" />
                     </NavLink>
                   </div>
                 ) : (
@@ -120,12 +157,12 @@ function Navbar() {
                     to="/login"
                     className={({ isActive }) =>
                       isActive
-                        ? "block no-underline py-2 px-4  font-semibold text-white    mx-auto"
-                        : "block no-underline py-2 px-4 text-gray-600 font-semibold hover:text-white lg:hover:bg-transparent  transition-all duration-300 transform hover:scale-110"
+                        ? "block no-underline py-2 px-4 font-semibold text-white mx-auto"
+                        : "block no-underline py-2 px-4 text-gray-600 font-semibold hover:text-white lg:hover:bg-transparent transition-all duration-300 transform hover:scale-110"
                     }
                     onClick={closeMenu}
                   >
-                    LOGIN
+                    {t("login")}
                   </NavLink>
                 )}
               </li>

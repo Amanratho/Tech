@@ -1,4 +1,5 @@
 import React, { useId, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FaEnvelope,
   FaLock,
@@ -20,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const Welcome = () => {
+  const { t } = useTranslation();
   const [view, setView] = useState("welcome");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,11 +44,10 @@ const Welcome = () => {
     setLoading(true);
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match!");
+      toast.error(t("passwordMismatch"));
       setLoading(false);
       return;
     }
-    
 
     // setError("");
     handleOtpSend();
@@ -64,13 +65,13 @@ const Welcome = () => {
         );
 
         if (response.data.success) {
-          toast.success("Signup successful! Please verify your email.");
+          toast.success(t("signup_success"));
           setOtpSent(true);
         } else {
-          toast.error("Signup failed. Please try again.");
+          toast.error(t("signup_failed"));
         }
       } else {
-        toast.error("Invalid OTP. Please try again.");
+        toast.error(t("invalid_otp"));
       }
     } catch (error) {
     } finally {
@@ -87,12 +88,12 @@ const Welcome = () => {
 
       if (response.data.success) {
         setOtpSent(true);
-        toast.info("OTP sent to your email!");
+        toast.info(t("otpSentSuccess"));
       } else {
-        toast.error("Failed to send OTP. Please try again.");
+        toast.error(t("otpSendFail"));
       }
     } catch (error) {
-      toast.error("Failed to send OTP. Please try again.");
+      toast.error(t("otpSendFail"));
     }
   };
 
@@ -109,10 +110,10 @@ const Welcome = () => {
         setOtpVerified(true);
         await handleCompleteAccountCreation();
       } else {
-        toast.error("Invalid OTP. Please try again.");
+        toast.error(t("invalidOtp"));
       }
     } catch (error) {
-      toast.error("Error verifying OTP. Please try again.");
+      toast.error(t("verificationError"));
     }
   };
 
@@ -123,32 +124,30 @@ const Welcome = () => {
         { email, password, username, mobileNo, companyName },
         { timeout: 10000 } // 10-second timeout
       );
-  
+
       console.log("Backend Response:", response.data); // Debugging log
-  
+
       if (response.data?.success) {
-        toast.success("Account created Successfully, Please Login");
+        toast.success(t("account_created_success"));
         setView("login");
       } else {
-        toast.error(response.data?.message || "Failed to create account.");
+        toast.error(t("failed_to_create_account"));
       }
     } catch (error) {
-      console.error("Signup Error:", error);
-  
+      // console.error("Signup Error:", error);
+
       if (error.code === "ECONNABORTED") {
-        toast.error("Server took too long to respond. Please try again.");
+        toast.error(t("server_timeout"));
       } else if (error?.response?.data?.message) {
         toast.error(error.response.data.message);
       } else if (error.response) {
-        console.error("Unexpected Backend Error:", error.response.data);
-        toast.error(error.response.data?.message || "Failed to create account. Please try again.");
+        // console.error("Unexpected Backend Error:", error.response.data);
+        toast.error(t("unexpected_backend_error"));
       } else {
-        toast.error("Something went wrong. Please check your internet connection and try again.");
+        toast.error(t("general_error"));
       }
     }
   };
-    
-  
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -167,7 +166,7 @@ const Welcome = () => {
       );
 
       if (response.status === 200) {
-        toast.success("Logged in successfully!");
+        toast.success(t("login_success"));
 
         const userData = response.data.user;
         localStorage.setItem("token", response.data.token);
@@ -176,10 +175,10 @@ const Welcome = () => {
 
         window.location.href = "/";
       } else {
-        toast.error("Login Failed");
+        toast.error(t("login_failed"));
       }
     } catch (error) {
-      toast.error("Please Enter Right Information");
+      toast.error(t("invalid_credentials"));
     }
   };
 
@@ -187,7 +186,7 @@ const Welcome = () => {
     e.preventDefault();
 
     if (!email) {
-      toast.warn("Please enter your email.");
+      toast.warn(t("enter_email"));
       return;
     }
 
@@ -204,15 +203,15 @@ const Welcome = () => {
       const data = await response.json();
 
       if (!data.exists) {
-        toast.error("Email is not registered.");
+        toast.error(t("email_not_registered"));
         return;
       }
 
       await sendPasswordResetEmail(auth, email);
       setIsEmailSent(true);
-      toast.success("A reset link has been sent to your email.");
+      toast.success(t("reset_link_sent"));
     } catch (error) {
-      toast.error("Error sending reset email. Please try again.");
+      toast.error(t("reset_email_error"));
     }
   };
 
@@ -237,48 +236,48 @@ const Welcome = () => {
             className="flex flex-col items-center text-center space-y-8"
             variants={containerVariants}
           >
-            <h1 className="text-4xl font-bold text-white">Welcome!</h1>
+            <h1 className="text-4xl font-bold text-white">{t("welcome")}</h1>
 
             <div className="space-y-4 w-full">
               <button
                 onClick={() => setView("createAccount")}
-                className="w-full py-3 bg-[#F8981D] text-base  font-semibold rounded-xl hover:bg-yellow-500 transition"
+                className="w-full py-3 bg-[#F8981D] text-base font-semibold rounded-xl hover:bg-yellow-500 transition"
               >
-                Create New Account
+                {t("create_account")}
               </button>
               <button
                 onClick={() => setView("login")}
-                className="w-full py-3 bg-gray-700 text-white rounded-xl  hover:bg-gray-800 transition"
+                className="w-full py-3 bg-gray-700 text-white rounded-xl hover:bg-gray-800 transition"
               >
-                Login
+                {t("login")}
               </button>
             </div>
           </motion.section>
         )}
 
         {view === "createAccount" && !otpSent && (
-          <motion.section className=" backdrop-blur-lg p-1 rounded-3xl shadow-2xl max-w-lg mx-auto ">
+          <motion.section className="backdrop-blur-lg p-1 rounded-3xl shadow-2xl max-w-lg mx-auto">
             <h1 className="text-3xl font-bold text-white text-center">
-              Create an Account
+              {t("create_account")}
             </h1>
             <form onSubmit={handleCreateAccount} className="space-y-2 mt-4">
               {[
                 {
-                  label: "Username",
+                  label: t("username"),
                   icon: FaUser,
                   state: username,
                   setState: setUsername,
                   type: "text",
                 },
                 {
-                  label: "Email",
+                  label: t("email"),
                   icon: FaEnvelope,
                   state: email,
                   setState: setEmail,
                   type: "email",
                 },
                 {
-                  label: "Mobile Number",
+                  label: t("mobile_number"),
                   icon: FaPhone,
                   state: mobileNo,
                   setState: setMobileNo,
@@ -287,7 +286,7 @@ const Welcome = () => {
                   pattern: "\\d{10}",
                 },
                 {
-                  label: "Password",
+                  label: t("password"),
                   icon: FaLock,
                   state: password,
                   setState: setPassword,
@@ -295,7 +294,7 @@ const Welcome = () => {
                   minLength: 6,
                 },
                 {
-                  label: "Confirm Password",
+                  label: t("confirm_password"),
                   icon: FaLock,
                   state: confirmPassword,
                   setState: setConfirmPassword,
@@ -303,7 +302,7 @@ const Welcome = () => {
                   minLength: 6,
                 },
                 {
-                  label: "Company Name",
+                  label: t("company_name"),
                   icon: FaBuilding,
                   state: companyName,
                   setState: setCompanyName,
@@ -321,11 +320,11 @@ const Welcome = () => {
                 }) => (
                   <div
                     key={label}
-                    className="flex items-center gap-2 bg-slate-50 rounded-2xl  p-2 w-full"
+                    className="flex items-center gap-2 bg-slate-50 rounded-2xl p-2 w-full"
                   >
                     <Icon
                       className={`text-black text-base ${
-                        label === "Mobile Number" ? "scale-x-[-1]" : ""
+                        label === t("mobile_number") ? "scale-x-[-1]" : ""
                       }`}
                     />
                     <input
@@ -353,14 +352,14 @@ const Welcome = () => {
                   loading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {loading ? "Processing..." : "Sign Up"}
+                {loading ? t("processing") : t("sign_up")}
               </button>
             </form>
             <button
               onClick={() => setView("welcome")}
               className="block text-center text-white text-sm hover:underline pl-3 mt-2"
             >
-              Back
+              {t("back")}
             </button>
           </motion.section>
         )}
@@ -371,13 +370,13 @@ const Welcome = () => {
             variants={containerVariants}
           >
             <h1 className="text-2xl font-bold text-white text-center">
-              Verify OTP
+              {t("verify_otp")}
             </h1>
             <form onSubmit={handleOtpVerify} className="space-y-4">
               <div className="flex items-center gap-2">
                 <input
                   type="text"
-                  placeholder="Enter OTP"
+                  placeholder={t("enter_otp")}
                   required
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
                   value={otp}
@@ -388,7 +387,7 @@ const Welcome = () => {
                 type="submit"
                 className="w-full py-3 bg-yellow-400 text-white rounded-xl hover:bg-yellow-500 transition"
               >
-                Submit OTP
+                {t("submit_otp")}
               </button>
             </form>
           </motion.section>
@@ -398,36 +397,35 @@ const Welcome = () => {
           <>
             <form
               onSubmit={handleForgotPassword}
-              className="flex flex-col gap-3  justify-between flex-wrap "
+              className="flex flex-col gap-3 justify-between flex-wrap"
             >
               <p className="text-yellow-200 font-thin">
-                Enter your email and we'll send you a link to get back into your
-                account.
+                {t("forgot_password_description")}
               </p>
               <input
-                className="rounded-xl p-2 w-full "
+                className="rounded-xl p-2 w-full"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t("enter_email")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <button
                 type="submit"
-                className="border rounded-lg w-1/2 text-white p-1 "
+                className="border rounded-lg w-1/2 text-white p-1"
               >
-                Send Login Link
+                {t("send_login_link")}
               </button>
               <button
                 onClick={() => setView("login")}
-                className="p-1  no-underline font-thin  text-white flex  "
+                className="p-1 no-underline font-thin text-white flex"
               >
-                Back
+                {t("back")}
               </button>
             </form>
             {isEmailSent && (
               <p className="text-green-500 text-center mt-2">
-                A reset link has been sent to your email.
+                {t("reset_link_sent")}
               </p>
             )}
           </>
@@ -435,13 +433,15 @@ const Welcome = () => {
 
         {view === "login" && (
           <motion.section className="space-y-6" variants={containerVariants}>
-            <h1 className="text-2xl font-bold text-white text-center">Login</h1>
+            <h1 className="text-2xl font-bold text-white text-center">
+              {t("login")}
+            </h1>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="flex items-center gap-3">
                 <FaEnvelope className="text-yellow-400" />
                 <input
                   type="email"
-                  placeholder="Email"
+                  placeholder={t("email")}
                   required
                   className="w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
                   value={email}
@@ -452,7 +452,7 @@ const Welcome = () => {
                 <FaLock className="text-yellow-400" />
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Password"
+                  placeholder={t("password")}
                   required
                   className="w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
                   value={password}
@@ -470,20 +470,20 @@ const Welcome = () => {
                 type="submit"
                 className="w-full py-2 bg-[#F8981D] text-white font-semibold rounded hover:bg-yellow-500 transition"
               >
-                Login
+                {t("login")}
               </button>
               <p
                 className="text-sm text-yellow-600 font-thin cursor-pointer hover:underline"
                 onClick={() => setView("forgotPassword")}
               >
-                Forgot Password ?
+                {t("forgot_password")}
               </p>
             </form>
             <button
               onClick={() => setView("welcome")}
               className="p-1 no-underline font-thin text-white text-center"
             >
-              Back
+              {t("back")}
             </button>
           </motion.section>
         )}

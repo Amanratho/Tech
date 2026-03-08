@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData}) => {
   const totalAmount = rentalData?.reduce((acc, rental) => acc + rental.totalAmount, 0) || 0;
   const totalPaidAmount = rentalData?.reduce((acc, rental) => acc + rental.paidAmount, 0) || 0;
   const totalPendingAmount = rentalData?.reduce((acc, rental) => acc + rental.pendingAmount, 0) || 0;
   const totalWork = rentalData?.reduce((acc, rental) => acc + rental.quantity, 0) || 0;
-
+  const { t } = useTranslation();
   return (
     <motion.div
       className="flex-shrink-0 bg-[#333333] text-[#F5F5F5] rounded-lg shadow-lg"
@@ -18,7 +19,7 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData}) => 
       <img
         className="h-36 w-full object-cover rounded-t-lg"
         src={machine.image || "https://via.placeholder.com/150"}
-        alt={`Machine ${machine.Machine_id}`}
+        alt={`${t('machineCardTitle')} ${machine.Machine_id}`}
       />
       <div className="p-4">
         <h5 className="text-sm font-semibold text-[#FEC111] flex justify-center items-start">
@@ -28,23 +29,21 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData}) => 
           onClick={() => toggleShowDetails(machine.Machine_id)}
           className="w-full bg-[#F8981D] text-[#4C4C4D] py-1 rounded-md font-semibold hover:bg-[#D9781A] transition-all"
         >
-          {showDetails ? "Hide Details" : "Show Details"}
+          {showDetails ? t('hideDetailsButton') : t('showDetailsButton')}
         </button>
         {showDetails && rentalData && rentalData.length > 0 ? (
           <div className="mt-4 p-4 bg-gray-700 rounded-lg text-white text-sm">
-            <p><strong>Total income :</strong> ₹{totalAmount}</p>
-            <p><strong>Done Amount:</strong> ₹{totalPaidAmount}</p>
-            <p><strong>Due Amount:</strong> ₹{totalPendingAmount}</p>
-            <p><strong>Total {rentalData[0]?.rentType} : {totalWork}</strong></p>
-
-           
-
+            <p><strong>{t('totalIncomeLabel')}</strong> ₹{totalAmount}</p>
+            <p><strong>{t('doneAmountLabel')}</strong> ₹{totalPaidAmount}</p>
+            <p><strong>{t('dueAmountLabel')}</strong> ₹{totalPendingAmount}</p>
+            <p><strong>{t('totalWorkLabel')} {rentalData[0]?.rentType} : {totalWork}</strong></p>
           </div>
         ) : (
-          showDetails && <p className="text-red-500">No rental data available</p>
+          showDetails && <p className="text-red-500">{t('noRentalDataMessage')}</p>
         )}
       </div>
     </motion.div>
+
   );
 };
 

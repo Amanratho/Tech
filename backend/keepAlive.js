@@ -13,5 +13,5 @@ export const keepAlive = () => {
     } catch (error) {
       console.error("❌ Keep-alive request failed:", error.message);
     }
-  }, 1200000); // Every 10 minutes (600,000 ms)
+  }, 1200000); // Every 12 minutes (600,000 ms)
 };
