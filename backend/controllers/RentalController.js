@@ -132,6 +132,37 @@ exports.getRentalDetails = async (req, res) => {
   }
 };
 
+// Delete Multiple Rentals (Bills)
+exports.deleteMultipleRentals = async (req, res) => {
+  try {
+    const { ids } = req.body; // UI se IDs ka array aayega
+
+    // Check agar array khali hai ya bheja hi nahi gaya
+    if (!ids || ids.length === 0) {
+      return res.status(400).json({ message: "No bills selected for deletion" });
+    }
+
+    // MongoDB ka $in operator ek sath saare matching IDs ko delete kar dega
+    const result = await Rental.deleteMany({
+      _id: { $in: ids }
+    });
+
+    return res.status(200).json({ 
+      success: true,
+      message: `${result.deletedCount} bills deleted successfully!`,
+      deletedCount: result.deletedCount
+    });
+
+  } catch (error) {
+    console.error("Error deleting multiple rentals:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Error deleting bills", 
+      error: error.message 
+    });
+  }
+};
+
 
 
 // Get Customer Details by Mobile Number

@@ -21,6 +21,9 @@ router.get("/customer/:mobileNumber", RentalController.getCustomerByMobile);
 
 // router.post("/addExpense", RentalController.addExpense);
 
-// router.get("/getDetails/:rentalId", RentalController.getRentalDetails);
+router.get("/getDetails/:rentalId", RentalController.getRentalDetails);
+
+// Route to delete multiple rentals (Bills) at once
+router.post("/delete-multiple", RentalController.deleteMultipleRentals);
 
 module.exports = router;
