@@ -14,7 +14,7 @@ const path = require("path");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes.js");
 const maintenanceRoutes = require("./routes/machineMaintenanceRoutes.js");
-const { keepAlive } = require("./keep.js");
+// const { keepAlive } = require("./keepAlive.js");
 
 const app = express();
 
@@ -46,5 +46,5 @@ connectDB();
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  keepAlive();
+  // keepAlive();
 });
