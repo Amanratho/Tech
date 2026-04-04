@@ -20,6 +20,7 @@ import Invoice from "./Componets/Invoice/Invoice";
 import EditProfile from "./Componets/UserProfile/EditProfile";
 import EditMachine from "./Componets/Machinery_Update/EditMachine";
 import Feature from "./Componets/Feature/Feature";
+import Statement from "./Componets/Statement/Statement";
 
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
           <Route path="/start-entry" element={<StartEntry />} />
           <Route path="/feature" element={<Feature />} />
           <Route path="/invoice" element={<Invoice />} />
+          <Route path="/statement" element={<Statement />} />
           <Route path="/add-machinery" element={<MachineRegistration />} />
           <Route path="/machine-maintenance" element={<MachineMaintenanceApp />} />
           <Route path="/machinery-update" element={<UpdateMachinery />} />

@@ -1,11 +1,11 @@
-{
-  "welcome": "Welcome to Tech Diary!",
-  "startTimer": "Start Timer",
-  "rentEntry": "Rent Entry",
-  "submit": "Submit",
-  "language": "Language",
+  {
+    "welcome": "Welcome to Tech Diary!",
+    "startTimer": "Start Timer",
+    "rentEntry": "Rent Entry",
+    "submit": "Submit",
+    "language": "Language",
 
-  "addNewEntry": "Add New Entry",
+    "addNewEntry": "Add New Entry",
   "rentalDetails": "Rental Details",
   "mobileNumber": "Mobile Number",
   "enterMobileNumber": "Enter mobile number",
@@ -288,5 +288,32 @@
   "amount": "Amount",
 
   "payOn": "Pay On",
-  "qrCodeError": "QR Code could not be loaded"
+  "qrCodeError": "QR Code could not be loaded",
+
+  "statementTitle": "ACCOUNT STATEMENT",
+  "generateReport": "Generate Report",
+  "downloadPdfDesc": "Download PDF Statements",
+  "thisMonth": "This Month",
+  "lastMonth": "Last Month",
+  "fromDate": "From Date",
+  "toDate": "To Date",
+  "recordType": "Record Type",
+  "allBills": "All Bills",
+  "fullyPaidOnly": "Fully Paid Only",
+  "pendingDuesOnly": "Pending Dues Only",
+  "downloadPdfBtn": "Download PDF Statement",
+  "generatingPdf": "Generating...",
+  "errorSelectDates": "Please select both Start and End dates.",
+  "errorDateRange": "End date cannot be earlier than Start date.",
+  "warningNoRecords": "No records found for the selected dates.",
+  "successStatementDownloaded": "Statement Downloaded Successfully!",
+  "errorGenerateStatement": "Failed to generate statement.",
+  "resetPassword": "Reset Password",
+  "forgotPasswordDesc": "Enter your registered email address. We'll send you a link to reset your password.",
+  "enterYourEmail": "Enter your email",
+  "sendResetLink": "Send Reset Link",
+  "checkInbox": "Check Inbox",
+  "emailSentMsg1": "We have sent a secure password reset link to",
+  "emailSentMsg2": "Click the link in the email to set a new password, then return here to log in.",
+  "backToLogin": "Back to Login"
 }

@@ -185,7 +185,8 @@ import {
   FaInfoCircle, 
   FaUserCircle, 
   FaSignInAlt,
-  FaLanguage
+  FaLanguage,
+  FaFileInvoice
 } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { ToastContainer } from "react-toastify";
@@ -221,7 +222,8 @@ function Navbar() {
   // Menu items config for mapping
   const navItems = [
     { name: t("home") || "Home", path: "/", icon: FaHome },
-    { name: t("contact") || "Contact", path: "/contact", icon: FaPhoneAlt },
+    // { name: t("contact") || "Contact", path: "/contact", icon: FaPhoneAlt },
+    { name: "Statement", path: "/statement", icon: FaFileInvoice },
     { name: t("about") || "About", path: "/about", icon: FaInfoCircle },
   ];
 

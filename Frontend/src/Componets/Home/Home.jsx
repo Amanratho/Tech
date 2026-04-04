@@ -7,6 +7,7 @@ import Machinery from "../Machinery/Machinery";
 // import StartEntery from "../StartEntery/StartEntery";
 // import PaymentTracking from "../PaymentTracking/PaymentTracking";
 import Footer from "../Footer/Footer";
+// import Statement from "../Statement/Statement";
 
 function Home() {
   
@@ -14,6 +15,7 @@ function Home() {
     <div>
       <MyCarousel />
       <Feature />
+      {/* <Statement /> */}
       <Machinery />
       <Footer/>
     </div>
