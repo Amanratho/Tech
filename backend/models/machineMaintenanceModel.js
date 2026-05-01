@@ -5,8 +5,9 @@ const maintenanceSchema = new mongoose.Schema({
   amount: { type: Number, required: true }, // The amount of income or expense
   description: { type: String, maxlength: 255 }, // Optional description
   date: { type: Date, default: Date.now }, // Date of the entry
-  machineId: { type: mongoose.Schema.Types.ObjectId, ref: "Machine", required: true }, // Reference to the machine
+  machineId: { type: String, required: true }, // Machine ID string (matches Machine_id in machineRegModel)
   uid: { type: String, required: true }, // User ID for authorization and filtering
+  createdAt: { type: Date, default: Date.now }, // Timestamp for sorting
 });
 
 module.exports = mongoose.model("Maintenance", maintenanceSchema);

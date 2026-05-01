@@ -6,5 +6,6 @@ const maintenanceController = require("../controllers/machineMaintenanceControll
 router.post("/add-maintenance", maintenanceController.addMaintenance);
 router.get("/maintenance/:machineId", maintenanceController.getMaintenanceByMachine);
 router.get("/maintenance/user/:uid", maintenanceController.getMaintenanceByUser);
+router.delete("/delete-maintenance/:id", maintenanceController.deleteMaintenanceEntry);
 
 module.exports = router;

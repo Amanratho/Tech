@@ -20,6 +20,7 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import axios from "axios";
+import { API_BASE_URL } from "../../config";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -56,13 +57,13 @@ const Welcome = () => {
 
     try {
       const otpres = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/otp/verify-otp`,
+        `${API_BASE_URL}/api/otp/verify-otp`,
         { otp, email }
       );
 
       if (otpres.data.success) {
         const response = await axios.post(
-          `${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`,
+          `${API_BASE_URL}/api/auth/signup`,
           { email, password, username, mobileNo, companyName }
         );
 
@@ -84,7 +85,7 @@ const Welcome = () => {
   const handleOtpSend = async () => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/otp/send-otp`,
+        `${API_BASE_URL}/api/otp/send-otp`,
         { email }
       );
 
@@ -104,7 +105,7 @@ const Welcome = () => {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/otp/verify-otp`,
+        `${API_BASE_URL}/api/otp/verify-otp`,
         { otp, email }
       );
 
@@ -122,7 +123,7 @@ const Welcome = () => {
   const handleCompleteAccountCreation = async () => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/auth/complete-signup`,
+        `${API_BASE_URL}/api/auth/complete-signup`,
         { email, password, username, mobileNo, companyName },
         { timeout: 10000 }
       );
@@ -152,7 +153,7 @@ const Welcome = () => {
       const idToken = await userCredential.user.getIdToken();
 
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
+        `${API_BASE_URL}/api/auth/login`,
         { idToken }
       );
 
@@ -179,7 +180,7 @@ const Welcome = () => {
     }
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/auth/check-email`,
+        `${API_BASE_URL}/api/auth/check-email`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

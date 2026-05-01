@@ -764,6 +764,7 @@ import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../../config";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
@@ -799,7 +800,7 @@ const Invoice = () => {
       }
 
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users/${uid}`);
+        const response = await axios.get(`${API_BASE_URL}/api/users/${uid}`);
         setUser(response.data);
       } catch (error) {
         toast.error("Failed to fetch user profile");

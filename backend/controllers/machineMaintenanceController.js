@@ -1,17 +1,24 @@
 const Maintenance = require("../models/machineMaintenanceModel");
-const Machine = require("../models/machineMaintenanceModel"); // Machine model for aggregation
 
 // Add a new maintenance entry
 exports.addMaintenance = async (req, res) => {
-  const { type, amount, description, machineId, uid } = req.body;
+  const { type, amount, description, machineId, uid, date } = req.body;
 
   try {
+    if (!type || !amount || !machineId || !uid) {
+      return res.status(400).json({
+        success: false,
+        message: "type, amount, machineId, and uid are required",
+      });
+    }
+
     const newMaintenance = await Maintenance.create({
       type,
       amount,
-      description,
+      description: description || "",
       machineId,
       uid,
+      date: date ? new Date(date) : new Date(),
     });
 
     res.status(201).json({
@@ -21,65 +28,14 @@ exports.addMaintenance = async (req, res) => {
     });
   } catch (error) {
     console.error("Error adding maintenance:", error);
-    res.status(500).json({ success: false, message: "Server Error", error });
-  }
-};
-
-// Get merged machine and maintenance entries
-exports.getMachinesWithMaintenance = async (req, res) => {
-  const { uid } = req.params;
-
-  try {
-    const machines = await Machine.aggregate([
-      { $match: { uid: uid } }, // Filter machines by user ID
-      {
-        $lookup: {
-          from: "maintenances", // The maintenance collection
-          localField: "_id", // Machine ID
-          foreignField: "machineId", // Matching field in maintenance
-          as: "maintenanceEntries", // Name of the new field with merged data
-        },
-      },
-      {
-        $addFields: {
-          totalIncome: {
-            $sum: {
-              $cond: [{ $eq: ["$maintenanceEntries.type", "income"] }, "$maintenanceEntries.amount", 0],
-            },
-          },
-          totalExpenses: {
-            $sum: {
-              $cond: [{ $eq: ["$maintenanceEntries.type", "expense"] }, "$maintenanceEntries.amount", 0],
-            },
-          },
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          Machine_name: 1,
-          totalIncome: 1,
-          totalExpenses: 1,
-          profitOrLoss: { $subtract: ["$totalIncome", "$totalExpenses"] },
-          maintenanceEntries: 1, // Include the merged maintenance entries
-        },
-      },
-    ]);
-
-    res.status(200).json({
-      success: true,
-      data: machines,
-    });
-  } catch (error) {
-    console.error("Error fetching machines with maintenance:", error);
-    res.status(500).json({ success: false, message: "Server Error", error });
+    res.status(500).json({ success: false, message: "Server Error", error: error.message });
   }
 };
 
 // Get maintenance entries for a specific machine
 exports.getMaintenanceByMachine = async (req, res) => {
   const { machineId } = req.params;
-  const { page = 1, limit = 10, type } = req.query;
+  const { type } = req.query;
 
   try {
     const query = { machineId };
@@ -87,22 +43,27 @@ exports.getMaintenanceByMachine = async (req, res) => {
     if (type) query.type = type; // Filter by type (income/expense) if provided
 
     const maintenanceEntries = await Maintenance.find(query)
-      .skip((page - 1) * limit)
-      .limit(Number(limit))
+      .sort({ date: -1, createdAt: -1 })
       .lean();
 
-    const total = await Maintenance.countDocuments(query);
+    // Calculate totals
+    const totalIncome = maintenanceEntries
+      .filter((e) => e.type === "income")
+      .reduce((sum, e) => sum + e.amount, 0);
+
+    const totalExpense = maintenanceEntries
+      .filter((e) => e.type === "expense")
+      .reduce((sum, e) => sum + e.amount, 0);
 
     res.status(200).json({
       success: true,
-      page,
-      limit,
-      total,
+      totalIncome,
+      totalExpense,
       data: maintenanceEntries,
     });
   } catch (error) {
     console.error("Error fetching maintenance entries:", error);
-    res.status(500).json({ success: false, message: "Server Error", error });
+    res.status(500).json({ success: false, message: "Server Error", error: error.message });
   }
 };
 
@@ -117,6 +78,7 @@ exports.getMaintenanceByUser = async (req, res) => {
     if (type) query.type = type; // Filter by type (income/expense) if provided
 
     const maintenanceEntries = await Maintenance.find(query)
+      .sort({ date: -1, createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit))
       .lean();
@@ -132,6 +94,28 @@ exports.getMaintenanceByUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching maintenance entries for user:", error);
-    res.status(500).json({ success: false, message: "Server Error", error });
+    res.status(500).json({ success: false, message: "Server Error", error: error.message });
+  }
+};
+
+// Delete a maintenance entry
+exports.deleteMaintenanceEntry = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deleted = await Maintenance.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Entry not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Entry deleted successfully",
+      data: deleted,
+    });
+  } catch (error) {
+    console.error("Error deleting maintenance entry:", error);
+    res.status(500).json({ success: false, message: "Server Error", error: error.message });
   }
 };

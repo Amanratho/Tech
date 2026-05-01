@@ -1,7 +1,6 @@
-
-
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../config";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import {
@@ -11,11 +10,13 @@ import {
   FaMoneyBillWave,
   FaCheckCircle,
   FaExclamationCircle,
-  FaSearch
+  FaSearch,
 } from "react-icons/fa";
+import FinancialTracker from "./FinancialTracker";
 
 const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) => {
   const { t } = useTranslation();
+  const uid = localStorage.getItem("uid");
   const totalPaidAmount = rentalData?.reduce((acc, rental) => acc + rental.paidAmount, 0) || 0;
   const totalPendingAmount = rentalData?.reduce((acc, rental) => acc + rental.pendingAmount, 0) || 0;
 
@@ -70,7 +71,7 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden bg-[#1E1E1E]"
           >
-            <div className="p-4 border-t border-[#2C2C2C]">
+            <div className="p-4 border-t border-[#2C2C2C] space-y-3">
               {rentalData && rentalData.length > 0 ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-[#121212] p-3 rounded-lg border border-[#333]">
@@ -91,6 +92,9 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
                   <p className="text-red-400 text-xs">{t('noRentalDataMessage') || "No rental data available for this machine."}</p>
                 </div>
               )}
+
+              {/* Financial Tracker Component */}
+              <FinancialTracker machineId={machine.Machine_id} uid={uid} />
             </div>
           </motion.div>
         )}
@@ -106,37 +110,29 @@ const MachineMaintenanceApp = () => {
   const [error, setError] = useState(null);
   const [showDetails, setShowDetails] = useState({});
   const [rentalData, setRentalData] = useState({});
-
-  // NEW STATES FOR SEARCH & FILTERS
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState("all"); // 'all', 'highest_income', 'lowest_income', 'most_active'
+  const [filterType, setFilterType] = useState("all");
 
   const fetchRentalsByMachineId = async (machineId) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/rentals-by-machine-id`, { machineId });
+      const response = await axios.post(`${API_BASE_URL}/api/rentals-by-machine-id`, { machineId });
       setRentalData((prevData) => ({
         ...prevData,
         [machineId]: Array.isArray(response.data) ? response.data : [],
       }));
     } catch (error) {
       console.error(`Error fetching rental data for ${machineId}:`, error.message);
-      setRentalData((prevData) => ({
-        ...prevData,
-        [machineId]: [],
-      }));
+      setRentalData((prevData) => ({ ...prevData, [machineId]: [] }));
     }
   };
 
   const fetchMachines = async () => {
     try {
       const uid = localStorage.getItem("uid");
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/machines`, { uid });
-
+      const response = await axios.post(`${API_BASE_URL}/api/machines`, { uid });
       if (response.data && Array.isArray(response.data)) {
         setMachines(response.data);
-        response.data.forEach(machine => {
-          fetchRentalsByMachineId(machine.Machine_id);
-        });
+        response.data.forEach(machine => fetchRentalsByMachineId(machine.Machine_id));
       } else {
         throw new Error("Unexpected data structure or no machine data found");
       }
@@ -147,17 +143,13 @@ const MachineMaintenanceApp = () => {
     }
   };
 
-  useEffect(() => {
-    fetchMachines();
-  }, []);
+  useEffect(() => { fetchMachines(); }, []);
 
   const toggleShowDetails = (machineId) => {
     setShowDetails((prev) => ({ ...prev, [machineId]: !prev[machineId] }));
   };
 
-  // --- LOGIC: SEARCH AND FILTER MACHINES ---
   const processedMachines = useMemo(() => {
-    // 1. Calculate Total Income & Work for sorting
     let mapped = machines.map(machine => {
       const rData = rentalData[machine.Machine_id] || [];
       const calculatedTotalAmount = rData.reduce((acc, curr) => acc + curr.totalAmount, 0);
@@ -165,7 +157,6 @@ const MachineMaintenanceApp = () => {
       return { ...machine, calculatedTotalAmount, calculatedTotalWork };
     });
 
-    // 2. Apply Search Filter
     if (searchQuery) {
       mapped = mapped.filter(m =>
         m.Machine_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -173,33 +164,26 @@ const MachineMaintenanceApp = () => {
       );
     }
 
-    // 3. Apply Sorting based on Filter Type
-    if (filterType === "highest_income") {
-      mapped.sort((a, b) => b.calculatedTotalAmount - a.calculatedTotalAmount);
-    } else if (filterType === "lowest_income") {
-      mapped.sort((a, b) => a.calculatedTotalAmount - b.calculatedTotalAmount);
-    } else if (filterType === "most_active") {
-      mapped.sort((a, b) => b.calculatedTotalWork - a.calculatedTotalWork);
-    }
+    if (filterType === "highest_income") mapped.sort((a, b) => b.calculatedTotalAmount - a.calculatedTotalAmount);
+    else if (filterType === "lowest_income") mapped.sort((a, b) => a.calculatedTotalAmount - b.calculatedTotalAmount);
+    else if (filterType === "most_active") mapped.sort((a, b) => b.calculatedTotalWork - a.calculatedTotalWork);
 
     return mapped;
   }, [machines, rentalData, searchQuery, filterType]);
 
   return (
     <div className="bg-[#121212] min-h-screen pb-20 relative overflow-hidden">
-
-      {/* 1. STICKY HEADER WITH SEARCH & FILTERS */}
+      {/* STICKY HEADER */}
       <div className="sticky top-0 mt-16 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] pb-2">
         <div className="px-4 py-3 flex justify-between items-center">
           <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
-            {t('machineStatusTitle') || "MACHINE STATUS"}
+            {t('machineStatusTitle')}
           </h2>
           <span className="text-[9px] bg-[#1E1E1E] text-[var(--primary)] px-2 py-0.5 rounded border border-[#333]">
-            {processedMachines.length} Machines
+            {processedMachines.length} {t('machinesCount')}
           </span>
         </div>
 
-        {/* Search Bar (Same as Payment Tracking) */}
         <div className="px-4 mb-3">
           <div className="relative">
             <FaSearch className="absolute left-3 top-2.5 text-gray-500 text-xs" />
@@ -213,13 +197,12 @@ const MachineMaintenanceApp = () => {
           </div>
         </div>
 
-        {/* Filter Pills */}
         <div className="px-4 flex gap-2 overflow-x-auto scrollbar-none pb-1">
           {[
-            { label: "All", val: "all" },
-            { label: "Top Earner", val: "highest_income" },
-            { label: "Lowest Earner", val: "lowest_income" },
-            { label: "Most Active", val: "most_active" },
+            { label: t("filterAllLabel"), val: "all" },
+            { label: t("filterTopEarner"), val: "highest_income" },
+            { label: t("filterLowestEarner"), val: "lowest_income" },
+            { label: t("filterMostActive"), val: "most_active" },
           ].map((f) => (
             <button
               key={f.val}
@@ -235,11 +218,11 @@ const MachineMaintenanceApp = () => {
         </div>
       </div>
 
-      {/* 2. MAIN CONTENT AREA */}
+      {/* MAIN CONTENT */}
       <div className="px-4 mt-3 space-y-4">
         {isLoading ? (
           <div className="text-center text-gray-500 mt-10 text-xs animate-pulse">
-            Loading machines...
+            {t('loadingMachines')}
           </div>
         ) : error ? (
           <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-400 text-xs text-center">
@@ -257,7 +240,7 @@ const MachineMaintenanceApp = () => {
           ))
         ) : (
           <div className="text-center text-gray-600 mt-10 text-xs">
-            No machines found.
+            {t('noMachinesFound')}
           </div>
         )}
       </div>
