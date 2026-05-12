@@ -94,6 +94,62 @@ exports.updatePayment = async (req, res) => {
   }
 };
 
+// Edit Rental Entry (Full Update)
+exports.editRental = async (req, res) => {
+  try {
+    const {
+      _id,
+      customerName,
+      mobileNumber,
+      address,
+      operatorName,
+      price,
+      quantity,
+      paidAmount,
+      pendingAmount,
+      jobWork,
+    } = req.body;
+
+    if (!_id) {
+      return res.status(400).json({ message: "Rental ID is required" });
+    }
+
+    const totalAmount = price * quantity;
+
+    const updatedRental = await Rental.findByIdAndUpdate(
+      _id,
+      {
+        customerName,
+        mobileNumber,
+        address,
+        operatorName,
+        price,
+        quantity,
+        totalAmount,
+        paidAmount,
+        pendingAmount,
+        jobWork,
+      },
+      { new: true }
+    );
+
+    if (!updatedRental) {
+      return res.status(404).json({ message: "Rental entry not found" });
+    }
+
+    return res.status(200).json({
+      message: "Rental updated successfully",
+      data: updatedRental,
+    });
+  } catch (error) {
+    console.error("Error editing rental:", error);
+    return res.status(500).json({
+      message: "Error updating rental",
+      error: error.message,
+    });
+  }
+};
+
 // Add Additional Income
 exports.addAdditionalIncome = async (req, res) => {
   try {

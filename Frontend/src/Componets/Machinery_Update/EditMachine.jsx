@@ -1,205 +1,14 @@
-// import React, { useState, useEffect } from "react";
-// import axios from "axios";
-// import { useParams, useNavigate } from "react-router-dom";
-// import { toast } from "react-toastify";
-// import { useTranslation } from "react-i18next";
-
-// const EditMachine = () => {
-//   const { t } = useTranslation();
-//   const [formData, setFormData] = useState({
-//     machineName: "",
-//     rentType: "",
-//   });
-//   const [image, setImage] = useState(null);
-//   const [preview, setPreview] = useState(null);
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-//   const [error, setError] = useState(null);
-//   const { id } = useParams(); // Machine ID from URL
-//   const navigate = useNavigate();
-  
-
-//   useEffect(() => {
-//     console.log("Machine ID from URL:", id);
-//   }, [id]);
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prevData) => ({
-//       ...prevData,
-//       [name]: value,
-//     }));
-//   };
-
-//   const handleImageChange = (e) => {
-//     const file = e.target.files[0];
-//     setImage(file);
-
-//     if (file) {
-//       const previewURL = URL.createObjectURL(file);
-//       setPreview(previewURL);
-//     } else {
-//       setPreview(null);
-//       setImage(null);
-//     }
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setIsSubmitting(true);
-//     setError(null);
-
-//     const formDataToSend = new FormData();
-//     formDataToSend.append("Machine_name", formData.machineName);
-//     formDataToSend.append("RentType", formData.rentType);
-//     if (image) {
-//       formDataToSend.append("image", image);
-//     }
-
-//     try {
-//       const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/machine/machines/${id}`, formDataToSend, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//         },
-//       });
-
-//       if (response.data.success) {
-//         toast.success("Machine updated successfully!");
-//         window.location.href = "/machinery-update";
-//       }
-//     } catch (error) {
-//       setError(error.response?.data?.message || error.message || "Failed to update the machine.");
-//       toast.error("Failed to update the machine.");
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
-
- 
-
-
-//   return (
-//     <div className="flex justify-center items-center min-h-screen bg-[#4C4C4D] p-5">
-//     <div className="bg-[#333333] w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/3 flex flex-col p-8 border border-[#FEC111] rounded-2xl shadow-xl">
-//       <h1 className="text-[#FEC111] text-2xl sm:text-3xl font-bold mb-6 text-center">
-//         {t('updateMachineTitle')}
-//       </h1>
-//       <form className="space-y-6" onSubmit={handleSubmit}>
-//         <div>
-//           <label
-//             htmlFor="MachineName"
-//             className="block text-[#F5F5F5] mb-2 font-bold text-sm sm:text-[18px]"
-//           >
-//             {t('machineNameLabel')}
-//           </label>
-//           <input
-//             type="text"
-//             id="MachineName"
-//             name="machineName"
-//             value={formData.machineName || ""}
-//             onChange={handleChange}
-//             placeholder={t('machineNamePlaceholder')}
-//             className="w-full bg-[#4C4C4D] text-[#F5F5F5] placeholder-[#F5F5F5] border border-[#FEC111] rounded-lg p-3 focus:outline-none focus:ring focus:ring-[#FEC111]"
-//             required
-//           />
-//         </div>
-
-//         <div>
-//           <label
-//             htmlFor="rentType"
-//             className="block text-[#F5F5F5] mb-2 font-bold text-sm sm:text-[18px]"
-//           >
-//             {t('rentTypeLabel')}
-//           </label>
-//           <select
-//             id="rentType"
-//             name="rentType"
-//             value={formData.rentType}
-//             onChange={handleChange}
-//             className="w-full bg-[#4C4C4D] text-[#F5F5F5] border border-[#FEC111] rounded-lg p-3 focus:outline-none focus:ring focus:ring-[#FEC111]"
-//             required
-//           >
-//             <option value="" disabled>
-//               {t('rentTypePlaceholder')}
-//             </option>
-//             <option value="Acre">{t('rentTypeOptions.acre')}</option>
-//             <option value="Hour">{t('rentTypeOptions.hour')}</option>
-//             <option value="Quantity">{t('rentTypeOptions.quantity')}</option>
-//             <option value="Days">{t('rentTypeOptions.days')}</option>
-//             <option value="Contract">{t('rentTypeOptions.contract')}</option>
-//             <option value="Kilometers">{t('rentTypeOptions.kilometers')}</option>
-//             <option value="Foot">{t('rentTypeOptions.foot')}</option>
-//           </select>
-//         </div>
-
-//         {error && (
-//           <div className="text-red-500 bg-red-100 p-3 rounded mb-4">
-//             {error}
-//           </div>
-//         )}
-
-//         <div className="mt-4">
-//           <label
-//             htmlFor="machineImage"
-//             className="block text-[#F5F5F5] font-bold text-sm sm:text-[18px]"
-//           >
-//             {t('uploadImageLabel')}
-//           </label>
-//           <div className="bg-[#4C4C4D] mt-2 flex items-center justify-between h-16 rounded-lg w-full p-3">
-//             <input
-//               type="file"
-//               id="machineImage"
-//               accept="image/*"
-//               onChange={handleImageChange}
-//               className="hidden"
-//             />
-//             <label
-//               htmlFor="machineImage"
-//               className="text-[#F5F5F5] cursor-pointer w-full"
-//             >
-//               {image ? image.name : t('chooseFile')}
-//             </label>
-//           </div>
-
-//           {preview && (
-//             <div className="mt-4">
-//               <img
-//                 src={preview}
-//                 alt={t('imagePreviewAlt')}
-//                 className="w-full h-40 object-cover rounded-lg"
-//               />
-//             </div>
-//           )}
-//         </div>
-
-//         <button
-//           type="submit"
-//           disabled={isSubmitting}
-//           className={`w-full bg-[#F8981D] text-gray-900 font-bold py-3 rounded-lg transition duration-300 ${
-//             isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-[#D9781A]"
-//           }`}
-//         >
-//           {isSubmitting ? t('updatingButton') : t('updateButton')}
-//         </button>
-//       </form>
-//     </div>
-//   </div>
-
-//   );
-// };
-
-// export default EditMachine;
-
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../config";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { 
-  FaTractor, 
-  FaCogs, 
-  FaCloudUploadAlt, 
+import {
+  FaTractor,
+  FaCogs,
+  FaCloudUploadAlt,
   FaPen,
   FaArrowLeft
 } from "react-icons/fa";
@@ -258,7 +67,7 @@ const EditMachine = () => {
     }
 
     try {
-      const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/machine/machines/${id}`, formDataToSend, {
+      const response = await axios.put(`${API_BASE_URL}/api/machine/machines/${id}`, formDataToSend, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -279,7 +88,7 @@ const EditMachine = () => {
 
   return (
     <div className="bg-[#121212] min-h-screen pb-20 flex flex-col relative overflow-hidden font-sans">
-      
+
       {/* 1. Top Sticky Header */}
       <div className="sticky top-0 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] mt-16 px-4 py-3 flex items-center justify-between">
         <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-white p-2 -ml-2 transition-colors">
@@ -293,7 +102,7 @@ const EditMachine = () => {
 
       {/* 2. Main Form Container */}
       <div className="flex-1 flex justify-center p-4 mt-2">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-[#1E1E1E] w-full max-w-md rounded-2xl p-5 sm:p-7 border border-[#2C2C2C] shadow-2xl h-fit relative"
@@ -302,7 +111,7 @@ const EditMachine = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--primary)]/5 rounded-full blur-[50px] pointer-events-none"></div>
 
           <form className="space-y-5 relative z-10" onSubmit={handleSubmit}>
-            
+
             {/* Machine Name */}
             <div>
               <label htmlFor="MachineName" className="block text-gray-400 text-xs font-semibold mb-1.5 pl-1">
@@ -359,7 +168,7 @@ const EditMachine = () => {
               <label className="block text-gray-400 text-xs font-semibold mb-1.5 pl-1">
                 {t('uploadImageLabel') || "Machine Image"}
               </label>
-              
+
               <div className="relative w-full h-40 bg-[#121212] border-2 border-dashed border-[#333] hover:border-[var(--primary)]/50 rounded-xl transition-colors overflow-hidden group cursor-pointer">
                 <input
                   type="file"
@@ -368,7 +177,7 @@ const EditMachine = () => {
                   onChange={handleImageChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
-                
+
                 {preview ? (
                   <>
                     <img
@@ -406,11 +215,10 @@ const EditMachine = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-3.5 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center transition-all ${
-                  isSubmitting 
-                  ? "bg-gray-600 text-gray-300 cursor-not-allowed" 
-                  : "bg-[var(--primary)] text-black hover:bg-yellow-500 shadow-[var(--primary)]/20 active:scale-95"
-                }`}
+                className={`w-full py-3.5 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center transition-all ${isSubmitting
+                    ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                    : "bg-[var(--primary)] text-black hover:bg-yellow-500 shadow-[var(--primary)]/20 active:scale-95"
+                  }`}
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">

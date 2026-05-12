@@ -21,6 +21,8 @@ import EditProfile from "./Componets/UserProfile/EditProfile";
 import EditMachine from "./Componets/Machinery_Update/EditMachine";
 import Feature from "./Componets/Feature/Feature";
 import Statement from "./Componets/Statement/Statement";
+import Tracker from "./Componets/Tracker/Tracker";
+import Calculator from "./Componets/Calculator/Calculator";
 
 
 function App() {
@@ -49,12 +51,14 @@ function App() {
           <Route path="/machinery" element={<Machinery />} />
           <Route path="/start-entry" element={<StartEntry />} />
           <Route path="/feature" element={<Feature />} />
+          <Route path="/tracker" element={<Tracker />} />
           <Route path="/invoice" element={<Invoice />} />
           <Route path="/statement" element={<Statement />} />
           <Route path="/add-machinery" element={<MachineRegistration />} />
           <Route path="/machine-maintenance" element={<MachineMaintenanceApp />} />
           <Route path="/machinery-update" element={<UpdateMachinery />} />
           <Route path="/Machinery-Update/edit-machine/:id" element={<EditMachine />} />
+          <Route path="/calculator" element={<Calculator />} />
         </Routes>
       </div>
     </Router>

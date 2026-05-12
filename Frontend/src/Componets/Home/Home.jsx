@@ -8,14 +8,16 @@ import Machinery from "../Machinery/Machinery";
 // import PaymentTracking from "../PaymentTracking/PaymentTracking";
 import Footer from "../Footer/Footer";
 // import Statement from "../Statement/Statement";
+// import Tracker from "../Tracker/Tracker";
 
 function Home() {
   
   return (
     <div>
       <MyCarousel />
-      <Feature />
-      {/* <Statement /> */}
+    {/* <Tracker /> */}
+     
+         <Feature />
       <Machinery />
       <Footer/>
     </div>

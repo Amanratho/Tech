@@ -23,6 +23,9 @@ router.get("/customer/:mobileNumber", RentalController.getCustomerByMobile);
 
 router.get("/getDetails/:rentalId", RentalController.getRentalDetails);
 
+// Route to edit a rental entry (full update)
+router.put("/edit-rental", RentalController.editRental);
+
 // Route to delete multiple rentals (Bills) at once
 router.post("/delete-multiple", RentalController.deleteMultipleRentals);
 
