@@ -356,5 +356,15 @@
   "machinesCount": "मशीनें",
   "filterTopEarner": "सबसे ज्यादा कमाई",
   "filterLowestEarner": "सबसे कम कमाई",
-  "filterMostActive": "सबसे सक्रिय"
+  "filterMostActive": "सबसे सक्रिय",
+  "time": "समय",
+  "count": "गिनती",
+
+  "startTracker": "ट्रैकर शुरू करें",
+  "stopAndSave": "रोकें और सेव करें",
+  "pause": "रोकें / STOP",
+  "resume": "फिर से शुरू करें",
+  "doneAndSave": "पूरा हुआ",
+  "liveSession": "चालू सेशन",
+  "manualCount": "मैनुअल गिनती"
 }

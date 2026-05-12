@@ -22,8 +22,7 @@ function Machinery() {
     skip: !uid,
     keepUnusedDataFor: 1000,
   });
-
-  // Unique Rent Types nikalne ke liye (Filter Dropdown ke liye)
+ 
   const uniqueRentTypes = useMemo(() => {
     const types = new Set(machines.map((m) => m.RentType).filter(Boolean));
     return ["All", ...Array.from(types)];
@@ -142,8 +141,7 @@ function Machinery() {
           <div className="grid grid-cols-2 gap-3">
             <AnimatePresence>
               {filteredMachines.map((item, index) => (
-
-                // ENTIRE CARD IS CLICKABLE (Full Image Background)
+ 
                 <motion.div
                   key={item.Machine_id}
                   initial={{ opacity: 0, scale: 0.95 }}

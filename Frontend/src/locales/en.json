@@ -357,5 +357,14 @@
   "machinesCount": "Machines",
   "filterTopEarner": "Top Earner",
   "filterLowestEarner": "Lowest Earner",
-  "filterMostActive": "Most Active"
+  "filterMostActive": "Most Active",
+  "time": "Time",
+  "count": "Count",
+  "startTracker": "Start Tracker",
+  "stopAndSave": "Stop & Save",
+  "pause": "STOP / PAUSE",
+  "resume": "RESUME",
+  "doneAndSave": "DONE",
+  "liveSession": "LIVE SESSION",
+  "manualCount": "MANUAL COUNT"
 }

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -44,6 +45,40 @@ const StartEntry = () => {
       handleCalculate();
     }
   }, [rentType, price, quantity]);
+
+
+  useEffect(() => {
+    if (!rentType) return; 
+
+    if (rentType === "Hour") {
+      const savedTime = localStorage.getItem("rentveda_pending_time_entry");
+      if (savedTime) {
+         
+        const totalSeconds = Number(savedTime);
+         
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+ 
+        const formattedQuantity = `${hours}.${minutes.toString().padStart(2, '0')}`;
+        
+        setQuantity(formattedQuantity);
+         
+        toast.info(`⏳ ${hours} hr ${minutes} min auto-filled from Tracker!`, { theme: "dark" });
+         
+        localStorage.removeItem("rentveda_pending_time_entry");
+      }
+    }  
+    else {
+      const savedCount = localStorage.getItem("rentveda_pending_count_entry");
+      if (savedCount) {
+        setQuantity(savedCount);
+        toast.info(`🔢 Count (${savedCount}) auto-filled from Tracker!`, { theme: "dark" });
+         
+        localStorage.removeItem("rentveda_pending_count_entry");
+      }
+    }
+  }, [rentType]); 
+
 
   const handleCalculate = () => {
     const priceVal = Number(price) || 0;
@@ -381,7 +416,6 @@ const StartEntry = () => {
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={handleSubmit}
-          // Changed: h-12 (standard touch size), simple text-sm font
           className="w-full h-12 rounded-full font-bold text-sm shadow-lg flex items-center justify-center gap-2 text-black bg-[var(--primary)] active:bg-yellow-600 transition-colors"
         >
           <FaSave /> {t('submitEntry') || "SAVE ENTRY"}

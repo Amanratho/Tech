@@ -7,7 +7,8 @@ import {
   FaUserCircle,
   FaSignInAlt,
   FaLanguage,
-  FaFileInvoice
+  FaFileInvoice,
+  FaCalculator  
 } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { ToastContainer } from "react-toastify";
@@ -43,18 +44,16 @@ function Navbar() {
   // Menu items config for mapping
   const navItems = [
     { name: t("home") || "Home", path: "/", icon: FaHome },
-    // { name: t("contact") || "Contact", path: "/contact", icon: FaPhoneAlt },
     { name: "Statement", path: "/statement", icon: FaFileInvoice },
+    // 🔥 Calculator About ke left mein (pehle) daal diya
+    { name: t("calculator") || "Calc", path: "/calculator", icon: FaCalculator }, 
     { name: t("about") || "About", path: "/about", icon: FaInfoCircle },
   ];
 
   return (
     <>
-      <ToastContainer style={{ zIndex: "9999" }} theme="dark" />
+      <ToastContainer style={{ zIndex: "9999" }} theme="dark" /> 
 
-      {/* =========================================
-          1. TOP APP BAR (Logo & Language)
-          ========================================= */}
       <div className="fixed top-0 left-0 w-full h-16 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] z-50 flex items-center justify-between px-4 sm:px-6">
 
         {/* Logo - Updated to RentVeda */}
@@ -66,8 +65,7 @@ function Navbar() {
             Rent<span className="text-[var(--primary)]">Veda</span>
           </span>
         </NavLink>
-
-        {/* Desktop Links (Hidden on Mobile) */}
+ 
         <div className="hidden md:flex items-center gap-6">
           {navItems.map((item) => (
             <NavLink
@@ -82,8 +80,7 @@ function Navbar() {
             </NavLink>
           ))}
         </div>
-
-        {/* Right Section: Language & Profile(Desktop) */}
+ 
         <div className="flex items-center gap-3">
           {/* Language Toggle Pill */}
           <button

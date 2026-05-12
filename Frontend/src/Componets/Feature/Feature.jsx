@@ -196,6 +196,7 @@ import { motion } from "framer-motion";
 import { assets } from "../../assets/image/assest";
 import { useTranslation } from "react-i18next";
 import { FaPlus, FaFileInvoice, FaHistory, FaTools } from "react-icons/fa";
+import Tracker from "../Tracker/Tracker";
 
 function Feature() {
   const { t } = useTranslation();
@@ -212,6 +213,7 @@ function Feature() {
 
   return (
     <div className="bg-[#121212] py-2">
+      <Tracker />
       
       {/* 1. SECTION LABEL (Updated to RentVeda) */}
       <div className="px-5 mb-3">
