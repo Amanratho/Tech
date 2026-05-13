@@ -77,8 +77,7 @@ const StartEntry = () => {
         localStorage.removeItem("rentveda_pending_count_entry");
       }
     }
-  }, [rentType]); 
-
+  }, [rentType]);
 
   const handleCalculate = () => {
     const priceVal = Number(price) || 0;
