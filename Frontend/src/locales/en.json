@@ -320,6 +320,7 @@
   "machineStatusTitle": "Machine Status",
   "totalExpenseLabel": "Total Expense",
   "extraIncomeLabel": "Extra Income",
+  "netProfitLabel": "Net Profit",
   "addExpenseButton": "+ Add Expense",
   "addIncomeButton": "+ Extra Income",
   "addEntryTitle": "Add Entry",

@@ -8,6 +8,7 @@ router.post("/add-entry", RentalController.addRentalEntry);
 // Route to get all rentals
 router.post("/rentals", RentalController.getAllRentals);
 
+// Route to get rentals by machine ID
 router.post("/rentals-by-machine-id", RentalController.getRentalsByMachineId);
 
 // Route to update payment information for a rental entry
@@ -15,13 +16,6 @@ router.put("/update-payment", RentalController.updatePayment);
 
 // Route to get customer details by mobile number
 router.get("/customer/:mobileNumber", RentalController.getCustomerByMobile);
-
-
-// router.post("/addAdditionalIncome", RentalController.addAdditionalIncome);
-
-// router.post("/addExpense", RentalController.addExpense);
-
-router.get("/getDetails/:rentalId", RentalController.getRentalDetails);
 
 // Route to edit a rental entry (full update)
 router.put("/edit-rental", RentalController.editRental);

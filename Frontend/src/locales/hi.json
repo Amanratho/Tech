@@ -319,6 +319,7 @@
   "machineStatusTitle": "मशीन स्थिति",
   "totalExpenseLabel": "कुल खर्च",
   "extraIncomeLabel": "अतिरिक्त आय",
+  "netProfitLabel": "शुद्ध लाभ",
   "addExpenseButton": "+ खर्च जोड़ें",
   "addIncomeButton": "+ अतिरिक्त आय",
   "addEntryTitle": "प्रविष्टि जोड़ें",
