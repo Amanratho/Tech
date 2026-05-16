@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./Componets/Navbar/Navbar";
 import Home from "./Componets/Home/Home";
 import Welcome from "./Componets/Login/Welcome";
@@ -10,8 +9,7 @@ import Profile from "./Componets/UserProfile/Profile";
 import StartEntry from "./Componets/StartEntery/StartEntery";
 import ScrollTop from "./Componets/ScrollToTop/ScrollTop";
 import Contact from "./Componets/Contact/Contact";
-import AboutUs from './Componets/About/AboutUs'
-import "bootstrap/dist/css/bootstrap.css";
+import AboutUs from './Componets/About/AboutUs';
 import MachineRegistration from "./Componets/MachineRegistration/MachineRegistration";
 import UpdateMachinery from "./Componets/Machinery_Update/UpdateMachinery";
 import MachineMaintenanceApp from "./Componets/Machine_Mantainanec/MachineMaintan";
