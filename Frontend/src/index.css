@@ -26,3 +26,12 @@ body
   --text-muted: #A3A3A3;
   --text-error: #FF4D4D;
 }
+
+/* Hide scrollbar for horizontal scroll areas (mobile-app pattern) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
