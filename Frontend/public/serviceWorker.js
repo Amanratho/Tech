@@ -1,4 +1,4 @@
-const CACHE_NAME = "tech-diary-cache-v4"; // Updated cache version
+const CACHE_NAME = "rentveda-cache-v5"; // Updated cache version
 const urlsToCache = [
   "/",
   "/index.html",

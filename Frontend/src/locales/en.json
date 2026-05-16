@@ -1,5 +1,5 @@
   {
-    "welcome": "Welcome to Tech Diary!",
+    "welcome": "Welcome to RentVeda!",
     "startTimer": "Start Timer",
     "rentEntry": "Rent Entry",
     "submit": "Submit",
@@ -25,7 +25,7 @@
   "paidAmount": "Paid Amount",
   "submitEntry": "Submit Entry",
 
-  "title": "Tech Diary",
+  "title": "RentVeda",
   "home": "Home",
   "contact": "Contact",
   "about": "About Us",
@@ -61,8 +61,8 @@
   "newEntry": "New Entry",
 
   "aboutUs": "About Us",
-  "welcomeToTechDiary": "Welcome to Tech Diary",
-  "aboutDescription": "At Tech Diary, we are committed to revolutionizing machinery rental management. Our easy-to-use platform helps businesses streamline operations, ensuring efficiency and transparency in rental tracking.",
+  "welcomeToTechDiary": "Welcome to RentVeda",
+  "aboutDescription": "At RentVeda, we are committed to revolutionizing machinery rental management. Our easy-to-use platform helps businesses streamline operations, ensuring efficiency and transparency in rental tracking.",
   "ourMission": "Our Mission",
   "missionDescription": "To simplify machinery rentals by offering a seamless, digital management experience that enhances efficiency and transparency.",
   "ourVision": "Our Vision",
@@ -74,7 +74,7 @@
   "kuldeepRole": "Co-Founder & CTO",
   "azharName": "Mr. Azhar Ali",
   "azharRole": "Mentor",
-  "copyright": "© {{year}} Tech Diary. All rights reserved.",
+  "copyright": "© {{year}} RentVeda. All rights reserved.",
 
   "contactUs": "Contact Us",
   "successMessage1": "Your message has been sent successfully!",
@@ -90,7 +90,7 @@
   "messageSuccess": "Message sent successfully!",
   "messageFailure": "Failed to send message.",
 
-  "techDiaryFeatures": "Tech Diary Features",
+  "techDiaryFeatures": "RentVeda Features",
   "addMachinery": "Add Machinery",
   "addMachine1": "Add Machine",
   "paymentTracking": "Payment Tracking",
@@ -249,7 +249,7 @@
 
   "forgot_password": "Forgot Password ?",
 
-  "tech_diary": "Tech Diary",
+  "tech_diary": "RentVeda",
   "tagline": "Revolutionizing machinery rentals with simplicity and efficiency. Your success, our priority.",
 
   "contact_us": "Contact Us",
