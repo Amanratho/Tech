@@ -1,7 +1,7 @@
 {
-    "name": "Tech Diary - Machinery Rental",
-    "short_name": "TechDiary",
-    "id": "com.techdiary.app",
+    "name": "RentVeda - Machinery Rental",
+    "short_name": "RentVeda",
+    "id": "com.rentveda.app",
     "start_url": "/",
     "scope": "/",
     "display": "standalone",
