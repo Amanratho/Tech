@@ -23,6 +23,7 @@ import Tracker from "./Componets/Tracker/Tracker";
 import Calculator from "./Componets/Calculator/Calculator";
 import PrivacyPolicy from './Componets/PrivacyPolicy/PrivacyPolicy';
 import RefundPolicy from './Componets/RefundPolicy/RefundPolicy';
+import TermsAndConditions from './Componets/TermsAndConditions/TermsAndConditions';
 
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
           <Route path="/calculator" element={<Calculator />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
         </Routes>
       </div>
     </Router>
