@@ -24,7 +24,9 @@ function MyCarousel() {
   }, [currentSlide, goToSlide]);
 
   return (
-    <div className="relative w-full max-w-screen-2xl mx-auto mt-16 overflow-hidden select-none">
+    // margin-bottom (mb-4) add kiya hai taaki neeche wale text se chipke nahi
+    <div className="relative w-full max-w-screen-2xl mx-auto mt-0 mb-4 overflow-hidden select-none">
+      
       {/* Slides Container */}
       <div
         className="flex transition-transform duration-[600ms] ease-in-out"
@@ -33,15 +35,17 @@ function MyCarousel() {
         {slides.map((slide, index) => (
           <div
             key={index}
+            // 🔥 Height ko Native App banners ke hisaab se chota aur adjust kar diya hai
             className="relative w-full flex-shrink-0
-                       h-[100px] sm:h-[200px]
-                       lg:h-[400px] 2xl:h-[300px]
+                       h-[150px] sm:h-[180px]
+                       md:h-[200px] lg:h-[250px] xl:h-[300px]
                        overflow-hidden bg-cover bg-center"
             style={{
               backgroundImage: `url(${slide.image})`,
             }}
           >
-            <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+            {/* Smooth dark overlay jo bottom me app ke background se mix ho jayega */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-[#121212]"></div>
           </div>
         ))}
       </div>
@@ -50,6 +54,3 @@ function MyCarousel() {
 }
 
 export default MyCarousel;
-
-// md:h-[200px] lg:h-[300px] 
-// xl:h-[300px] 2xl:h-[300px] 
