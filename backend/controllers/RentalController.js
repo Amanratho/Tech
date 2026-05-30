@@ -54,8 +54,8 @@ exports.addRentalEntry = async (req, res) => {
 exports.getAllRentals = async (req, res) => {
   try {
     const { uid } = req.body;
-    
-    const rentals = await Rental.find({ uid }); 
+
+    const rentals = await Rental.find({ uid });
     res.status(200).json(rentals);
   } catch (error) {
     res.status(500).json({ message: "Error fetching rentals", error: error.message });
@@ -65,7 +65,7 @@ exports.getAllRentals = async (req, res) => {
 exports.getRentalsByMachineId = async (req, res) => {
   try {
     const { machineId } = req.body;
-    
+
     const rentals = await Rental.find({ machineId });
 
     // Always return an array — never 404 for empty results
@@ -77,12 +77,12 @@ exports.getRentalsByMachineId = async (req, res) => {
 
 exports.updatePayment = async (req, res) => {
   try {
-    const { _id, paidAmount, pendingAmount } = req.body; 
+    const { _id, paidAmount, pendingAmount } = req.body;
 
     const updatedRental = await Rental.findByIdAndUpdate(
-      _id,  
-      { paidAmount, pendingAmount },  
-      { new: true }  
+      _id,
+      { paidAmount, pendingAmount },
+      { new: true }
     );
 
     if (!updatedRental) {
@@ -171,7 +171,7 @@ exports.deleteMultipleRentals = async (req, res) => {
       _id: { $in: ids }
     });
 
-    return res.status(200).json({ 
+    return res.status(200).json({
       success: true,
       message: `${result.deletedCount} bills deleted successfully!`,
       deletedCount: result.deletedCount
@@ -179,10 +179,10 @@ exports.deleteMultipleRentals = async (req, res) => {
 
   } catch (error) {
     console.error("Error deleting multiple rentals:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Error deleting bills", 
-      error: error.message 
+    return res.status(500).json({
+      success: false,
+      message: "Error deleting bills",
+      error: error.message
     });
   }
 };
@@ -279,7 +279,7 @@ exports.deleteOrCompleteReminder = async (req, res) => {
       if (!rental) {
         return res.status(404).json({ message: "Rental entry not found" });
       }
-      
+
       const paidAmt = Number(rental.paidAmount) + Number(rental.pendingAmount);
       updatedRental = await Rental.findByIdAndUpdate(
         _id,
