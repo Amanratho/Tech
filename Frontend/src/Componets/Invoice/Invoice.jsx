@@ -830,10 +830,14 @@ const Invoice = () => {
   const triggerDownload = async (lang) => {
     setPdfLang(lang);
     setIsLangModalOpen(false);
-    toast.info(lang === "hi" ? "इनवॉइस बन रहा है, कृपया प्रतीक्षा करें..." : "Generating & Uploading Invoice...");
+    // TODO: Uncomment later if notifications are required here.
+    // toast.info(lang === "hi" ? "इनवॉइस बन रहा है, कृपया प्रतीक्षा करें..." : "Generating & Uploading Invoice...");
 
-    setTimeout(async () => {
-      try {
+    // TODO: Uncomment later if notifications are required here.
+    // The setTimeout below was only needed to let the toast render before the heavy
+    // html2canvas work blocked the main thread. Removing it for instant response.
+    // setTimeout(async () => {
+    try {
         const element = document.getElementById("hidden-pdf-template");
         
         // FIX: Explicitly sizing the canvas to standard A4 ratio
@@ -882,8 +886,9 @@ const Invoice = () => {
           // Isse browser popup block nahi karega aur direct WA app open hoga.
           const whatsappUrl = `https://api.whatsapp.com/send?phone=91${entryData.mobileNumber}&text=${encodeURIComponent(whatsappMessage)}`;
           
-          toast.success("Invoice Ready! Opening WhatsApp...");
-          window.location.href = whatsappUrl; 
+          // TODO: Uncomment later if notifications are required here.
+          // toast.success("Invoice Ready! Opening WhatsApp...");
+          window.location.href = whatsappUrl; // Redirect is now instant — no toast delay
           
         }, "image/png");
 
@@ -891,7 +896,7 @@ const Invoice = () => {
         console.error("Upload/WA Error: ", error);
         toast.error("Failed to generate or upload Invoice.");
       }
-    }, 500); 
+    // }, 500); // <-- setTimeout closing brace (commented out with the opener above)
   };
 
   return (

@@ -275,8 +275,8 @@ const Statement = () => {
             onClick={generatePDFStatement}
             disabled={isGenerating}
             className={`w-full mt-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${isGenerating
-                ? "bg-[#333] text-gray-400 cursor-not-allowed"
-                : "bg-[var(--primary)] text-black hover:bg-yellow-500 shadow-md shadow-[var(--primary)]/20 active:scale-95"
+              ? "bg-[#333] text-gray-400 cursor-not-allowed"
+              : "bg-[var(--primary)] text-black hover:bg-yellow-500 shadow-md shadow-[var(--primary)]/20 active:scale-95"
               }`}
           >
             {isGenerating ? (
