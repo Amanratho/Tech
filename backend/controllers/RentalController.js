@@ -1,4 +1,5 @@
 const Rental = require("../models/RentalModel");
+const Maintenance = require("../models/machineMaintenanceModel");
 
 
 exports.addRentalEntry = async (req, res) => {
@@ -307,5 +308,86 @@ exports.deleteOrCompleteReminder = async (req, res) => {
   } catch (error) {
     console.error("Error performing reminder action:", error);
     res.status(500).json({ message: "Error processing reminder action", error: error.message });
+  }
+};
+
+// ─── EOD / Business Summary ────────────────────────────────────────────────────
+// GET /api/rentals/eod-summary?uid=...&startDate=...&endDate=...
+exports.getEODSummary = async (req, res) => {
+  try {
+    const { uid, startDate, endDate } = req.query;
+
+    if (!uid) {
+      return res.status(400).json({ message: "uid is required" });
+    }
+
+    // Build a robust UTC date range — always cover the full end-day
+    const start = startDate ? new Date(startDate) : new Date();
+    start.setUTCHours(0, 0, 0, 0);
+
+    const end = endDate ? new Date(endDate) : new Date(startDate || new Date());
+    end.setUTCHours(23, 59, 59, 999);
+
+    // Run both aggregations in parallel for performance
+    const [rentalResult, maintenanceResult] = await Promise.all([
+      // 1. Sum paidAmount (income) and pendingAmount from Rental collection
+      Rental.aggregate([
+        {
+          $match: {
+            uid,
+            createdAt: { $gte: start, $lte: end },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalIncome: { $sum: "$paidAmount" },
+            totalPending: { $sum: "$pendingAmount" },
+            totalBilled: { $sum: "$totalAmount" },
+            count: { $sum: 1 },
+          },
+        },
+      ]),
+
+      // 2. Sum expenses from Maintenance collection (type = "expense")
+      Maintenance.aggregate([
+        {
+          $match: {
+            uid,
+            type: "expense",
+            date: { $gte: start, $lte: end },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalExpenses: { $sum: "$amount" },
+          },
+        },
+      ]),
+    ]);
+
+    const income = rentalResult[0]?.totalIncome || 0;
+    const pending = rentalResult[0]?.totalPending || 0;
+    const billed = rentalResult[0]?.totalBilled || 0;
+    const count = rentalResult[0]?.count || 0;
+    const expenses = maintenanceResult[0]?.totalExpenses || 0;
+    const netProfit = income - expenses;
+
+    res.status(200).json({
+      totalIncome: income,
+      totalPending: pending,
+      totalBilled: billed,
+      totalExpenses: expenses,
+      netProfit,
+      entryCount: count,
+      dateRange: {
+        from: start.toISOString(),
+        to: end.toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching EOD summary:", error);
+    res.status(500).json({ message: "Failed to fetch EOD summary", error: error.message });
   }
 };
