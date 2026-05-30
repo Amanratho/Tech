@@ -41,10 +41,14 @@ app.use("/api", rentalRoutes);
 app.use("/api", maintenanceRoutes);
 app.use("/api/otp", otpRoutes);
 
+const { startReminderCron } = require("./services/reminderCron");
+
 // Connect to MongoDB and start the server
 connectDB();
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  // Start the background cron jobs
+  startReminderCron();
   // keepAlive();
 });

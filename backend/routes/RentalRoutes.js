@@ -23,4 +23,13 @@ router.put("/edit-rental", RentalController.editRental);
 // Route to delete multiple rentals (Bills) at once
 router.post("/delete-multiple", RentalController.deleteMultipleRentals);
 
+// Route to get all active pending reminders
+router.post("/reminders/pending", RentalController.getPendingReminders);
+
+// Route to update reminder date or pendingAmount
+router.put("/reminders/update", RentalController.updateReminderDetails);
+
+// Route to complete or delete/cancel reminder
+router.put("/reminders/action", RentalController.deleteOrCompleteReminder);
+
 module.exports = router;
