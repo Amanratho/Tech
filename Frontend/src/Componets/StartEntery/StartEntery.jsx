@@ -132,7 +132,29 @@ const StartEntry = () => {
   };
 
   // --- LOGIC: FETCH CUSTOMER (scoped to logged-in user) ---
-  const fetchCustomerByMobile = async (mobile) => {
+  // const fetchCustomerByMobile = async (mobile) => {
+  //   const uid = localStorage.getItem("uid");
+  //   if (!uid) return;
+  //   try {
+  //     const response = await axios.get(
+  //       `${API_BASE_URL}/api/rentals/customer/${mobile}`,
+  //       { params: { uid } }   // <-- scoped: only THIS user's records
+  //     );
+  //     if (response.data) {
+  //       setCustomerName(response.data.customerName);
+  //       setAddress(response.data.address);
+  //       setIsCustomerFound(true);
+  //       toast.success("Existing Customer Found!", { theme: "dark" });
+  //     }
+  //   } catch {
+  //     // 404 just means new customer — silently clear
+  //     setCustomerName("");
+  //     setAddress("");
+  //   }
+  // };
+
+  // --- LOGIC: FETCH CUSTOMER (scoped to logged-in user) ---
+  const fetchCustomerByMobile = async (mobile, isFromContactPicker = false) => {
     const uid = localStorage.getItem("uid");
     if (!uid) return;
     try {
@@ -141,15 +163,20 @@ const StartEntry = () => {
         { params: { uid } }   // <-- scoped: only THIS user's records
       );
       if (response.data) {
+        // Agar database me purana record mil gaya, toh usko use karenge
         setCustomerName(response.data.customerName);
         setAddress(response.data.address);
         setIsCustomerFound(true);
         toast.success("Existing Customer Found!", { theme: "dark" });
       }
     } catch {
-      // 404 just means new customer — silently clear
-      setCustomerName("");
-      setAddress("");
+      // 🚨 YAHAN FIX HAI: 
+      // Agar contact picker se naam aaya hai, toh use erase mat karo. 
+      // Sirf tab erase karo jab user manually type kar raha ho.
+      if (!isFromContactPicker) {
+        setCustomerName("");
+      }
+      setAddress(""); // Address hamesha naya hoga naye number ke liye
     }
   };
 
@@ -205,7 +232,8 @@ const StartEntry = () => {
         setCustomerMobile(cleanedTel);
         setIsCustomerFound(false);
         if (cleanedTel.length === 10) {
-          fetchCustomerByMobile(cleanedTel);
+          // fetchCustomerByMobile(cleanedTel);
+          fetchCustomerByMobile(cleanedTel, true);
         }
       }
 
