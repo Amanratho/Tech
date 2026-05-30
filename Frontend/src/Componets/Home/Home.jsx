@@ -31,7 +31,7 @@ function HeroBanner() {
   }, [next]);
 
   return (
-    <div className="relative w-full h-[200px] sm:h-[260px] lg:h-[360px] overflow-hidden select-none">
+    <div className="relative w-full h-[50px]  sm:h-[260px] lg:h-[360px] overflow-hidden select-none">
       {/* Slides — blurred to hide baked-in text on images */}
       <AnimatePresence initial={false}>
         <motion.div
@@ -137,7 +137,7 @@ function QuickActions() {
   };
 
   return (
-    <div className="px-4 -mt-8 relative z-20">
+    <div className="px-4 -mt-10 relative z-20">
       {/* Glass card container */}
       <motion.div
         variants={container}

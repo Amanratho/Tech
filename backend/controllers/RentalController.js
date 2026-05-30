@@ -16,6 +16,9 @@ exports.addRentalEntry = async (req, res) => {
       machineId,
       rentType,
       jobWork,
+      reminderDate,
+      reminderStatus,
+      customerMobile,
     } = req.body;
     const totalAmount = price * quantity;
     const newRental = new Rental({
@@ -32,6 +35,9 @@ exports.addRentalEntry = async (req, res) => {
       machineId,
       rentType,
       jobWork,
+      reminderDate,
+      reminderStatus,
+      customerMobile,
     });
     await newRental.save();
 
@@ -104,6 +110,9 @@ exports.editRental = async (req, res) => {
       paidAmount,
       pendingAmount,
       jobWork,
+      reminderDate,
+      reminderStatus,
+      customerMobile,
     } = req.body;
 
     if (!_id) {
@@ -125,6 +134,9 @@ exports.editRental = async (req, res) => {
         paidAmount,
         pendingAmount,
         jobWork,
+        reminderDate,
+        reminderStatus,
+        customerMobile,
       },
       { new: true }
     );
@@ -175,22 +187,125 @@ exports.deleteMultipleRentals = async (req, res) => {
   }
 };
 
-// Get Customer Details by Mobile Number
+// Get Customer Details by Mobile Number — scoped to the requesting user
 exports.getCustomerByMobile = async (req, res) => {
   try {
     const { mobileNumber } = req.params;
-    
-    const customer = await Rental.findOne({ mobileNumber }).sort({ createdAt: -1 });
-    
+    // uid must be supplied as a query param: /customer/:mobile?uid=xxx
+    const { uid } = req.query;
+
+    if (!uid) {
+      return res.status(400).json({ message: "uid query parameter is required" });
+    }
+
+    // Scope the lookup to THIS user only — prevents cross-user data leaks
+    const customer = await Rental.findOne({ mobileNumber, uid }).sort({ createdAt: -1 });
+
     if (!customer) {
       return res.status(404).json({ message: "Customer not found" });
     }
-    
+
     res.status(200).json({
       customerName: customer.customerName,
       address: customer.address,
     });
   } catch (error) {
     res.status(500).json({ message: "Error fetching customer details", error: error.message });
+  }
+};
+
+// Fetch active pending reminders (status is 'PENDING' and pendingAmount > 0)
+exports.getPendingReminders = async (req, res) => {
+  try {
+    const uid = req.body.uid || req.query.uid;
+    if (!uid) {
+      return res.status(400).json({ message: "User ID (uid) is required" });
+    }
+
+    const reminders = await Rental.find({
+      uid,
+      reminderStatus: "PENDING",
+      pendingAmount: { $gt: 0 },
+      reminderDate: { $ne: null }
+    }).sort({ reminderDate: 1 });
+
+    res.status(200).json(reminders);
+  } catch (error) {
+    console.error("Error fetching reminders:", error);
+    res.status(500).json({ message: "Error fetching active reminders", error: error.message });
+  }
+};
+
+// Update just reminderDate or pendingAmount
+exports.updateReminderDetails = async (req, res) => {
+  try {
+    const { _id, reminderDate, pendingAmount } = req.body;
+    if (!_id) {
+      return res.status(400).json({ message: "Rental ID is required" });
+    }
+
+    const updateFields = {};
+    if (reminderDate !== undefined) updateFields.reminderDate = reminderDate;
+    if (pendingAmount !== undefined) updateFields.pendingAmount = pendingAmount;
+
+    const updatedRental = await Rental.findByIdAndUpdate(
+      _id,
+      updateFields,
+      { new: true }
+    );
+
+    if (!updatedRental) {
+      return res.status(404).json({ message: "Rental entry not found" });
+    }
+
+    res.status(200).json({ message: "Reminder updated successfully", data: updatedRental });
+  } catch (error) {
+    console.error("Error updating reminder details:", error);
+    res.status(500).json({ message: "Error updating reminder details", error: error.message });
+  }
+};
+
+// Delete a reminder (CANCEL) or mark it as PAID
+exports.deleteOrCompleteReminder = async (req, res) => {
+  try {
+    const { _id, action } = req.body;
+    if (!_id) {
+      return res.status(400).json({ message: "Rental ID is required" });
+    }
+
+    let updatedRental;
+    if (action === "PAID") {
+      const rental = await Rental.findById(_id);
+      if (!rental) {
+        return res.status(404).json({ message: "Rental entry not found" });
+      }
+      
+      const paidAmt = Number(rental.paidAmount) + Number(rental.pendingAmount);
+      updatedRental = await Rental.findByIdAndUpdate(
+        _id,
+        {
+          reminderStatus: "PAID",
+          paidAmount: paidAmt,
+          pendingAmount: 0
+        },
+        { new: true }
+      );
+    } else if (action === "DELETE" || action === "CANCEL") {
+      updatedRental = await Rental.findByIdAndUpdate(
+        _id,
+        {
+          reminderStatus: "CANCELLED",
+          reminderDate: null
+        },
+        { new: true }
+      );
+    } else {
+      return res.status(400).json({ message: "Invalid action. Supported actions are 'PAID', 'DELETE', and 'CANCEL'" });
+    }
+
+    res.status(200).json({ message: `Reminder updated successfully`, data: updatedRental });
+  } catch (error) {
+    console.error("Error performing reminder action:", error);
+    res.status(500).json({ message: "Error processing reminder action", error: error.message });
   }
 };

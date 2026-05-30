@@ -5,7 +5,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import { toast } from "react-toastify";
 import { useTranslation } from 'react-i18next';
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FaChevronLeft,
   FaUser,
@@ -15,7 +15,8 @@ import {
   FaWrench,
   FaCalculator,
   FaCheckCircle,
-  FaSave
+  FaSave,
+  FaAddressBook
 } from "react-icons/fa";
 
 const StartEntry = () => {
@@ -38,6 +39,10 @@ const StartEntry = () => {
   const [jobWork, setJobWork] = useState("");
 
   const [isCustomerFound, setIsCustomerFound] = useState(false);
+
+  const [setReminder, setSetReminder] = useState(false);
+  const [reminderDate, setReminderDate] = useState("");
+  const [customerMobile, setCustomerMobile] = useState("");
 
   // --- LOGIC: CALCULATION ---
   useEffect(() => {
@@ -126,26 +131,88 @@ const StartEntry = () => {
     setPaidAmount((total || 0) - validPendingAmount);
   };
 
-  // --- LOGIC: FETCH CUSTOMER ---
+  // --- LOGIC: FETCH CUSTOMER (scoped to logged-in user) ---
+  const fetchCustomerByMobile = async (mobile) => {
+    const uid = localStorage.getItem("uid");
+    if (!uid) return;
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/api/rentals/customer/${mobile}`,
+        { params: { uid } }   // <-- scoped: only THIS user's records
+      );
+      if (response.data) {
+        setCustomerName(response.data.customerName);
+        setAddress(response.data.address);
+        setIsCustomerFound(true);
+        toast.success("Existing Customer Found!", { theme: "dark" });
+      }
+    } catch {
+      // 404 just means new customer — silently clear
+      setCustomerName("");
+      setAddress("");
+    }
+  };
+
   const handleMobileNumberChange = async (e) => {
     const mobile = e.target.value;
     setMobileNumber(mobile);
     setIsCustomerFound(false);
-
+    if (!customerMobile || customerMobile === mobileNumber) {
+      setCustomerMobile(mobile);
+    }
     if (mobile.length === 10) {
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}/api/rentals/customer/${mobile}`
-        );
-        if (response.data) {
-          setCustomerName(response.data.customerName);
-          setAddress(response.data.address);
-          setIsCustomerFound(true);
-          toast.success("Existing Customer Found!");
+      fetchCustomerByMobile(mobile);
+    }
+  };
+
+  // --- LOGIC: NATIVE CONTACT PICKER ---
+  const handleContactPicker = async () => {
+    // Web Contact Picker API — supported on Android Chrome / Samsung Browser
+    if (!navigator.contacts || !navigator.contacts.select) {
+      toast.warn(
+        "Contact Picker is not supported on this browser. Please enter manually.",
+        { theme: "dark" }
+      );
+      return;
+    }
+    try {
+      const contacts = await navigator.contacts.select(
+        ["name", "tel"],
+        { multiple: false }
+      );
+      if (!contacts || contacts.length === 0) return; // user cancelled
+
+      const contact = contacts[0];
+
+      // Extract name
+      const name = Array.isArray(contact.name) && contact.name.length > 0
+        ? contact.name[0]
+        : typeof contact.name === "string"
+        ? contact.name
+        : "";
+
+      // Extract & clean phone number (strip spaces, dashes, country code)
+      const rawTel = Array.isArray(contact.tel) && contact.tel.length > 0
+        ? contact.tel[0]
+        : typeof contact.tel === "string"
+        ? contact.tel
+        : "";
+      const cleanedTel = rawTel.replace(/[^\d]/g, "").slice(-10); // keep last 10 digits
+
+      if (name) setCustomerName(name);
+      if (cleanedTel) {
+        setMobileNumber(cleanedTel);
+        setCustomerMobile(cleanedTel);
+        setIsCustomerFound(false);
+        if (cleanedTel.length === 10) {
+          fetchCustomerByMobile(cleanedTel);
         }
-      } catch (error) {
-        setCustomerName("");
-        setAddress("");
+      }
+
+      toast.success(`Contact "${name}" imported!`, { theme: "dark" });
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        toast.error("Could not open contact picker.", { theme: "dark" });
       }
     }
   };
@@ -155,6 +222,11 @@ const StartEntry = () => {
     e.preventDefault();
     if (!customerName || !mobileNumber || !price || !quantity) {
       toast.error("Please fill all required fields.");
+      return;
+    }
+
+    if (setReminder && !reminderDate) {
+      toast.error("Please select a reminder date.");
       return;
     }
 
@@ -172,6 +244,9 @@ const StartEntry = () => {
       uid: uid,
       machineId: machineId,
       jobWork,
+      reminderDate: setReminder ? reminderDate : undefined,
+      reminderStatus: setReminder ? "PENDING" : undefined,
+      customerMobile: setReminder ? (customerMobile || mobileNumber) : undefined,
     };
 
     try {
@@ -198,6 +273,9 @@ const StartEntry = () => {
     setTotal(null);
     setPaidAmount(0);
     setPendingAmount(null);
+    setSetReminder(false);
+    setReminderDate("");
+    setCustomerMobile("");
   };
 
   // Animation variants
@@ -245,23 +323,36 @@ const StartEntry = () => {
             {t('rentalDetails') || "CUSTOMER DETAILS"}
           </h2>
 
-          <motion.div variants={item} className="relative group">
-            <div className="absolute top-3.5 left-4 text-gray-500 group-focus-within:text-[var(--primary)]">
-              <FaPhoneAlt size={14} />
-            </div>
-            <input
-              type="tel"
-              maxLength={10}
-              placeholder={t('enterMobileNumber') || "Mobile Number"}
-              value={mobileNumber}
-              onChange={handleMobileNumberChange}
-              className="w-full bg-[#1E1E1E] text-white pl-11 pr-10 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-sm font-medium tracking-wide transition-all"
-            />
-            {isCustomerFound && (
-              <div className="absolute top-3.5 right-4 text-green-500 animate-bounce">
-                <FaCheckCircle size={16} />
+          <motion.div variants={item} className="relative group flex items-center gap-2">
+            {/* Mobile number input */}
+            <div className="relative flex-1">
+              <div className="absolute top-3.5 left-4 text-gray-500 group-focus-within:text-[var(--primary)] pointer-events-none">
+                <FaPhoneAlt size={14} />
               </div>
-            )}
+              <input
+                type="tel"
+                maxLength={10}
+                placeholder={t('enterMobileNumber') || "Mobile Number"}
+                value={mobileNumber}
+                onChange={handleMobileNumberChange}
+                className="w-full bg-[#1E1E1E] text-white pl-11 pr-10 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-sm font-medium tracking-wide transition-all"
+              />
+              {isCustomerFound && (
+                <div className="absolute top-3.5 right-3 text-green-500 animate-bounce">
+                  <FaCheckCircle size={16} />
+                </div>
+              )}
+            </div>
+
+            {/* Contact Book Button */}
+            <button
+              type="button"
+              onClick={handleContactPicker}
+              title="Import from Contacts"
+              className="flex-shrink-0 w-11 h-11 rounded-xl bg-[#1E1E1E] border border-[#333] flex items-center justify-center text-[var(--primary)] active:bg-[#2C2C2C] hover:border-[var(--primary)] transition-all"
+            >
+              <FaAddressBook size={16} />
+            </button>
           </motion.div>
 
           <motion.div variants={item} className="relative group">
@@ -372,38 +463,109 @@ const StartEntry = () => {
 
           {/* PAYMENT SPLIT (Clean Inputs - No Boxes) */}
           {total > 0 && (
-            <div className="grid grid-cols-2 gap-4">
-              {/* PAID */}
-              <div>
-                <label className="text-green-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
-                  Paid Amount
-                </label>
-                <div className="relative">
-                  <span className="absolute left-0 top-2 text-green-600 font-bold">₹</span>
-                  <input
-                    type="number"
-                    value={paidAmount}
-                    onChange={handlePaidAmountChange}
-                    className="w-full bg-transparent text-green-500 pl-4 py-2 border-b border-[#333] focus:border-green-500 outline-none font-bold text-lg placeholder-green-900"
-                  />
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                {/* PAID */}
+                <div>
+                  <label className="text-green-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
+                    Paid Amount
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-0 top-2 text-green-600 font-bold">₹</span>
+                    <input
+                      type="number"
+                      value={paidAmount}
+                      onChange={handlePaidAmountChange}
+                      className="w-full bg-transparent text-green-500 pl-4 py-2 border-b border-[#333] focus:border-green-500 outline-none font-bold text-lg placeholder-green-900"
+                    />
+                  </div>
+                </div>
+
+                {/* PENDING */}
+                <div>
+                  <label className="text-red-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
+                    Pending Due
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-0 top-2 text-red-600 font-bold">₹</span>
+                    <input
+                      type="number"
+                      value={pendingAmount}
+                      onChange={handlePendingAmountChange}
+                      className="w-full bg-transparent text-red-500 pl-4 py-2 border-b border-[#333] focus:border-red-500 outline-none font-bold text-lg placeholder-red-900"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* PENDING */}
-              <div>
-                <label className="text-red-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
-                  Pending Due
-                </label>
-                <div className="relative">
-                  <span className="absolute left-0 top-2 text-red-600 font-bold">₹</span>
-                  <input
-                    type="number"
-                    value={pendingAmount}
-                    onChange={handlePendingAmountChange}
-                    className="w-full bg-transparent text-red-500 pl-4 py-2 border-b border-[#333] focus:border-red-500 outline-none font-bold text-lg placeholder-red-900"
-                  />
+              {/* REMINDER SECTION */}
+              {pendingAmount > 0 && (
+                <div className="pt-5 border-t border-[#333]">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-white text-xs font-bold">Set Payment Reminder</h4>
+                      <p className="text-[10px] text-gray-500">Get notified when follow-up is due</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSetReminder(!setReminder);
+                        if (!customerMobile) {
+                          setCustomerMobile(mobileNumber);
+                        }
+                      }}
+                      className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${
+                        setReminder ? "bg-[var(--primary)]" : "bg-[#333]"
+                      }`}
+                    >
+                      <div
+                        className={`w-5 h-5 rounded-full bg-black transition-all duration-300 ${
+                          setReminder ? "translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <AnimatePresence>
+                    {setReminder && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                        animate={{ height: "auto", opacity: 1, marginTop: 16 }}
+                        exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                        className="overflow-hidden space-y-4"
+                      >
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-gray-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
+                              Reminder Date
+                            </label>
+                            <input
+                              type="date"
+                              value={reminderDate}
+                              onChange={(e) => setReminderDate(e.target.value)}
+                              className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none text-xs font-semibold"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-gray-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
+                              SMS Mobile (Optional)
+                            </label>
+                            <input
+                              type="tel"
+                              maxLength={10}
+                              value={customerMobile}
+                              onChange={(e) => setCustomerMobile(e.target.value)}
+                              placeholder="SMS Mobile"
+                              className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none text-xs font-semibold"
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              </div>
+              )}
             </div>
           )}
         </motion.div>

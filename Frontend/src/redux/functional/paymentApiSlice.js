@@ -45,6 +45,33 @@ export const paymentApi = createApi({
       }),
       invalidatesTags: ["Payments"],
     }),
+
+    getPendingReminders: builder.query({
+      query: (uid) => ({
+        url: "/api/reminders/pending",
+        method: "POST",
+        body: { uid },
+      }),
+      providesTags: ["Payments"],
+    }),
+
+    updateReminderDetails: builder.mutation({
+      query: ({ _id, reminderDate, pendingAmount }) => ({
+        url: "/api/reminders/update",
+        method: "PUT",
+        body: { _id, reminderDate, pendingAmount },
+      }),
+      invalidatesTags: ["Payments"],
+    }),
+
+    deleteOrCompleteReminder: builder.mutation({
+      query: ({ _id, action }) => ({
+        url: "/api/reminders/action",
+        method: "PUT",
+        body: { _id, action },
+      }),
+      invalidatesTags: ["Payments"],
+    }),
   }),
 });
 
@@ -53,4 +80,7 @@ export const {
   useUpdatePaymentMutation,
   useEditRentalMutation,
   useDeleteRentalsMutation,
+  useGetPendingRemindersQuery,
+  useUpdateReminderDetailsMutation,
+  useDeleteOrCompleteReminderMutation,
 } = paymentApi;

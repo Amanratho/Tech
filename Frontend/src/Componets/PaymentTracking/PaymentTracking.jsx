@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useGetPaymentsQuery, useUpdatePaymentMutation } from "../../redux/functional/paymentApiSlice";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
@@ -18,6 +19,7 @@ import {
 
 const PaymentTracking = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const uid = localStorage.getItem("uid");
 
     const { data: paymentData = [], error, isLoading, refetch } = useGetPaymentsQuery(uid, { skip: !uid });
@@ -171,8 +173,8 @@ const PaymentTracking = () => {
                             key={f.val}
                             onClick={() => setFilterType(f.val)}
                             className={`px-3 py-1 rounded-full text-[10px] font-bold border transition-all ${filterType === f.val
-                                    ? "bg-[var(--primary)] text-black border-[var(--primary)]"
-                                    : "bg-transparent text-gray-500 border-[#333]"
+                                ? "bg-[var(--primary)] text-black border-[var(--primary)]"
+                                : "bg-transparent text-gray-500 border-[#333]"
                                 }`}
                         >
                             {f.label}

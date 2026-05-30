@@ -12,7 +12,10 @@ const RentalSchema = new mongoose.Schema({
   quantity: { type: Number, required: true },
   totalAmount: { type: Number, required: true },
   paidAmount: { type: Number, required: true },
-  pendingAmount: { type: Number, required: true },
+  pendingAmount: { type: Number, default: 0 },
+  reminderDate: { type: Date },
+  reminderStatus: { type: String, enum: ['PENDING', 'PAID', 'CANCELLED'], default: 'PENDING' },
+  customerMobile: { type: String },
   uid: { type: String, required: true, },
   machineId: { type: String, required: true,  },
   createdAt: {

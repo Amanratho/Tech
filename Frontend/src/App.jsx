@@ -24,6 +24,7 @@ import Calculator from "./Componets/Calculator/Calculator";
 import PrivacyPolicy from './Componets/PrivacyPolicy/PrivacyPolicy';
 import RefundPolicy from './Componets/RefundPolicy/RefundPolicy';
 import TermsAndConditions from './Componets/TermsAndConditions/TermsAndConditions';
+import PendingPayments from "./Componets/PendingPayments/PendingPayments";
 
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
           <Route path="/EditProfile" element={<EditProfile />} />
           <Route path="/bill-history" element={<Billing />} />
           <Route path="/payment-tracking" element={<PaymentTracking />} />
+          <Route path="/pending-payments" element={<PendingPayments />} />
           <Route path="/machinery" element={<Machinery />} />
           <Route path="/start-entry" element={<StartEntry />} />
           <Route path="/feature" element={<Feature />} />
