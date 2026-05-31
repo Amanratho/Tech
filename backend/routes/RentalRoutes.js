@@ -5,6 +5,9 @@ const RentalController = require("../controllers/RentalController");
 // Route to add new rental entry
 router.post("/add-entry", RentalController.addRentalEntry);
 
+// Route to get EOD / Business Summary (aggregated by date range)
+router.get("/eod-summary", RentalController.getEODSummary);
+
 // Route to get all rentals
 router.post("/rentals", RentalController.getAllRentals);
 

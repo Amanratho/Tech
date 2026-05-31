@@ -9,7 +9,8 @@ import {
   FaLanguage,
   FaFileInvoice,
   FaCalculator,
-  FaBell  
+  FaBell,
+  FaChartBar
 } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { ToastContainer } from "react-toastify";
@@ -46,9 +47,9 @@ function Navbar() {
   const navItems = [
     { name: t("home") || "Home", path: "/", icon: FaHome },
     { name: "Statement", path: "/statement", icon: FaFileInvoice },
-    // 🔥 Calculator About ke left mein (pehle) daal diya
     { name: t("calculator") || "Calc", path: "/calculator", icon: FaCalculator }, 
     { name: "Reminders", path: "/pending-payments", icon: FaBell },
+    { name: "Summary", path: "/eod-dashboard", icon: FaChartBar },
   ];
 
   return (
