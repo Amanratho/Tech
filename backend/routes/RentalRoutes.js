@@ -8,9 +8,6 @@ router.post("/add-entry", RentalController.addRentalEntry);
 // Route to get EOD / Business Summary (aggregated by date range)
 router.get("/eod-summary", RentalController.getEODSummary);
 
-// Route to get filtered statement data (scoped to uid, dynamic filters via query params)
-router.get("/statement", RentalController.getStatement);
-
 // Route to get all rentals
 router.post("/rentals", RentalController.getAllRentals);
 
