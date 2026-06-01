@@ -45,11 +45,11 @@ function Navbar() {
 
   // Menu items config for mapping
   const navItems = [
-    { name: t("home") || "Home", path: "/", icon: FaHome },
-    { name: "Statement", path: "/statement", icon: FaFileInvoice },
-    { name: t("calculator") || "Calc", path: "/calculator", icon: FaCalculator }, 
-    { name: "Reminders", path: "/pending-payments", icon: FaBell },
-    { name: "Summary", path: "/eod-dashboard", icon: FaChartBar },
+    { name: t("home")             || "Home",       path: "/",                icon: FaHome },
+    { name: t("navStatement")     || "Statement",  path: "/statement",       icon: FaFileInvoice },
+    { name: t("calculator")       || "Calc",       path: "/calculator",      icon: FaCalculator },
+    { name: t("navReminders")     || "Reminders",  path: "/pending-payments",icon: FaBell },
+    { name: t("navSummary")       || "Summary",    path: "/eod-dashboard",   icon: FaChartBar },
   ];
 
   return (

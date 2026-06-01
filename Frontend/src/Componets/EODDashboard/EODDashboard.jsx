@@ -3,6 +3,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
   FaWallet,
   FaChartBar,
@@ -42,13 +43,7 @@ const getThisMonth = () => {
   return { start: toISO(first), end: toISO(d) };
 };
 
-const QUICK_FILTERS = [
-  { id: "today", label: "Today", icon: FaCalendarDay, fn: getToday },
-  { id: "yesterday", label: "Yesterday", icon: FaCalendarCheck, fn: getYesterday },
-  { id: "week", label: "This Week", icon: FaCalendarWeek, fn: getThisWeek },
-  { id: "month", label: "This Month", icon: FaCalendarAlt, fn: getThisMonth },
-  { id: "custom", label: "Custom", icon: FaThLarge, fn: null },
-];
+// QUICK_FILTERS is now built inside the component so labels are translatable
 
 // ─── Animated Counter ──────────────────────────────────────────────────────────
 const AnimatedNumber = ({ value }) => {
@@ -86,7 +81,17 @@ const SummaryCard = ({ icon: Icon, label, value, color, bg, border, glow, delay 
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 const EODDashboard = () => {
+  const { t } = useTranslation();
   const uid = localStorage.getItem("uid");
+
+  // Built here so labels go through t()
+  const QUICK_FILTERS = [
+    { id: "today",     label: t("eodFilterToday")     || "Today",      icon: FaCalendarDay,   fn: getToday },
+    { id: "yesterday", label: t("eodFilterYesterday") || "Yesterday",  icon: FaCalendarCheck, fn: getYesterday },
+    { id: "week",      label: t("eodFilterThisWeek")  || "This Week",  icon: FaCalendarWeek,  fn: getThisWeek },
+    { id: "month",     label: t("eodFilterThisMonth") || "This Month", icon: FaCalendarAlt,   fn: getThisMonth },
+    { id: "custom",    label: t("eodFilterCustom")    || "Custom",     icon: FaThLarge,       fn: null },
+  ];
 
   const [activeFilter, setActiveFilter] = useState("today");
   const [customStart, setCustomStart] = useState("");
@@ -102,7 +107,7 @@ const EODDashboard = () => {
   const fetchSummary = useCallback(
     async ({ start, end } = {}) => {
       if (!uid) {
-        toast.error("Please log in to view your dashboard.");
+        toast.error(t("eodLoginRequired") || "Please log in to view your dashboard.");
         return;
       }
       if (!start || !end) return;
@@ -117,7 +122,7 @@ const EODDashboard = () => {
         setLastRange({ start, end });
       } catch (err) {
         console.error("EOD fetch error:", err);
-        toast.error("Failed to load summary. Please try again.");
+        toast.error(t("eodFetchError") || "Failed to load summary. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -141,11 +146,11 @@ const EODDashboard = () => {
   // ── Custom range submit ──
   const handleCustomSubmit = () => {
     if (!customStart || !customEnd) {
-      toast.error("Please select both start and end dates.");
+      toast.error(t("eodSelectBothDates") || "Please select both start and end dates.");
       return;
     }
     if (new Date(customStart) > new Date(customEnd)) {
-      toast.error("End date cannot be before start date.");
+      toast.error(t("eodEndDateError") || "End date cannot be before start date.");
       return;
     }
     fetchSummary({ start: customStart, end: customEnd });
@@ -175,10 +180,10 @@ const EODDashboard = () => {
           </div>
           <div>
             <h2 className="text-white text-xs font-black uppercase tracking-widest leading-tight">
-              Business Summary
+              {t("eodBusinessSummary") || "Business Summary"}
             </h2>
             <p className="text-gray-600 text-[9px] font-semibold uppercase tracking-wider">
-              EOD Dashboard
+              {t("eodDashboardTitle") || "EOD Dashboard"}
             </p>
           </div>
         </div>
@@ -194,7 +199,7 @@ const EODDashboard = () => {
         {/* ── QUICK DATE FILTER PILLS ── */}
         <div>
           <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mb-2 pl-1">
-            Select Period
+            {t("eodSelectPeriod") || "Select Period"}
           </p>
           <div className="grid grid-cols-5 gap-1.5">
             {QUICK_FILTERS.map((f) => {
@@ -229,12 +234,12 @@ const EODDashboard = () => {
               className="overflow-hidden"
             >
               <div className="bg-[#1A1A1A] border border-[#2C2C2C] rounded-2xl p-4 space-y-3">
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Custom Range</p>
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t("eodCustomRange") || "Custom Range"}</p>
 
                 <div className="grid grid-cols-2 gap-3">
                   {/* Start Date */}
                   <div>
-                    <label className="block text-gray-400 text-[10px] font-semibold mb-1 pl-1">From</label>
+                    <label className="block text-gray-400 text-[10px] font-semibold mb-1 pl-1">{t("eodFrom") || "From"}</label>
                     <input
                       type="date"
                       value={customStart}
@@ -250,7 +255,7 @@ const EODDashboard = () => {
 
                   {/* End Date — min is always customStart to prevent invalid ranges */}
                   <div>
-                    <label className="block text-gray-400 text-[10px] font-semibold mb-1 pl-1">To</label>
+                    <label className="block text-gray-400 text-[10px] font-semibold mb-1 pl-1">{t("eodTo") || "To"}</label>
                     <input
                       type="date"
                       value={customEnd}
@@ -269,7 +274,7 @@ const EODDashboard = () => {
                   onClick={handleCustomSubmit}
                   className="w-full py-2.5 bg-[var(--primary)] text-black rounded-xl font-black text-xs tracking-wide active:scale-95 transition-all shadow-md shadow-[var(--primary)]/20"
                 >
-                  Apply Range
+                  {t("eodApplyRange") || "Apply Range"}
                 </button>
               </div>
             </motion.div>
@@ -297,7 +302,7 @@ const EODDashboard = () => {
               <div className="flex items-center gap-1.5 bg-[#1A1A1A] border border-[#2C2C2C] rounded-full px-3 py-1">
                 <FaReceipt size={9} className="text-[var(--primary)]" />
                 <span className="text-[10px] font-bold text-gray-400">
-                  {summary.entryCount} {summary.entryCount === 1 ? "entry" : "entries"} in period
+                  {summary.entryCount} {summary.entryCount === 1 ? (t("eodEntry") || "entry") : (t("eodEntries") || "entries")} {t("eodInPeriod") || "in period"}
                 </span>
               </div>
             </div>
@@ -306,7 +311,7 @@ const EODDashboard = () => {
             <div className="grid grid-cols-2 gap-3">
               <SummaryCard
                 icon={FaWallet}
-                label="Total Income"
+                label={t("eodTotalIncome") || "Total Income"}
                 value={summary.totalIncome}
                 color="green"
                 bg="from-[#0D1F0D] to-[#111]"
@@ -316,7 +321,7 @@ const EODDashboard = () => {
               />
               <SummaryCard
                 icon={FaArrowDown}
-                label="Expenses"
+                label={t("eodExpenses") || "Expenses"}
                 value={summary.totalExpenses}
                 color="red"
                 bg="from-[#1F0D0D] to-[#111]"
@@ -326,7 +331,7 @@ const EODDashboard = () => {
               />
               <SummaryCard
                 icon={FaClock}
-                label="Pending Dues"
+                label={t("eodPendingDues") || "Pending Dues"}
                 value={summary.totalPending}
                 color="amber"
                 bg="from-[#1F1700] to-[#111]"
@@ -336,7 +341,7 @@ const EODDashboard = () => {
               />
               <SummaryCard
                 icon={FaArrowUp}
-                label="Net Profit"
+                label={t("eodNetProfit") || "Net Profit"}
                 value={summary.netProfit}
                 color={netIsPositive ? "green" : "red"}
                 bg={netIsPositive ? "from-[#0D1F0D] to-[#111]" : "from-[#1F0D0D] to-[#111]"}
@@ -354,17 +359,17 @@ const EODDashboard = () => {
               className="bg-[#1A1A1A] border border-[#2C2C2C] rounded-2xl overflow-hidden"
             >
               <div className="px-4 py-3 border-b border-[#2C2C2C] flex items-center justify-between">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Breakdown</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t("eodBreakdown") || "Breakdown"}</p>
                 <FaChartBar size={11} className="text-[var(--primary)]" />
               </div>
 
               {[
-                { label: "Total Billed", value: summary.totalBilled, color: "text-[var(--primary)]" },
-                { label: "Collected (Income)", value: summary.totalIncome, color: "text-green-400" },
-                { label: "Maintenance Expenses", value: summary.totalExpenses, color: "text-red-400" },
-                { label: "Still Pending", value: summary.totalPending, color: "text-amber-400" },
+                { label: t("eodTotalBilled")    || "Total Billed",                    value: summary.totalBilled,   color: "text-[var(--primary)]" },
+                { label: t("eodCollected")      || "Collected (Income)",              value: summary.totalIncome,   color: "text-green-400" },
+                { label: t("eodMaintExpenses")  || "Maintenance Expenses",            value: summary.totalExpenses, color: "text-red-400" },
+                { label: t("eodStillPending")   || "Still Pending",                   value: summary.totalPending,  color: "text-amber-400" },
                 {
-                  label: "Net Profit (Income − Expenses)",
+                  label: t("eodNetProfitRow") || "Net Profit (Income − Expenses)",
                   value: summary.netProfit,
                   color: netIsPositive ? "text-green-400" : "text-red-400",
                   bold: true,
@@ -397,8 +402,8 @@ const EODDashboard = () => {
             <div className="w-16 h-16 rounded-2xl bg-[#1E1E1E] border border-[#2C2C2C] flex items-center justify-center mb-4 shadow-lg">
               <FaChartBar size={24} className="text-gray-700" />
             </div>
-            <p className="text-gray-500 text-sm font-bold">Select a time period</p>
-            <p className="text-gray-700 text-xs mt-1">Tap one of the filters above to load your summary</p>
+            <p className="text-gray-500 text-sm font-bold">{t("eodEmptyTitle") || "Select a time period"}</p>
+            <p className="text-gray-700 text-xs mt-1">{t("eodEmptySubtitle") || "Tap one of the filters above to load your summary"}</p>
           </motion.div>
         )}
       </div>

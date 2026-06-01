@@ -68,7 +68,7 @@ const StartEntry = () => {
         
         setQuantity(formattedQuantity);
          
-        toast.info(`⏳ ${hours} hr ${minutes} min auto-filled from Tracker!`, { theme: "dark" });
+        toast.info(`⏳ ${hours} ${t('trackerHr') || 'hr'} ${minutes} ${t('trackerMin') || 'min'} ${t('trackerAutoFilled') || 'auto-filled from Tracker!'}`, { theme: "dark" });
          
         localStorage.removeItem("rentveda_pending_time_entry");
       }
@@ -77,7 +77,7 @@ const StartEntry = () => {
       const savedCount = localStorage.getItem("rentveda_pending_count_entry");
       if (savedCount) {
         setQuantity(savedCount);
-        toast.info(`🔢 Count (${savedCount}) auto-filled from Tracker!`, { theme: "dark" });
+        toast.info(`🔢 ${t('trackerCountAutoFilled') || 'Count'} (${savedCount}) ${t('trackerAutoFilled') || 'auto-filled from Tracker!'}`, { theme: "dark" });
          
         localStorage.removeItem("rentveda_pending_count_entry");
       }
@@ -167,7 +167,7 @@ const StartEntry = () => {
         setCustomerName(response.data.customerName);
         setAddress(response.data.address);
         setIsCustomerFound(true);
-        toast.success("Existing Customer Found!", { theme: "dark" });
+        toast.success(t('existingCustomerFound') || "Existing Customer Found!", { theme: "dark" });
       }
     } catch {
       // 🚨 YAHAN FIX HAI: 
@@ -197,7 +197,7 @@ const StartEntry = () => {
     // Web Contact Picker API — supported on Android Chrome / Samsung Browser
     if (!navigator.contacts || !navigator.contacts.select) {
       toast.warn(
-        "Contact Picker is not supported on this browser. Please enter manually.",
+        t('contactPickerUnsupported') || "Contact Picker is not supported on this browser. Please enter manually.",
         { theme: "dark" }
       );
       return;
@@ -237,10 +237,10 @@ const StartEntry = () => {
         }
       }
 
-      toast.success(`Contact "${name}" imported!`, { theme: "dark" });
+      toast.success(`${t('contactImported') || 'Contact'} "${name}" ${t('contactImportedSuffix') || 'imported!'}`, { theme: "dark" });
     } catch (err) {
       if (err.name !== "AbortError") {
-        toast.error("Could not open contact picker.", { theme: "dark" });
+        toast.error(t('contactPickerError') || "Could not open contact picker.", { theme: "dark" });
       }
     }
   };
@@ -249,12 +249,12 @@ const StartEntry = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!customerName || !mobileNumber || !price || !quantity) {
-      toast.error("Please fill all required fields.");
+      toast.error(t('fillAllFields') || "Please fill all required fields.");
       return;
     }
 
     if (setReminder && !reminderDate) {
-      toast.error("Please select a reminder date.");
+      toast.error(t('selectReminderDate') || "Please select a reminder date.");
       return;
     }
 
@@ -282,11 +282,11 @@ const StartEntry = () => {
         `${API_BASE_URL}/api/rentals/add-entry`,
         entryData
       );
-      toast.success("Entry saved!");
+      toast.success(t('entrySaved') || "Entry saved!");
       navigate("/invoice", { state: { entryData, machineName } });
       resetForm();
     } catch (error) {
-      toast.error("Error: " + (error.response?.data?.message || error.message));
+      toast.error((t('entryError') || "Error: ") + (error.response?.data?.message || error.message));
     }
   };
 
@@ -376,7 +376,7 @@ const StartEntry = () => {
             <button
               type="button"
               onClick={handleContactPicker}
-              title="Import from Contacts"
+              title={t('importFromContacts') || "Import from Contacts"}
               className="flex-shrink-0 w-11 h-11 rounded-xl bg-[#1E1E1E] border border-[#333] flex items-center justify-center text-[var(--primary)] active:bg-[#2C2C2C] hover:border-[var(--primary)] transition-all"
             >
               <FaAddressBook size={16} />
@@ -457,7 +457,7 @@ const StartEntry = () => {
           {/* Price & Qty Row */}
           <div className="flex gap-3 mb-5">
             <div className="flex-1">
-              <label className="text-gray-500 text-[10px] font-bold mb-1 block">RATE</label>
+              <label className="text-gray-500 text-[10px] font-bold mb-1 block">{t('rateLabel') || "RATE"}</label>
               <input
                 type="number"
                 placeholder="0"
@@ -469,7 +469,7 @@ const StartEntry = () => {
 
             <div className="flex-1">
               <label className="text-gray-500 text-[10px] font-bold mb-1 block">
-                QTY ({rentType})
+                {t('qtyLabel') || "QTY"} ({rentType})
               </label>
               <input
                 type="number"
@@ -483,7 +483,7 @@ const StartEntry = () => {
 
           {/* TOTAL BILL (Center) */}
           <div className="text-center mb-5 pb-5 border-b border-[#333]">
-            <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Total Bill Amount</p>
+            <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">{t('totalBillAmount') || "Total Bill Amount"}</p>
             <div className="text-3xl font-extrabold text-white tracking-tight">
               ₹ {total || 0}
             </div>
@@ -496,7 +496,7 @@ const StartEntry = () => {
                 {/* PAID */}
                 <div>
                   <label className="text-green-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
-                    Paid Amount
+                    {t('paidAmount') || "Paid Amount"}
                   </label>
                   <div className="relative">
                     <span className="absolute left-0 top-2 text-green-600 font-bold">₹</span>
@@ -512,7 +512,7 @@ const StartEntry = () => {
                 {/* PENDING */}
                 <div>
                   <label className="text-red-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
-                    Pending Due
+                    {t('pendingDue') || "Pending Due"}
                   </label>
                   <div className="relative">
                     <span className="absolute left-0 top-2 text-red-600 font-bold">₹</span>
@@ -531,8 +531,8 @@ const StartEntry = () => {
                 <div className="pt-5 border-t border-[#333]">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-white text-xs font-bold">Set Payment Reminder</h4>
-                      <p className="text-[10px] text-gray-500">Get notified when follow-up is due</p>
+                      <h4 className="text-white text-xs font-bold">{t('setPaymentReminder') || "Set Payment Reminder"}</h4>
+                      <p className="text-[10px] text-gray-500">{t('reminderNotifyText') || "Get notified when follow-up is due"}</p>
                     </div>
                     <button
                       type="button"
@@ -565,7 +565,7 @@ const StartEntry = () => {
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="text-gray-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
-                              Reminder Date
+                              {t('reminderModalDateLabel') || "Reminder Date"}
                             </label>
                             <input
                               type="date"
@@ -577,14 +577,14 @@ const StartEntry = () => {
 
                           <div>
                             <label className="text-gray-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
-                              SMS Mobile (Optional)
+                              {t('smsMobileLabel') || "SMS Mobile (Optional)"}
                             </label>
                             <input
                               type="tel"
                               maxLength={10}
                               value={customerMobile}
                               onChange={(e) => setCustomerMobile(e.target.value)}
-                              placeholder="SMS Mobile"
+                              placeholder={t('smsMobilePlaceholder') || "SMS Mobile"}
                               className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none text-xs font-semibold"
                             />
                           </div>

@@ -51,15 +51,15 @@ const PendingPayments = () => {
 
   // Helper: Get status label and color styling for dates
   const getDateStatus = (dateString) => {
-    if (!dateString) return { label: "No Date", color: "text-gray-500", bg: "bg-gray-500/10", border: "border-gray-500/20" };
+    if (!dateString) return { label: t("reminderStatusNoDate") || "No Date",  color: "text-gray-500",  bg: "bg-gray-500/10",  border: "border-gray-500/20" };
     const date = new Date(dateString);
     if (isToday(date)) {
-      return { label: "Due Today", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" };
+      return { label: t("reminderStatusDueToday") || "Due Today", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" };
     }
     if (isPast(date)) {
-      return { label: "Overdue", color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20" };
+      return { label: t("reminderStatusOverdue")  || "Overdue",   color: "text-red-400",   bg: "bg-red-500/10",   border: "border-red-500/20" };
     }
-    return { label: "Upcoming", color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" };
+    return { label: t("reminderStatusUpcoming") || "Upcoming", color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" };
   };
 
   // Filter Logic
@@ -99,11 +99,11 @@ const PendingPayments = () => {
   // Submit edits
   const handleSaveEdit = async () => {
     if (!editDate) {
-      toast.error("Please pick a reminder date");
+      toast.error(t("reminderPickDateError") || "Please pick a reminder date");
       return;
     }
     if (editAmount <= 0) {
-      toast.error("Amount must be greater than zero");
+      toast.error(t("reminderAmountError") || "Amount must be greater than zero");
       return;
     }
 
@@ -114,19 +114,21 @@ const PendingPayments = () => {
         pendingAmount: Number(editAmount),
       }).unwrap();
 
-      toast.success("Reminder details updated successfully!");
+      toast.success(t("reminderUpdatedSuccess") || "Reminder details updated successfully!");
       setIsEditModalOpen(false);
       refetch();
     } catch (err) {
       console.error("Error saving edits:", err);
-      toast.error(err.data?.message || "Failed to update reminder details");
+      toast.error(err.data?.message || (t("reminderUpdateFailed") || "Failed to update reminder details"));
     }
   };
 
   // Action: Mark PAID or CANCEL
   const handleAction = async (reminderId, action) => {
-    const actionText = action === "PAID" ? "mark as Paid" : "delete reminder";
-    const confirmAction = window.confirm(`Are you sure you want to ${actionText}?`);
+    const actionText = action === "PAID"
+      ? (t("reminderConfirmPaid")   || "mark as Paid")
+      : (t("reminderConfirmDelete") || "delete reminder");
+    const confirmAction = window.confirm(`${t("reminderConfirmPrompt") || "Are you sure you want to"} ${actionText}?`);
     if (!confirmAction) return;
 
     try {
@@ -137,18 +139,18 @@ const PendingPayments = () => {
 
       toast.success(
         action === "PAID"
-          ? "Payment completed successfully!"
-          : "Reminder cleared!"
+          ? (t("reminderMarkedPaidSuccess")    || "Payment completed successfully!")
+          : (t("reminderClearedSuccess")       || "Reminder cleared!")
       );
       refetch();
     } catch (err) {
       console.error("Action failed:", err);
-      toast.error(err.data?.message || "Action failed");
+      toast.error(err.data?.message || (t("reminderActionFailed") || "Action failed"));
     }
   };
 
-  if (isLoading) return <div className="p-5 text-white bg-[#121212] min-h-screen">Loading active reminders...</div>;
-  if (error) return <div className="p-5 text-red-500 bg-[#121212] min-h-screen">Error loading active reminders</div>;
+  if (isLoading) return <div className="p-5 text-white bg-[#121212] min-h-screen">{t("reminderLoading") || "Loading active reminders..."}</div>;
+  if (error)     return <div className="p-5 text-red-500 bg-[#121212] min-h-screen">{t("reminderLoadError") || "Error loading active reminders"}</div>;
 
   return (
     <div className="bg-[#121212] min-h-screen pb-20 relative overflow-hidden">
@@ -165,7 +167,7 @@ const PendingPayments = () => {
             {t("pendingReminders") || "Payment Reminders"}
           </h1>
           <p className="text-[10px] text-[var(--primary)] font-medium uppercase tracking-wider">
-            {reminders.length} Active Dues
+            {reminders.length} {t("reminderActiveDues") || "Active Dues"}
           </p>
         </div>
       </div>
@@ -179,7 +181,7 @@ const PendingPayments = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by customer name or mobile..."
+              placeholder={t("reminderSearchPlaceholder") || "Search by customer name or mobile..."}
               className="w-full bg-[#1E1E1E] text-white pl-9 pr-3 py-2 rounded-full text-xs outline-none border border-[#333] focus:border-[var(--primary)] transition-colors placeholder-gray-600 font-medium"
             />
           </div>
@@ -187,10 +189,10 @@ const PendingPayments = () => {
 
         <div className="px-4 mt-3 flex gap-2 overflow-x-auto no-scrollbar">
           {[
-            { label: "All Reminders", val: "all" },
-            { label: "Overdue", val: "overdue" },
-            { label: "Due Today", val: "today" },
-            { label: "Upcoming", val: "upcoming" },
+            { label: t("reminderFilterAll")      || "All Reminders", val: "all" },
+            { label: t("reminderFilterOverdue")  || "Overdue",       val: "overdue" },
+            { label: t("reminderFilterToday")    || "Due Today",     val: "today" },
+            { label: t("reminderFilterUpcoming") || "Upcoming",      val: "upcoming" },
           ].map((f) => (
             <button
               key={f.val}
@@ -211,7 +213,7 @@ const PendingPayments = () => {
       <div className="px-4 mt-4 space-y-3">
         {filteredReminders.length === 0 ? (
           <div className="text-center text-gray-600 py-20 text-xs font-semibold">
-            No pending reminders match the filter
+            {t("reminderNoResults") || "No pending reminders match the filter"}
           </div>
         ) : (
           filteredReminders.map((rem, index) => {
@@ -227,9 +229,9 @@ const PendingPayments = () => {
                 {/* Visual Accent Glow on the side based on status */}
                 <div
                   className={`absolute left-0 top-0 bottom-0 w-1 ${
-                    dateStatus.label === "Overdue"
+                    dateStatus.label === (t("reminderStatusOverdue")  || "Overdue")
                       ? "bg-red-500"
-                      : dateStatus.label === "Due Today"
+                      : dateStatus.label === (t("reminderStatusDueToday") || "Due Today")
                       ? "bg-amber-500"
                       : "bg-blue-500"
                   }`}
@@ -267,15 +269,15 @@ const PendingPayments = () => {
                 <div className="flex justify-between items-center text-xs pl-1 mt-1 bg-[#121212]/50 p-2 rounded-lg border border-[#262626]">
                   <div>
                     <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">
-                      Rent Item
+                      {t("reminderRentItem") || "Rent Item"}
                     </p>
                     <p className="text-white font-bold text-[10px] mt-0.5 truncate max-w-[120px]">
-                      {rem.rentType} Work
+                      {rem.rentType} {t("reminderWork") || "Work"}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">
-                      Follow Up
+                      {t("reminderFollowUp") || "Follow Up"}
                     </p>
                     <p className="text-gray-300 font-bold text-[10px] mt-0.5 flex items-center gap-1 justify-end">
                       <FaCalendarAlt size={8} className="text-[var(--primary)]" />
@@ -290,7 +292,7 @@ const PendingPayments = () => {
                 <div className="flex justify-between items-center pl-1 border-t border-[#2a2a2a] pt-3">
                   <div>
                     <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">
-                      Pending Dues
+                      {t("reminderPendingDues") || "Pending Dues"}
                     </p>
                     <p className="text-red-500 text-base font-extrabold tracking-tight mt-0.5">
                       ₹{rem.pendingAmount.toLocaleString()}
@@ -302,14 +304,14 @@ const PendingPayments = () => {
                     <button
                       onClick={() => handleOpenEdit(rem)}
                       className="w-8 h-8 rounded-full bg-[#2a2a2a] hover:bg-[#3a3a3a] text-gray-300 flex items-center justify-center border border-[#3b3b3b] active:scale-90 transition-transform"
-                      title="Edit Reminder"
+                      title={t("reminderEditTitle") || "Edit Reminder"}
                     >
                       <FaEdit size={10} />
                     </button>
                     <button
                       onClick={() => handleAction(rem._id, "DELETE")}
                       className="w-8 h-8 rounded-full bg-red-950/40 hover:bg-red-900/60 text-red-400 flex items-center justify-center border border-red-900/30 active:scale-90 transition-transform"
-                      title="Delete Reminder"
+                      title={t("reminderDeleteTitle") || "Delete Reminder"}
                     >
                       <FaTrashAlt size={10} />
                     </button>
@@ -317,7 +319,7 @@ const PendingPayments = () => {
                       onClick={() => handleAction(rem._id, "PAID")}
                       className="px-3 h-8 bg-green-500 text-white rounded-lg text-[10px] font-black flex items-center gap-1 active:scale-95 transition-transform shadow-md shadow-green-500/10"
                     >
-                      <FaCheckCircle size={10} /> Complete
+                      <FaCheckCircle size={10} /> {t("reminderCompleteBtn") || "Complete"}
                     </button>
                   </div>
                 </div>
@@ -339,7 +341,7 @@ const PendingPayments = () => {
             >
               <div className="flex justify-between items-center mb-4 border-b border-[#2d2d2d] pb-2">
                 <h3 className="text-white text-sm font-black uppercase tracking-wider">
-                  Edit Reminder
+                  {t("reminderEditModalTitle") || "Edit Reminder"}
                 </h3>
                 <button
                   onClick={() => setIsEditModalOpen(false)}
@@ -353,7 +355,7 @@ const PendingPayments = () => {
                 {/* Client Reference */}
                 <div className="bg-[#121212] p-3 rounded-xl border border-[#2c2c2c]">
                   <p className="text-gray-500 text-[9px] font-bold uppercase tracking-wider">
-                    Customer
+                    {t("reminderModalCustomer") || "Customer"}
                   </p>
                   <p className="text-white text-xs font-bold mt-0.5">
                     {selectedReminder.customerName}
@@ -366,7 +368,7 @@ const PendingPayments = () => {
                 {/* Edit Pending Amount */}
                 <div>
                   <label className="text-gray-400 text-[10px] font-bold mb-1.5 block uppercase tracking-wider">
-                    Pending Amount Due
+                    {t("reminderModalAmountLabel") || "Pending Amount Due"}
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-2.5 text-red-500 font-bold">₹</span>
@@ -382,7 +384,7 @@ const PendingPayments = () => {
                 {/* Edit Reminder Date */}
                 <div>
                   <label className="text-gray-400 text-[10px] font-bold mb-1.5 block uppercase tracking-wider">
-                    Reminder Date
+                    {t("reminderModalDateLabel") || "Reminder Date"}
                   </label>
                   <div className="relative">
                     <input
@@ -400,13 +402,13 @@ const PendingPayments = () => {
                   onClick={() => setIsEditModalOpen(false)}
                   className="flex-1 py-2.5 bg-transparent hover:bg-white/5 text-gray-400 rounded-xl font-bold text-xs border border-[#333] active:scale-95 transition-all"
                 >
-                  Cancel
+                  {t("cancelButton") || "Cancel"}
                 </button>
                 <button
                   onClick={handleSaveEdit}
                   className="flex-1 py-2.5 bg-[var(--primary)] text-black rounded-xl font-black text-xs active:scale-95 transition-all shadow-md shadow-[var(--primary)]/10"
                 >
-                  Save Changes
+                  {t("reminderSaveChanges") || "Save Changes"}
                 </button>
               </div>
             </motion.div>
