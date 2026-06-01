@@ -6,6 +6,7 @@ import { API_BASE_URL } from "../../config";
 import { toast } from "react-toastify";
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from "framer-motion";
+import { cleanStringInput, cleanNumberInput, blockInvalidNumberKeys } from "../../utils/inputValidation";
 import {
   FaChevronLeft,
   FaUser,
@@ -118,14 +119,16 @@ const StartEntry = () => {
   };
 
   const handlePaidAmountChange = (e) => {
-    const paid = Number(e.target.value) || 0;
+    const cleanValue = cleanNumberInput(e.target.value);
+    const paid = Number(cleanValue) || 0;
     const validPaidAmount = Math.min(paid, total || 0);
     setPaidAmount(validPaidAmount);
     setPendingAmount((total || 0) - validPaidAmount);
   };
 
   const handlePendingAmountChange = (e) => {
-    const pending = Number(e.target.value) || 0;
+    const cleanValue = cleanNumberInput(e.target.value);
+    const pending = Number(cleanValue) || 0;
     const validPendingAmount = Math.min(pending, total || 0);
     setPendingAmount(validPendingAmount);
     setPaidAmount((total || 0) - validPendingAmount);
@@ -181,7 +184,8 @@ const StartEntry = () => {
   };
 
   const handleMobileNumberChange = async (e) => {
-    const mobile = e.target.value;
+    // Strip anything except digits for mobile number specifically
+    const mobile = e.target.value.replace(/\D/g, "");
     setMobileNumber(mobile);
     setIsCustomerFound(false);
     if (!customerMobile || customerMobile === mobileNumber) {
@@ -391,7 +395,7 @@ const StartEntry = () => {
               type="text"
               placeholder={t('enterCustomerName') || "Customer Name"}
               value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
+              onChange={(e) => setCustomerName(cleanStringInput(e.target.value))}
               className="w-full bg-[#1E1E1E] text-white pl-11 pr-4 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-sm transition-all"
             />
           </motion.div>
@@ -404,7 +408,7 @@ const StartEntry = () => {
               type="text"
               placeholder={t('clientAddress') || "Address"}
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(e) => setAddress(cleanStringInput(e.target.value))}
               className="w-full bg-[#1E1E1E] text-white pl-11 pr-4 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-sm transition-all"
             />
           </motion.div>
@@ -425,7 +429,7 @@ const StartEntry = () => {
                 type="text"
                 placeholder={t('operatorName') || "Operator"}
                 value={operatorName}
-                onChange={(e) => setOperatorName(e.target.value)}
+                onChange={(e) => setOperatorName(cleanStringInput(e.target.value))}
                 className="w-full bg-[#1E1E1E] text-white pl-9 pr-2 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-xs"
               />
             </motion.div>
@@ -438,7 +442,7 @@ const StartEntry = () => {
                 type="text"
                 placeholder={t('jobWork') || "Work Type"}
                 value={jobWork}
-                onChange={(e) => setJobWork(e.target.value)}
+                onChange={(e) => setJobWork(cleanStringInput(e.target.value))}
                 className="w-full bg-[#1E1E1E] text-white pl-9 pr-2 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-xs"
               />
             </motion.div>
@@ -462,7 +466,8 @@ const StartEntry = () => {
                 type="number"
                 placeholder="0"
                 value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                onChange={(e) => setPrice(cleanNumberInput(e.target.value))}
+                onKeyDown={blockInvalidNumberKeys}
                 className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none font-bold text-sm"
               />
             </div>
@@ -475,7 +480,8 @@ const StartEntry = () => {
                 type="number"
                 placeholder="0"
                 value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
+                onChange={(e) => setQuantity(cleanNumberInput(e.target.value))}
+                onKeyDown={blockInvalidNumberKeys}
                 className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none font-bold text-sm"
               />
             </div>
@@ -504,6 +510,7 @@ const StartEntry = () => {
                       type="number"
                       value={paidAmount}
                       onChange={handlePaidAmountChange}
+                      onKeyDown={blockInvalidNumberKeys}
                       className="w-full bg-transparent text-green-500 pl-4 py-2 border-b border-[#333] focus:border-green-500 outline-none font-bold text-lg placeholder-green-900"
                     />
                   </div>
@@ -520,6 +527,7 @@ const StartEntry = () => {
                       type="number"
                       value={pendingAmount}
                       onChange={handlePendingAmountChange}
+                      onKeyDown={blockInvalidNumberKeys}
                       className="w-full bg-transparent text-red-500 pl-4 py-2 border-b border-[#333] focus:border-red-500 outline-none font-bold text-lg placeholder-red-900"
                     />
                   </div>
