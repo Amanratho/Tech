@@ -416,5 +416,22 @@
   "trackerHr": "घंटा",
   "trackerMin": "मिनट",
   "trackerAutoFilled": "ट्रैकर से स्वचालित भरा गया!",
-  "trackerCountAutoFilled": "गिनती"
+  "trackerCountAutoFilled": "गिनती",
+
+  "कंफर्म मोडल संबंधित": "",
+  "confirmModalDefaultTitle": "क्या आप निश्चित हैं?",
+  "confirmModalDefaultMessage": "यह कार्य वापस नहीं हो सकता।",
+  "confirmModalConfirm": "पुष्टि करें",
+  "confirmPaidTitle": "भुगतान प्राप्त चिह्नित करें?",
+  "confirmPaidMessage": "यह इस भुगतान को पूर्ण मान कर आपकी रिमाइंडर सूची से हटा देगा।",
+  "confirmDeleteTitle": "रिमाइंडर हटाएं?",
+  "confirmDeleteMessage": "यह रिमाइंडर स्थायी रूप से हटा दिया जाएगा। यह कार्य वापस नहीं हो सकता।",
+  "confirmMachineDeleteTitle": "मशीन हटाएं?",
+  "confirmDeleteAccountTitle": "खाता हटाएं?",
+  "confirmDeleteAccountMessage": "क्या आप वाकई अपना खाता हटाना चाहते हैं? यह कार्य वापस नहीं होगा और आपका सारा डेटा हमेशा के लिए मिट जाएगा।",
+  "profileUpdateSuccess": "प्रोफ़ाइल सफलतापूर्वक अपडेट हो गई!",
+  "profileUpdateFailed": "प्रोफ़ाइल अपडेट करने में विफल।",
+  "accountDeletedSuccess": "आपका खाता सफलतापूर्वक हटा दिया गया।",
+  "accountDeleteFailed": "खाता हटाने में विफल। कृपया पुनः प्रयास करें।",
+  "deleteAccountButton": "खाता हटाएं"
 }

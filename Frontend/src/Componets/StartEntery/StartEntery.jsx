@@ -53,32 +53,32 @@ const StartEntry = () => {
 
 
   useEffect(() => {
-    if (!rentType) return; 
+    if (!rentType) return;
 
     if (rentType === "Hour") {
       const savedTime = localStorage.getItem("rentveda_pending_time_entry");
       if (savedTime) {
-         
+
         const totalSeconds = Number(savedTime);
-         
+
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
- 
+
         const formattedQuantity = `${hours}.${minutes.toString().padStart(2, '0')}`;
-        
+
         setQuantity(formattedQuantity);
-         
+
         toast.info(`⏳ ${hours} ${t('trackerHr') || 'hr'} ${minutes} ${t('trackerMin') || 'min'} ${t('trackerAutoFilled') || 'auto-filled from Tracker!'}`, { theme: "dark" });
-         
+
         localStorage.removeItem("rentveda_pending_time_entry");
       }
-    }  
+    }
     else {
       const savedCount = localStorage.getItem("rentveda_pending_count_entry");
       if (savedCount) {
         setQuantity(savedCount);
         toast.info(`🔢 ${t('trackerCountAutoFilled') || 'Count'} (${savedCount}) ${t('trackerAutoFilled') || 'auto-filled from Tracker!'}`, { theme: "dark" });
-         
+
         localStorage.removeItem("rentveda_pending_count_entry");
       }
     }
@@ -215,15 +215,15 @@ const StartEntry = () => {
       const name = Array.isArray(contact.name) && contact.name.length > 0
         ? contact.name[0]
         : typeof contact.name === "string"
-        ? contact.name
-        : "";
+          ? contact.name
+          : "";
 
       // Extract & clean phone number (strip spaces, dashes, country code)
       const rawTel = Array.isArray(contact.tel) && contact.tel.length > 0
         ? contact.tel[0]
         : typeof contact.tel === "string"
-        ? contact.tel
-        : "";
+          ? contact.tel
+          : "";
       const cleanedTel = rawTel.replace(/[^\d]/g, "").slice(-10); // keep last 10 digits
 
       if (name) setCustomerName(name);
@@ -542,14 +542,12 @@ const StartEntry = () => {
                           setCustomerMobile(mobileNumber);
                         }
                       }}
-                      className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${
-                        setReminder ? "bg-[var(--primary)]" : "bg-[#333]"
-                      }`}
+                      className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${setReminder ? "bg-[var(--primary)]" : "bg-[#333]"
+                        }`}
                     >
                       <div
-                        className={`w-5 h-5 rounded-full bg-black transition-all duration-300 ${
-                          setReminder ? "translate-x-5" : "translate-x-0"
-                        }`}
+                        className={`w-5 h-5 rounded-full bg-black transition-all duration-300 ${setReminder ? "translate-x-5" : "translate-x-0"
+                          }`}
                       />
                     </button>
                   </div>

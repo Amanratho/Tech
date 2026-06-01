@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -8,11 +7,14 @@ import { API_BASE_URL } from "../../config";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { FaPen, FaTrashAlt, FaArrowLeft } from "react-icons/fa";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
 
 const MachineryUpdate = () => {
   const { t } = useTranslation();
   const [machines, setMachines] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [machineToDelete, setMachineToDelete] = useState(null); // holds Machine_id
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,55 +41,30 @@ const MachineryUpdate = () => {
     navigate(`/Machinery-Update/edit-machine/${item.Machine_id}`);
   };
 
+  // Opens the confirm modal
   const handleDeleteClick = (Machine_id) => {
-    toast(
-      ({ closeToast }) => (
-        <div className="flex flex-col gap-3">
-          <p className="text-gray-200 font-semibold text-sm text-center">
-            {t('deleteConfirmation') || "Are you sure you want to delete this machine?"}
-          </p>
-          <div className="flex justify-center gap-3 mt-2">
-            <button
-              className="bg-[#2A2A2A] text-white px-5 py-2 rounded-lg text-xs font-bold hover:bg-[#333] transition-colors"
-              onClick={() => {
-                toast.info(t('cancelToastMessage') || "Deletion cancelled", { theme: "dark" });
-                closeToast();
-              }}
-            >
-              {t('cancelButton') || "Cancel"}
-            </button>
-            <button
-              className="bg-red-500 text-white px-5 py-2 rounded-lg text-xs font-bold shadow-lg shadow-red-500/20 active:scale-95 transition-transform"
-              onClick={async () => {
-                try {
-                  const response = await axios.delete(
-                    `${API_BASE_URL}/api/machine/machines/${Machine_id}`
-                  );
-                  if (response.status === 200) {
-                    setMachines((prev) => prev.filter((m) => m.Machine_id !== Machine_id));
-                    toast.success(t('deleteSuccessToast') || "Machine deleted successfully", { theme: "dark" });
-                  }
-                } catch (error) {
-                  console.error("Error deleting machine:", error);
-                  toast.error(t('deleteErrorToast') || "Failed to delete machine", { theme: "dark" });
-                }
-                closeToast();
-              }}
-            >
-              {t('deleteButton') || "Delete"}
-            </button>
-          </div>
-        </div>
-      ),
-      {
-        position: "top-center",
-        autoClose: false,
-        closeOnClick: false,
-        draggable: false,
-        hideProgressBar: true,
-        className: "bg-[#1E1E1E] border border-[#333] rounded-2xl",
+    setMachineToDelete(Machine_id);
+  };
+
+  // Called when user confirms deletion in the modal
+  const confirmDelete = async () => {
+    if (!machineToDelete) return;
+    setIsDeleting(true);
+    try {
+      const response = await axios.delete(
+        `${API_BASE_URL}/api/machine/machines/${machineToDelete}`
+      );
+      if (response.status === 200) {
+        setMachines((prev) => prev.filter((m) => m.Machine_id !== machineToDelete));
+        toast.success(t('deleteSuccessToast') || "Machine deleted successfully", { theme: "dark" });
       }
-    );
+    } catch (error) {
+      console.error("Error deleting machine:", error);
+      toast.error(t('deleteErrorToast') || "Failed to delete machine", { theme: "dark" });
+    } finally {
+      setIsDeleting(false);
+      setMachineToDelete(null);
+    }
   };
 
   return (
@@ -171,6 +148,19 @@ const MachineryUpdate = () => {
           </AnimatePresence>
         )}
       </div>
+
+      {/* CONFIRM DELETE MODAL */}
+      <ConfirmModal
+        isOpen={!!machineToDelete}
+        onCancel={() => setMachineToDelete(null)}
+        onConfirm={confirmDelete}
+        isLoading={isDeleting}
+        variant="danger"
+        title={t('confirmMachineDeleteTitle') || "Delete Machine?"}
+        message={t('deleteConfirmation') || "Are you sure you want to delete this machine? This action cannot be undone."}
+        confirmText={t('deleteButton') || "Delete"}
+        cancelText={t('cancelButton') || "Cancel"}
+      />
     </div>
   );
 };

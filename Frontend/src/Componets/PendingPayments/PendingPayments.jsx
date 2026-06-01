@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { format, isPast, isToday } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
 import {
   FaChevronLeft,
   FaSearch,
@@ -48,6 +49,9 @@ const PendingPayments = () => {
   const [selectedReminder, setSelectedReminder] = useState(null);
   const [editDate, setEditDate] = useState("");
   const [editAmount, setEditAmount] = useState(0);
+
+  // Confirm Dialog State
+  const [confirmDialog, setConfirmDialog] = useState({ open: false, reminderId: null, action: null });
 
   // Helper: Get status label and color styling for dates
   const getDateStatus = (dateString) => {
@@ -123,20 +127,17 @@ const PendingPayments = () => {
     }
   };
 
-  // Action: Mark PAID or CANCEL
-  const handleAction = async (reminderId, action) => {
-    const actionText = action === "PAID"
-      ? (t("reminderConfirmPaid")   || "mark as Paid")
-      : (t("reminderConfirmDelete") || "delete reminder");
-    const confirmAction = window.confirm(`${t("reminderConfirmPrompt") || "Are you sure you want to"} ${actionText}?`);
-    if (!confirmAction) return;
+  // Action: Mark PAID or CANCEL — opens confirm modal
+  const handleAction = (reminderId, action) => {
+    setConfirmDialog({ open: true, reminderId, action });
+  };
 
+  // Called when user confirms inside the modal
+  const handleConfirmedAction = async () => {
+    const { reminderId, action } = confirmDialog;
+    setConfirmDialog({ open: false, reminderId: null, action: null });
     try {
-      await performAction({
-        _id: reminderId,
-        action: action, // 'PAID' or 'DELETE'/'CANCEL'
-      }).unwrap();
-
+      await performAction({ _id: reminderId, action }).unwrap();
       toast.success(
         action === "PAID"
           ? (t("reminderMarkedPaidSuccess")    || "Payment completed successfully!")
@@ -415,6 +416,30 @@ const PendingPayments = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* ─── GLOBAL CONFIRM MODAL ─────────────────────────────────── */}
+      <ConfirmModal
+        isOpen={confirmDialog.open}
+        onCancel={() => setConfirmDialog({ open: false, reminderId: null, action: null })}
+        onConfirm={handleConfirmedAction}
+        variant={confirmDialog.action === "PAID" ? "success" : "danger"}
+        title={
+          confirmDialog.action === "PAID"
+            ? (t("confirmPaidTitle")   || "Mark as Paid?")
+            : (t("confirmDeleteTitle") || "Delete Reminder?")
+        }
+        message={
+          confirmDialog.action === "PAID"
+            ? (t("confirmPaidMessage")   || "This will mark the payment as completed and remove it from your pending list.")
+            : (t("confirmDeleteMessage") || "This reminder will be permanently deleted. This action cannot be undone.")
+        }
+        confirmText={
+          confirmDialog.action === "PAID"
+            ? (t("reminderCompleteBtn") || "Mark Paid")
+            : (t("deleteButton")        || "Delete")
+        }
+        cancelText={t("cancelButton") || "Cancel"}
+      />
     </div>
   );
 };

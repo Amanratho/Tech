@@ -415,5 +415,21 @@
     "trackerHr": "hr",
     "trackerMin": "min",
     "trackerAutoFilled": "auto-filled from Tracker!",
-    "trackerCountAutoFilled": "Count"
+    "trackerCountAutoFilled": "Count",
+
+    "confirmModalDefaultTitle": "Are you sure?",
+    "confirmModalDefaultMessage": "This action cannot be undone.",
+    "confirmModalConfirm": "Confirm",
+    "confirmPaidTitle": "Mark as Paid?",
+    "confirmPaidMessage": "This will mark the payment as completed and remove it from your pending list.",
+    "confirmDeleteTitle": "Delete Reminder?",
+    "confirmDeleteMessage": "This reminder will be permanently deleted. This action cannot be undone.",
+    "confirmMachineDeleteTitle": "Delete Machine?",
+    "confirmDeleteAccountTitle": "Delete Account?",
+    "confirmDeleteAccountMessage": "Are you sure you want to delete your account? This action is <b class=\"text-red-400\">irreversible</b> and all your data will be permanently erased.",
+    "profileUpdateSuccess": "Profile updated successfully!",
+    "profileUpdateFailed": "Failed to update profile.",
+    "accountDeletedSuccess": "Your account has been deleted successfully.",
+    "accountDeleteFailed": "Failed to delete account. Please try again.",
+    "deleteAccountButton": "Delete Account"
   }
