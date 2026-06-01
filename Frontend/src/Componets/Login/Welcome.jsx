@@ -1,6 +1,7 @@
 
 
 import React, { useState } from "react";
+import "../Loader/Loader.css"; // rv-btn-spinner used in login & sign-up buttons
 import { useTranslation } from "react-i18next";
 import {
   FaEnvelope,
@@ -147,6 +148,7 @@ const Welcome = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true); // lock UI immediately
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -169,6 +171,8 @@ const Welcome = () => {
       }
     } catch (error) {
       toast.error(t("invalid_credentials"));
+    } finally {
+      setLoading(false); // always unlock, even on error
     }
   };
 
@@ -290,10 +294,18 @@ const Welcome = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full py-3.5 mt-2 bg-[var(--primary)] text-black font-bold rounded-xl shadow-lg shadow-[var(--primary)]/20 transition-all ${loading ? "opacity-70 cursor-not-allowed" : "active:scale-95 hover:bg-yellow-500"
-                    }`}
+                  className={`w-full py-3.5 mt-2 bg-[var(--primary)] text-black font-bold rounded-xl shadow-lg shadow-[var(--primary)]/20 transition-all flex items-center justify-center gap-2 ${
+                    loading ? "opacity-60 cursor-not-allowed" : "active:scale-95 hover:bg-yellow-500"
+                  }`}
                 >
-                  {loading ? (t("processing") || "Processing...") : (t("sign_up") || "Sign Up")}
+                  {loading ? (
+                    <>
+                      <span className="rv-btn-spinner" />
+                      {t("processing") || "Processing…"}
+                    </>
+                  ) : (
+                    t("sign_up") || "Sign Up"
+                  )}
                 </button>
               </form>
             </div>
@@ -451,9 +463,19 @@ const Welcome = () => {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 mt-2 bg-[var(--primary)] text-black font-bold rounded-xl shadow-lg shadow-[var(--primary)]/20 active:scale-95 transition-all"
+                  disabled={loading}
+                  className={`w-full py-3.5 mt-2 bg-[var(--primary)] text-black font-bold rounded-xl shadow-lg shadow-[var(--primary)]/20 transition-all flex items-center justify-center gap-2 ${
+                    loading ? "opacity-60 cursor-not-allowed" : "active:scale-95 hover:bg-yellow-500"
+                  }`}
                 >
-                  {t("login") || "Login"}
+                  {loading ? (
+                    <>
+                      <span className="rv-btn-spinner" />
+                      {t("signingIn") || "Signing in…"}
+                    </>
+                  ) : (
+                    t("login") || "Login"
+                  )}
                 </button>
               </form>
             </div>
