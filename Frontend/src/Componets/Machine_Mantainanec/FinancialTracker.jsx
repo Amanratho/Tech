@@ -68,7 +68,7 @@ const FinancialTracker = ({ machineId, uid }) => {
 
   const handleDelete = async (id) => {
     try {
-      await deleteMaintenance(id).unwrap();
+      await deleteMaintenance({ id, machineId }).unwrap();
       showToast(t("entryDeletedSuccess"));
       setDeleteId(null);
     } catch { showToast(t("entryDeleteFailed"), "error"); }

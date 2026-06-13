@@ -13,6 +13,7 @@ import {
   FaExclamationCircle,
   FaSearch,
   FaChartLine,
+  FaArchive,
 } from "react-icons/fa";
 import FinancialTracker from "./FinancialTracker";
 
@@ -20,6 +21,7 @@ import FinancialTracker from "./FinancialTracker";
 const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) => {
   const { t } = useTranslation();
   const uid = localStorage.getItem("uid");
+  const isArchived = machine.isActive === false;
 
   // Rental aggregations
   const totalPaidAmount = rentalData?.reduce((acc, r) => acc + r.paidAmount, 0) || 0;
@@ -41,7 +43,7 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[#1E1E1E] rounded-xl border border-[#2C2C2C] overflow-hidden shadow-lg flex flex-col"
+      className={`bg-[#1E1E1E] rounded-xl border overflow-hidden shadow-lg flex flex-col ${isArchived ? 'border-orange-500/30 opacity-75' : 'border-[#2C2C2C]'}`}
     >
       {/* Image + Badge header */}
       <div
@@ -79,8 +81,13 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
               </span>
             </div>
 
-            <h3 className="text-white text-base font-bold drop-shadow-md">
+            <h3 className="text-white text-base font-bold drop-shadow-md flex items-center gap-2">
               {machine.Machine_name}
+              {isArchived && (
+                <span className="text-[9px] text-orange-400 font-bold uppercase tracking-wider bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/30 flex items-center gap-1">
+                  <FaArchive size={8} /> {t('soldLabel') || 'SOLD'}
+                </span>
+              )}
             </h3>
           </div>
 
@@ -173,7 +180,7 @@ const MachineMaintenanceApp = () => {
   const fetchMachines = async () => {
     try {
       const uid = localStorage.getItem("uid");
-      const response = await axios.post(`${API_BASE_URL}/api/machines`, { uid });
+      const response = await axios.post(`${API_BASE_URL}/api/machines?includeArchived=true`, { uid });
       if (response.data && Array.isArray(response.data)) {
         setMachines(response.data);
         response.data.forEach((machine) => fetchRentalsByMachineId(machine.Machine_id));
@@ -198,7 +205,7 @@ const MachineMaintenanceApp = () => {
   const processedMachines = useMemo(() => {
     let mapped = machines.map((machine) => {
       const rData = rentalData[machine.Machine_id] || [];
-      const calculatedTotalAmount = rData.reduce((acc, curr) => acc + curr.totalAmount, 0);
+      const calculatedTotalAmount = rData.reduce((acc, curr) => acc + (Number(curr.paidAmount) + Number(curr.pendingAmount)), 0);
       const calculatedTotalWork = rData.reduce((acc, curr) => acc + curr.quantity, 0);
       return { ...machine, calculatedTotalAmount, calculatedTotalWork };
     });

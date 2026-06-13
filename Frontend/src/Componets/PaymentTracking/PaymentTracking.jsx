@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useGetPaymentsQuery, useUpdatePaymentMutation } from "../../redux/functional/paymentApiSlice";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
@@ -35,6 +35,38 @@ const PaymentTracking = () => {
 
     const [searchQuery, setSearchQuery] = useState("");
     const [filterType, setFilterType] = useState("all");
+
+    // Form states for pre-filling and editing
+    const [editCustomerName, setEditCustomerName] = useState("");
+    const [editMobileNumber, setEditMobileNumber] = useState("");
+    const [editMachineId, setEditMachineId] = useState("");
+    const [activeReminderId, setActiveReminderId] = useState(null);
+
+    const location = useLocation();
+
+    // Auto-open and pre-fill modal if redirected from Reminder module
+    React.useEffect(() => {
+        if (location.state && location.state.fromReminder) {
+            const { customerName, mobileNumber, pendingAmount, machineId, reminderId, paidAmount } = location.state;
+            
+            setEditCustomerName(customerName || "");
+            setEditMobileNumber(mobileNumber || "");
+            setEditMachineId(machineId || "");
+            setPaymentAmount(pendingAmount || 0);
+            setActiveReminderId(reminderId);
+            
+            setSelectedEntry({
+                _id: reminderId,
+                pendingAmount: pendingAmount || 0,
+                paidAmount: paidAmount || 0
+            });
+            
+            setIsModalOpen(true);
+            
+            // Clear router state to prevent re-triggering on refresh
+            window.history.replaceState({}, document.title);
+        }
+    }, [location]);
 
     // --- LOGIC: AGGREGATE DATA ---
     React.useEffect(() => {
@@ -75,6 +107,10 @@ const PaymentTracking = () => {
     const handleMarkPaid = (entry) => {
         setSelectedEntry(entry);
         setPaymentAmount(entry.pendingAmount);
+        setEditCustomerName(entry.customerName || "");
+        setEditMobileNumber(entry.mobileNumber || "");
+        setEditMachineId(entry.machineId || "");
+        setActiveReminderId(entry._id);
         setIsModalOpen(true);
     };
 
@@ -95,6 +131,11 @@ const PaymentTracking = () => {
                     _id: selectedEntry._id,
                     pendingAmount: newPendingAmount,
                     paidAmount: newPaidAmount,
+                    // Send editable fields back if they were changed
+                    customerName: editCustomerName,
+                    mobileNumber: editMobileNumber,
+                    machineId: editMachineId,
+                    reminderId: activeReminderId // Can be used by backend to trigger reminder status change
                 }).unwrap();
 
                 toast.success("Payment updated successfully!");
@@ -326,7 +367,31 @@ const PaymentTracking = () => {
                                 <button onClick={() => setIsModalOpen(false)} className="text-gray-500"><FaTimes /></button>
                             </div>
 
-                            <p className="text-gray-400 text-xs mb-1">Pending Amount</p>
+                            <label className="text-gray-400 text-[10px] block mb-1">Customer Name</label>
+                            <input
+                                type="text"
+                                value={editCustomerName}
+                                onChange={(e) => setEditCustomerName(e.target.value)}
+                                className="w-full bg-[#121212] text-white border border-[#333] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
+                            />
+
+                            <label className="text-gray-400 text-[10px] block mb-1">Mobile Number</label>
+                            <input
+                                type="text"
+                                value={editMobileNumber}
+                                onChange={(e) => setEditMobileNumber(e.target.value)}
+                                className="w-full bg-[#121212] text-white border border-[#333] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
+                            />
+
+                            <label className="text-gray-400 text-[10px] block mb-1">Machine/Rent Type</label>
+                            <input
+                                type="text"
+                                value={editMachineId}
+                                onChange={(e) => setEditMachineId(e.target.value)}
+                                className="w-full bg-[#121212] text-white border border-[#333] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
+                            />
+
+                            <p className="text-gray-400 text-xs mb-1">Total Pending Balance</p>
                             <p className="text-red-500 text-lg font-bold mb-4">₹{selectedEntry.pendingAmount}</p>
 
                             <label className="text-gray-400 text-xs mb-1 block">{t('enterPaymentAmount')}</label>

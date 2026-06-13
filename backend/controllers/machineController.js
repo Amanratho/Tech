@@ -18,12 +18,13 @@ const deleteLocalFile = (filePath) => {
 exports.getAllMachines = async (req, res) => {
   const { page = 1, limit = 10 } = req.query; // Pagination parameters
   try {
+    const filter = { isActive: { $ne: false } };
     const machines = await machineRegModel
-      .find()
+      .find(filter)
       .skip((page - 1) * limit)
       .limit(Number(limit))
       .lean();
-    const total = await machineRegModel.countDocuments();
+    const total = await machineRegModel.countDocuments(filter);
     res.status(200).json({ success: true, page, limit, total, data: machines });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server Error", error });
@@ -130,20 +131,23 @@ exports.updateMachine = async (req, res) => {
 };
 
 
-// Delete a machine by ID
+// Soft-delete (archive) a machine by ID
 
 exports.deleteMachine = async (req, res) => {
   const { id } = req.params; 
 
   try {
-    
-    const deletedMachine = await machineRegModel.findOneAndDelete({ Machine_id: id });
+    const archivedMachine = await machineRegModel.findOneAndUpdate(
+      { Machine_id: id },
+      { isActive: false, archivedAt: new Date() },
+      { new: true }
+    );
 
-    if (!deletedMachine) {
+    if (!archivedMachine) {
       return res.status(404).json({ success: false, message: "Machine not found" });
     }
 
-    res.status(200).json({ success: true, message: "Machine deleted successfully" });
+    res.status(200).json({ success: true, message: "Machine archived successfully", data: archivedMachine });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server Error", error });
   }

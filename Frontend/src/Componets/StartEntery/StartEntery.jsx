@@ -6,6 +6,7 @@ import { API_BASE_URL } from "../../config";
 import { toast } from "react-toastify";
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from "framer-motion";
+import { cleanStringInput, cleanNumberInput, blockInvalidNumberKeys } from "../../utils/inputValidation";
 import {
   FaChevronLeft,
   FaUser,
@@ -44,6 +45,20 @@ const StartEntry = () => {
   const [reminderDate, setReminderDate] = useState("");
   const [customerMobile, setCustomerMobile] = useState("");
 
+  // Today's date in YYYY-MM-DD for min attribute on date picker
+  const today = new Date().toISOString().split("T")[0];
+
+  // Validated reminder date handler — blocks past dates
+  const handleReminderDateChange = (e) => {
+    const selectedDate = e.target.value;
+    if (selectedDate < today) {
+      setReminderDate("");
+      toast.warn(t('reminderPastDateError') || "Reminder date cannot be in the past", { theme: "dark" });
+      return;
+    }
+    setReminderDate(selectedDate);
+  };
+
   // --- LOGIC: CALCULATION ---
   useEffect(() => {
     if (rentType && price && quantity) {
@@ -53,32 +68,32 @@ const StartEntry = () => {
 
 
   useEffect(() => {
-    if (!rentType) return; 
+    if (!rentType) return;
 
     if (rentType === "Hour") {
       const savedTime = localStorage.getItem("rentveda_pending_time_entry");
       if (savedTime) {
-         
+
         const totalSeconds = Number(savedTime);
-         
+
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
- 
+
         const formattedQuantity = `${hours}.${minutes.toString().padStart(2, '0')}`;
-        
+
         setQuantity(formattedQuantity);
-         
-        toast.info(`⏳ ${hours} hr ${minutes} min auto-filled from Tracker!`, { theme: "dark" });
-         
+
+        toast.info(`⏳ ${hours} ${t('trackerHr') || 'hr'} ${minutes} ${t('trackerMin') || 'min'} ${t('trackerAutoFilled') || 'auto-filled from Tracker!'}`, { theme: "dark" });
+
         localStorage.removeItem("rentveda_pending_time_entry");
       }
-    }  
+    }
     else {
       const savedCount = localStorage.getItem("rentveda_pending_count_entry");
       if (savedCount) {
         setQuantity(savedCount);
-        toast.info(`🔢 Count (${savedCount}) auto-filled from Tracker!`, { theme: "dark" });
-         
+        toast.info(`🔢 ${t('trackerCountAutoFilled') || 'Count'} (${savedCount}) ${t('trackerAutoFilled') || 'auto-filled from Tracker!'}`, { theme: "dark" });
+
         localStorage.removeItem("rentveda_pending_count_entry");
       }
     }
@@ -118,14 +133,16 @@ const StartEntry = () => {
   };
 
   const handlePaidAmountChange = (e) => {
-    const paid = Number(e.target.value) || 0;
+    const cleanValue = cleanNumberInput(e.target.value);
+    const paid = Number(cleanValue) || 0;
     const validPaidAmount = Math.min(paid, total || 0);
     setPaidAmount(validPaidAmount);
     setPendingAmount((total || 0) - validPaidAmount);
   };
 
   const handlePendingAmountChange = (e) => {
-    const pending = Number(e.target.value) || 0;
+    const cleanValue = cleanNumberInput(e.target.value);
+    const pending = Number(cleanValue) || 0;
     const validPendingAmount = Math.min(pending, total || 0);
     setPendingAmount(validPendingAmount);
     setPaidAmount((total || 0) - validPendingAmount);
@@ -167,7 +184,7 @@ const StartEntry = () => {
         setCustomerName(response.data.customerName);
         setAddress(response.data.address);
         setIsCustomerFound(true);
-        toast.success("Existing Customer Found!", { theme: "dark" });
+        toast.success(t('existingCustomerFound') || "Existing Customer Found!", { theme: "dark" });
       }
     } catch {
       // 🚨 YAHAN FIX HAI: 
@@ -181,7 +198,8 @@ const StartEntry = () => {
   };
 
   const handleMobileNumberChange = async (e) => {
-    const mobile = e.target.value;
+    // Strip anything except digits for mobile number specifically
+    const mobile = e.target.value.replace(/\D/g, "");
     setMobileNumber(mobile);
     setIsCustomerFound(false);
     if (!customerMobile || customerMobile === mobileNumber) {
@@ -197,7 +215,7 @@ const StartEntry = () => {
     // Web Contact Picker API — supported on Android Chrome / Samsung Browser
     if (!navigator.contacts || !navigator.contacts.select) {
       toast.warn(
-        "Contact Picker is not supported on this browser. Please enter manually.",
+        t('contactPickerUnsupported') || "Contact Picker is not supported on this browser. Please enter manually.",
         { theme: "dark" }
       );
       return;
@@ -215,15 +233,15 @@ const StartEntry = () => {
       const name = Array.isArray(contact.name) && contact.name.length > 0
         ? contact.name[0]
         : typeof contact.name === "string"
-        ? contact.name
-        : "";
+          ? contact.name
+          : "";
 
       // Extract & clean phone number (strip spaces, dashes, country code)
       const rawTel = Array.isArray(contact.tel) && contact.tel.length > 0
         ? contact.tel[0]
         : typeof contact.tel === "string"
-        ? contact.tel
-        : "";
+          ? contact.tel
+          : "";
       const cleanedTel = rawTel.replace(/[^\d]/g, "").slice(-10); // keep last 10 digits
 
       if (name) setCustomerName(name);
@@ -237,10 +255,10 @@ const StartEntry = () => {
         }
       }
 
-      toast.success(`Contact "${name}" imported!`, { theme: "dark" });
+      toast.success(`${t('contactImported') || 'Contact'} "${name}" ${t('contactImportedSuffix') || 'imported!'}`, { theme: "dark" });
     } catch (err) {
       if (err.name !== "AbortError") {
-        toast.error("Could not open contact picker.", { theme: "dark" });
+        toast.error(t('contactPickerError') || "Could not open contact picker.", { theme: "dark" });
       }
     }
   };
@@ -249,12 +267,12 @@ const StartEntry = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!customerName || !mobileNumber || !price || !quantity) {
-      toast.error("Please fill all required fields.");
+      toast.error(t('fillAllFields') || "Please fill all required fields.");
       return;
     }
 
     if (setReminder && !reminderDate) {
-      toast.error("Please select a reminder date.");
+      toast.error(t('selectReminderDate') || "Please select a reminder date.");
       return;
     }
 
@@ -282,11 +300,11 @@ const StartEntry = () => {
         `${API_BASE_URL}/api/rentals/add-entry`,
         entryData
       );
-      toast.success("Entry saved!");
+      toast.success(t('entrySaved') || "Entry saved!");
       navigate("/invoice", { state: { entryData, machineName } });
       resetForm();
     } catch (error) {
-      toast.error("Error: " + (error.response?.data?.message || error.message));
+      toast.error((t('entryError') || "Error: ") + (error.response?.data?.message || error.message));
     }
   };
 
@@ -376,7 +394,7 @@ const StartEntry = () => {
             <button
               type="button"
               onClick={handleContactPicker}
-              title="Import from Contacts"
+              title={t('importFromContacts') || "Import from Contacts"}
               className="flex-shrink-0 w-11 h-11 rounded-xl bg-[#1E1E1E] border border-[#333] flex items-center justify-center text-[var(--primary)] active:bg-[#2C2C2C] hover:border-[var(--primary)] transition-all"
             >
               <FaAddressBook size={16} />
@@ -391,7 +409,7 @@ const StartEntry = () => {
               type="text"
               placeholder={t('enterCustomerName') || "Customer Name"}
               value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
+              onChange={(e) => setCustomerName(cleanStringInput(e.target.value))}
               className="w-full bg-[#1E1E1E] text-white pl-11 pr-4 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-sm transition-all"
             />
           </motion.div>
@@ -404,7 +422,7 @@ const StartEntry = () => {
               type="text"
               placeholder={t('clientAddress') || "Address"}
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(e) => setAddress(cleanStringInput(e.target.value))}
               className="w-full bg-[#1E1E1E] text-white pl-11 pr-4 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-sm transition-all"
             />
           </motion.div>
@@ -425,7 +443,7 @@ const StartEntry = () => {
                 type="text"
                 placeholder={t('operatorName') || "Operator"}
                 value={operatorName}
-                onChange={(e) => setOperatorName(e.target.value)}
+                onChange={(e) => setOperatorName(cleanStringInput(e.target.value))}
                 className="w-full bg-[#1E1E1E] text-white pl-9 pr-2 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-xs"
               />
             </motion.div>
@@ -438,7 +456,7 @@ const StartEntry = () => {
                 type="text"
                 placeholder={t('jobWork') || "Work Type"}
                 value={jobWork}
-                onChange={(e) => setJobWork(e.target.value)}
+                onChange={(e) => setJobWork(cleanStringInput(e.target.value))}
                 className="w-full bg-[#1E1E1E] text-white pl-9 pr-2 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-xs"
               />
             </motion.div>
@@ -457,25 +475,27 @@ const StartEntry = () => {
           {/* Price & Qty Row */}
           <div className="flex gap-3 mb-5">
             <div className="flex-1">
-              <label className="text-gray-500 text-[10px] font-bold mb-1 block">RATE</label>
+              <label className="text-gray-500 text-[10px] font-bold mb-1 block">{t('rateLabel') || "RATE"}</label>
               <input
                 type="number"
                 placeholder="0"
                 value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                onChange={(e) => setPrice(cleanNumberInput(e.target.value))}
+                onKeyDown={blockInvalidNumberKeys}
                 className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none font-bold text-sm"
               />
             </div>
 
             <div className="flex-1">
               <label className="text-gray-500 text-[10px] font-bold mb-1 block">
-                QTY ({rentType})
+                {t('qtyLabel') || "QTY"} ({rentType})
               </label>
               <input
                 type="number"
                 placeholder="0"
                 value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
+                onChange={(e) => setQuantity(cleanNumberInput(e.target.value))}
+                onKeyDown={blockInvalidNumberKeys}
                 className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none font-bold text-sm"
               />
             </div>
@@ -483,7 +503,7 @@ const StartEntry = () => {
 
           {/* TOTAL BILL (Center) */}
           <div className="text-center mb-5 pb-5 border-b border-[#333]">
-            <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Total Bill Amount</p>
+            <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">{t('totalBillAmount') || "Total Bill Amount"}</p>
             <div className="text-3xl font-extrabold text-white tracking-tight">
               ₹ {total || 0}
             </div>
@@ -496,7 +516,7 @@ const StartEntry = () => {
                 {/* PAID */}
                 <div>
                   <label className="text-green-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
-                    Paid Amount
+                    {t('paidAmount') || "Paid Amount"}
                   </label>
                   <div className="relative">
                     <span className="absolute left-0 top-2 text-green-600 font-bold">₹</span>
@@ -504,6 +524,7 @@ const StartEntry = () => {
                       type="number"
                       value={paidAmount}
                       onChange={handlePaidAmountChange}
+                      onKeyDown={blockInvalidNumberKeys}
                       className="w-full bg-transparent text-green-500 pl-4 py-2 border-b border-[#333] focus:border-green-500 outline-none font-bold text-lg placeholder-green-900"
                     />
                   </div>
@@ -512,7 +533,7 @@ const StartEntry = () => {
                 {/* PENDING */}
                 <div>
                   <label className="text-red-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
-                    Pending Due
+                    {t('pendingDue') || "Pending Due"}
                   </label>
                   <div className="relative">
                     <span className="absolute left-0 top-2 text-red-600 font-bold">₹</span>
@@ -520,6 +541,7 @@ const StartEntry = () => {
                       type="number"
                       value={pendingAmount}
                       onChange={handlePendingAmountChange}
+                      onKeyDown={blockInvalidNumberKeys}
                       className="w-full bg-transparent text-red-500 pl-4 py-2 border-b border-[#333] focus:border-red-500 outline-none font-bold text-lg placeholder-red-900"
                     />
                   </div>
@@ -531,8 +553,8 @@ const StartEntry = () => {
                 <div className="pt-5 border-t border-[#333]">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-white text-xs font-bold">Set Payment Reminder</h4>
-                      <p className="text-[10px] text-gray-500">Get notified when follow-up is due</p>
+                      <h4 className="text-white text-xs font-bold">{t('setPaymentReminder') || "Set Payment Reminder"}</h4>
+                      <p className="text-[10px] text-gray-500">{t('reminderNotifyText') || "Get notified when follow-up is due"}</p>
                     </div>
                     <button
                       type="button"
@@ -542,14 +564,12 @@ const StartEntry = () => {
                           setCustomerMobile(mobileNumber);
                         }
                       }}
-                      className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${
-                        setReminder ? "bg-[var(--primary)]" : "bg-[#333]"
-                      }`}
+                      className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${setReminder ? "bg-[var(--primary)]" : "bg-[#333]"
+                        }`}
                     >
                       <div
-                        className={`w-5 h-5 rounded-full bg-black transition-all duration-300 ${
-                          setReminder ? "translate-x-5" : "translate-x-0"
-                        }`}
+                        className={`w-5 h-5 rounded-full bg-black transition-all duration-300 ${setReminder ? "translate-x-5" : "translate-x-0"
+                          }`}
                       />
                     </button>
                   </div>
@@ -565,26 +585,27 @@ const StartEntry = () => {
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="text-gray-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
-                              Reminder Date
+                              {t('reminderModalDateLabel') || "Reminder Date"}
                             </label>
                             <input
                               type="date"
                               value={reminderDate}
-                              onChange={(e) => setReminderDate(e.target.value)}
+                              min={today}
+                              onChange={handleReminderDateChange}
                               className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none text-xs font-semibold"
                             />
                           </div>
 
                           <div>
                             <label className="text-gray-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
-                              SMS Mobile (Optional)
+                              {t('smsMobileLabel') || "SMS Mobile (Optional)"}
                             </label>
                             <input
                               type="tel"
                               maxLength={10}
                               value={customerMobile}
                               onChange={(e) => setCustomerMobile(e.target.value)}
-                              placeholder="SMS Mobile"
+                              placeholder={t('smsMobilePlaceholder') || "SMS Mobile"}
                               className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none text-xs font-semibold"
                             />
                           </div>

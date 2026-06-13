@@ -14,7 +14,7 @@ import {
   FaArrowLeft,
   FaTrashAlt
 } from "react-icons/fa";
-import "react-confirm-alert/src/react-confirm-alert.css";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
 
 const EditProfile = () => {
   const { t } = useTranslation();
@@ -26,6 +26,8 @@ const EditProfile = () => {
   const [qrCode, setQrCode] = useState(null);
   const [qrPreview, setQrPreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const uid = localStorage.getItem("uid");
 
@@ -87,63 +89,37 @@ const EditProfile = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      toast.success("Profile updated successfully!");
+      toast.success(t('profileUpdateSuccess') || "Profile updated successfully!");
       setTimeout(() => {
-        window.history.back(); // Go back to profile after successful update
+        window.history.back();
       }, 1500);
-
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error("Failed to update profile.");
+      toast.error(t('profileUpdateFailed') || "Failed to update profile.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDeleteAccount = () => {
-    toast(
-      ({ closeToast }) => (
-        <div className="flex flex-col gap-3">
-          <p className="text-gray-200 font-semibold text-sm text-center">
-            Are you sure you want to delete your account? This action is <b className="text-red-500">irreversible</b>.
-          </p>
-          <div className="flex justify-center gap-3 mt-2">
-            <button
-              className="bg-[#2A2A2A] text-white px-5 py-2 rounded-lg text-xs font-bold hover:bg-[#333] transition-colors"
-              onClick={closeToast}
-            >
-              Cancel
-            </button>
-            <button
-              className="bg-red-500 text-white px-5 py-2 rounded-lg text-xs font-bold shadow-lg shadow-red-500/20 active:scale-95 transition-transform"
-              onClick={async () => {
-                try {
-                  await axios.delete(`${API_BASE_URL}/api/user/delete/${uid}`);
-                  toast.success("Your account has been deleted successfully.");
-                  localStorage.removeItem("uid");
-                  localStorage.removeItem("token");
-                  closeToast();
-                  window.location.href = "/login";
-                } catch (error) {
-                  console.error("Error deleting account:", error);
-                  toast.error("Failed to delete account. Please try again.");
-                }
-              }}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      ),
-      {
-        position: "top-center",
-        autoClose: false,
-        closeOnClick: false,
-        draggable: false,
-        hideProgressBar: true,
-        className: "bg-[#1E1E1E] border border-[#333] rounded-2xl",
-      }
-    );
+  // Opens the danger confirm modal
+  const handleDeleteAccount = () => setIsDeleteOpen(true);
+
+  // Executed after user confirms in modal
+  const performDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      await axios.delete(`${API_BASE_URL}/api/user/delete/${uid}`);
+      toast.success(t('accountDeletedSuccess') || "Your account has been deleted successfully.");
+      localStorage.removeItem("uid");
+      localStorage.removeItem("token");
+      setIsDeleteOpen(false);
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast.error(t('accountDeleteFailed') || "Failed to delete account. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const slideUp = {
@@ -265,13 +241,29 @@ const EditProfile = () => {
                 className="w-full py-3.5 bg-transparent border border-red-500/30 text-red-500 font-bold rounded-xl text-sm flex items-center justify-center gap-2 hover:bg-red-500/10 active:scale-95 transition-all"
               >
                 <FaTrashAlt size={12} />
-                Delete Account
+                {t('deleteAccountButton') || "Delete Account"}
               </button>
             </div>
 
           </form>
         </motion.div>
       </div>
+
+      {/* DELETE ACCOUNT CONFIRM MODAL */}
+      <ConfirmModal
+        isOpen={isDeleteOpen}
+        onCancel={() => setIsDeleteOpen(false)}
+        onConfirm={performDeleteAccount}
+        isLoading={isDeleting}
+        variant="danger"
+        title={t('confirmDeleteAccountTitle') || "Delete Account?"}
+        message={
+          t('confirmDeleteAccountMessage') ||
+          "Are you sure you want to delete your account? This action is <b class=\"text-red-400\">irreversible</b> and all your data will be permanently erased."
+        }
+        confirmText={t('deleteButton') || "Delete"}
+        cancelText={t('cancelButton') || "Cancel"}
+      />
     </div>
   );
 };
