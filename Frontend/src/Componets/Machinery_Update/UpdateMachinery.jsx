@@ -6,7 +6,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import { FaPen, FaTrashAlt, FaArrowLeft } from "react-icons/fa";
+import { FaPen, FaTrashAlt, FaArrowLeft, FaArchive } from "react-icons/fa";
 import ConfirmModal from "../ConfirmModal/ConfirmModal";
 
 const MachineryUpdate = () => {
@@ -46,7 +46,7 @@ const MachineryUpdate = () => {
     setMachineToDelete(Machine_id);
   };
 
-  // Called when user confirms deletion in the modal
+  // Called when user confirms archiving in the modal
   const confirmDelete = async () => {
     if (!machineToDelete) return;
     setIsDeleting(true);
@@ -56,11 +56,11 @@ const MachineryUpdate = () => {
       );
       if (response.status === 200) {
         setMachines((prev) => prev.filter((m) => m.Machine_id !== machineToDelete));
-        toast.success(t('deleteSuccessToast') || "Machine deleted successfully", { theme: "dark" });
+        toast.success(t('archiveSuccessToast') || "Machine archived successfully! Historical data preserved.", { theme: "dark" });
       }
     } catch (error) {
-      console.error("Error deleting machine:", error);
-      toast.error(t('deleteErrorToast') || "Failed to delete machine", { theme: "dark" });
+      console.error("Error archiving machine:", error);
+      toast.error(t('archiveErrorToast') || "Failed to archive machine", { theme: "dark" });
     } finally {
       setIsDeleting(false);
       setMachineToDelete(null);
@@ -137,9 +137,10 @@ const MachineryUpdate = () => {
 
                     <button
                       onClick={() => handleDeleteClick(item.Machine_id)}
-                      className="w-9 h-9 rounded-full bg-red-500/10 backdrop-blur-sm border border-red-500/50 text-red-500 flex items-center justify-center shadow-lg hover:bg-red-500/20 active:bg-red-500 active:text-white transition-all"
+                      className="w-9 h-9 rounded-full bg-orange-500/10 backdrop-blur-sm border border-orange-500/50 text-orange-500 flex items-center justify-center shadow-lg hover:bg-orange-500/20 active:bg-orange-500 active:text-white transition-all"
+                      title={t('archiveMachineTitle') || "Archive / Mark as Sold"}
                     >
-                      <FaTrashAlt size={12} />
+                      <FaArchive size={12} />
                     </button>
                   </div>
                 </div>
@@ -156,9 +157,9 @@ const MachineryUpdate = () => {
         onConfirm={confirmDelete}
         isLoading={isDeleting}
         variant="danger"
-        title={t('confirmMachineDeleteTitle') || "Delete Machine?"}
-        message={t('deleteConfirmation') || "Are you sure you want to delete this machine? This action cannot be undone."}
-        confirmText={t('deleteButton') || "Delete"}
+        title={t('confirmMachineArchiveTitle') || "Archive Machine?"}
+        message={t('archiveConfirmation') || "This will mark the machine as sold/archived. All historical income & expense data will be preserved for your P&L reports. You can still see this machine in the Maintenance section."}
+        confirmText={t('archiveButton') || "Archive"}
         cancelText={t('cancelButton') || "Cancel"}
       />
     </div>

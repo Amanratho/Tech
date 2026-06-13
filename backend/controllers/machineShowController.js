@@ -4,8 +4,14 @@ const getAllMachines = async (req, res) => {
   const { uid } = req.body; // Extract uid from the request body
 
   try {
+    // Build filter: default to active-only, allow ?includeArchived=true for P&L pages
+    const filter = { uid };
+    if (req.query.includeArchived !== 'true') {
+      filter.isActive = { $ne: false };
+    }
+
     // Query the database for machines with the given uid
-    const machines = await Machine.find({ uid }); 
+    const machines = await Machine.find(filter); 
     if (!machines || machines.length === 0) {
       return res.status(404).json({ message: "No machines found for this UID" });
     }

@@ -115,6 +115,9 @@ exports.deleteMaintenanceEntry = async (req, res) => {
       data: deleted,
     });
   } catch (error) {
+    if (error.name === 'CastError') {
+      return res.status(400).json({ success: false, message: "Invalid entry ID format" });
+    }
     console.error("Error deleting maintenance entry:", error);
     res.status(500).json({ success: false, message: "Server Error", error: error.message });
   }

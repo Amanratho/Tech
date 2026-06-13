@@ -48,10 +48,23 @@ const PendingPayments = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedReminder, setSelectedReminder] = useState(null);
   const [editDate, setEditDate] = useState("");
-  const [editAmount, setEditAmount] = useState(0);
 
   // Confirm Dialog State
   const [confirmDialog, setConfirmDialog] = useState({ open: false, reminderId: null, action: null });
+
+  // Today's date in YYYY-MM-DD for min attribute on date picker
+  const today = new Date().toISOString().split("T")[0];
+
+  // Validated date change handler — blocks past dates
+  const handleEditDateChange = (e) => {
+    const selectedDate = e.target.value;
+    if (selectedDate < today) {
+      setEditDate("");
+      toast.warn(t('reminderPastDateError') || "Reminder date cannot be in the past", { theme: "dark" });
+      return;
+    }
+    setEditDate(selectedDate);
+  };
 
   // Helper: Get status label and color styling for dates
   const getDateStatus = (dateString) => {
@@ -91,7 +104,6 @@ const PendingPayments = () => {
   // Open Edit Modal
   const handleOpenEdit = (reminder) => {
     setSelectedReminder(reminder);
-    setEditAmount(reminder.pendingAmount);
     // Format date to YYYY-MM-DD for the HTML5 input
     const dateFormatted = reminder.reminderDate
       ? new Date(reminder.reminderDate).toISOString().split("T")[0]
@@ -106,8 +118,8 @@ const PendingPayments = () => {
       toast.error(t("reminderPickDateError") || "Please pick a reminder date");
       return;
     }
-    if (editAmount <= 0) {
-      toast.error(t("reminderAmountError") || "Amount must be greater than zero");
+    if (editDate < today) {
+      toast.warn(t('reminderPastDateError') || "Reminder date cannot be in the past", { theme: "dark" });
       return;
     }
 
@@ -115,7 +127,6 @@ const PendingPayments = () => {
       await updateReminder({
         _id: selectedReminder._id,
         reminderDate: editDate,
-        pendingAmount: Number(editAmount),
       }).unwrap();
 
       toast.success(t("reminderUpdatedSuccess") || "Reminder details updated successfully!");
@@ -317,7 +328,19 @@ const PendingPayments = () => {
                       <FaTrashAlt size={10} />
                     </button>
                     <button
-                      onClick={() => handleAction(rem._id, "PAID")}
+                      onClick={() => {
+                        navigate("/payment-tracking", {
+                          state: {
+                            fromReminder: true,
+                            customerName: rem.customerName,
+                            mobileNumber: rem.customerMobile || rem.mobileNumber,
+                            pendingAmount: rem.pendingAmount,
+                            machineId: rem.machineId || rem.rentType,
+                            reminderId: rem._id,
+                            paidAmount: rem.paidAmount || 0
+                          }
+                        });
+                      }}
                       className="px-3 h-8 bg-green-500 text-white rounded-lg text-[10px] font-black flex items-center gap-1 active:scale-95 transition-transform shadow-md shadow-green-500/10"
                     >
                       <FaCheckCircle size={10} /> {t("reminderCompleteBtn") || "Complete"}
@@ -366,21 +389,7 @@ const PendingPayments = () => {
                   </p>
                 </div>
 
-                {/* Edit Pending Amount */}
-                <div>
-                  <label className="text-gray-400 text-[10px] font-bold mb-1.5 block uppercase tracking-wider">
-                    {t("reminderModalAmountLabel") || "Pending Amount Due"}
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-red-500 font-bold">₹</span>
-                    <input
-                      type="number"
-                      value={editAmount}
-                      onChange={(e) => setEditAmount(e.target.value)}
-                      className="w-full bg-[#121212] text-red-400 font-bold border border-[#333] rounded-lg py-2 pl-7 pr-3 focus:border-[var(--primary)] outline-none text-sm"
-                    />
-                  </div>
-                </div>
+                {/* Removed Edit Pending Amount block */}
 
                 {/* Edit Reminder Date */}
                 <div>
@@ -391,7 +400,8 @@ const PendingPayments = () => {
                     <input
                       type="date"
                       value={editDate}
-                      onChange={(e) => setEditDate(e.target.value)}
+                      min={today}
+                      onChange={handleEditDateChange}
                       className="w-full bg-[#121212] text-white border border-[#333] rounded-lg py-2 px-3 focus:border-[var(--primary)] outline-none text-xs font-semibold"
                     />
                   </div>

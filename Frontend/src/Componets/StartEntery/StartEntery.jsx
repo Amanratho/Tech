@@ -45,6 +45,20 @@ const StartEntry = () => {
   const [reminderDate, setReminderDate] = useState("");
   const [customerMobile, setCustomerMobile] = useState("");
 
+  // Today's date in YYYY-MM-DD for min attribute on date picker
+  const today = new Date().toISOString().split("T")[0];
+
+  // Validated reminder date handler — blocks past dates
+  const handleReminderDateChange = (e) => {
+    const selectedDate = e.target.value;
+    if (selectedDate < today) {
+      setReminderDate("");
+      toast.warn(t('reminderPastDateError') || "Reminder date cannot be in the past", { theme: "dark" });
+      return;
+    }
+    setReminderDate(selectedDate);
+  };
+
   // --- LOGIC: CALCULATION ---
   useEffect(() => {
     if (rentType && price && quantity) {
@@ -576,7 +590,8 @@ const StartEntry = () => {
                             <input
                               type="date"
                               value={reminderDate}
-                              onChange={(e) => setReminderDate(e.target.value)}
+                              min={today}
+                              onChange={handleReminderDateChange}
                               className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none text-xs font-semibold"
                             />
                           </div>

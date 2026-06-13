@@ -187,7 +187,7 @@ function MachineSection() {
     data: machines = [],
     error,
     isLoading,
-  } = useGetMachinesQuery(uid, {
+  } = useGetMachinesQuery({ uid }, {
     skip: !uid,
     keepUnusedDataFor: 1000,
   });

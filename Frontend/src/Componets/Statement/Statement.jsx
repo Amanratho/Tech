@@ -49,7 +49,7 @@ const Statement = () => {
     try {
       const [rentalsResponse, machinesResponse] = await Promise.all([
         axios.post(`${API_BASE_URL}/api/rentals`, { uid }),
-        axios.post(`${API_BASE_URL}/api/machines`, { uid })
+        axios.post(`${API_BASE_URL}/api/machines?includeArchived=true`, { uid })
       ]);
 
       const allRentals = rentalsResponse.data;

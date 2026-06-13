@@ -24,6 +24,8 @@ const machineShowSchema = new mongoose.Schema({
   uid: { 
     type: String, required: true 
   },
+  isActive: { type: Boolean, default: true },
+  archivedAt: { type: Date, default: null },
 });
 
 module.exports = mongoose.model("machine", machineShowSchema);
