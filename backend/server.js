@@ -14,6 +14,7 @@ const path = require("path");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes.js");
 const maintenanceRoutes = require("./routes/machineMaintenanceRoutes.js");
+const cronRoutes = require("./routes/cronRoutes.js");
 // const { keepAlive } = require("./keepAlive.js");
 
 const app = express();
@@ -40,15 +41,13 @@ app.use("/api/rentals", rentalRoutes);
 app.use("/api", rentalRoutes);
 app.use("/api", maintenanceRoutes);
 app.use("/api/otp", otpRoutes);
-
-const { startReminderCron } = require("./services/reminderCron");
+app.use("/api/cron", cronRoutes);
 
 // Connect to MongoDB and start the server
 connectDB();
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  // Start the background cron jobs
-  startReminderCron();
+  // Reminders are now triggered externally via GET /api/cron/send-reminders
   // keepAlive();
 });
