@@ -10,6 +10,7 @@ export const maintenanceApi = createApi({
       query: (machineId) => `/api/maintenance/${machineId}`,
       providesTags: (result, error, machineId) => [
         { type: "Maintenance", id: machineId },
+        { type: "Maintenance", id: "LIST" },
       ],
     }),
 
@@ -21,15 +22,19 @@ export const maintenanceApi = createApi({
       }),
       invalidatesTags: (result, error, { machineId }) => [
         { type: "Maintenance", id: machineId },
+        { type: "Maintenance", id: "LIST" },
       ],
     }),
 
     deleteMaintenance: builder.mutation({
-      query: (id) => ({
+      query: ({ id }) => ({
         url: `/api/delete-maintenance/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Maintenance"],
+      invalidatesTags: (result, error, { machineId }) => [
+        { type: "Maintenance", id: machineId },
+        { type: "Maintenance", id: "LIST" },
+      ],
     }),
   }),
 });

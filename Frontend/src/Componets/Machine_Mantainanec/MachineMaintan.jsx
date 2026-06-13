@@ -205,7 +205,7 @@ const MachineMaintenanceApp = () => {
   const processedMachines = useMemo(() => {
     let mapped = machines.map((machine) => {
       const rData = rentalData[machine.Machine_id] || [];
-      const calculatedTotalAmount = rData.reduce((acc, curr) => acc + curr.totalAmount, 0);
+      const calculatedTotalAmount = rData.reduce((acc, curr) => acc + (Number(curr.paidAmount) + Number(curr.pendingAmount)), 0);
       const calculatedTotalWork = rData.reduce((acc, curr) => acc + curr.quantity, 0);
       return { ...machine, calculatedTotalAmount, calculatedTotalWork };
     });
