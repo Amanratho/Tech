@@ -383,13 +383,13 @@ const PaymentTracking = () => {
                                 className="w-full bg-[#121212] text-white border border-[#333] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
                             />
 
-                            <label className="text-gray-400 text-[10px] block mb-1">Machine/Rent Type</label>
+                            {/* <label className="text-gray-400 text-[10px] block mb-1">Machine/Rent Type</label>
                             <input
                                 type="text"
                                 value={editMachineId}
                                 onChange={(e) => setEditMachineId(e.target.value)}
                                 className="w-full bg-[#121212] text-white border border-[#333] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
-                            />
+                            /> */}
 
                             <p className="text-gray-400 text-xs mb-1">Total Pending Balance</p>
                             <p className="text-red-500 text-lg font-bold mb-4">₹{selectedEntry.pendingAmount}</p>

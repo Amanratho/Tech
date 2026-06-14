@@ -277,75 +277,64 @@ const PendingPayments = () => {
                   </span>
                 </div>
 
-                {/* Middle row: Machine ID & Target reminder Date */}
-                <div className="flex justify-between items-center text-xs pl-1 mt-1 bg-[#121212]/50 p-2 rounded-lg border border-[#262626]">
+                {/* Middle row: Follow-up Date & Pending Amount */}
+                <div className="flex justify-between items-center text-xs pl-1 mt-1 bg-[#121212]/50 p-2.5 rounded-lg border border-[#262626]">
                   <div>
-                    <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">
-                      {t("reminderRentItem") || "Rent Item"}
-                    </p>
-                    <p className="text-white font-bold text-[10px] mt-0.5 truncate max-w-[120px]">
-                      {rem.rentType} {t("reminderWork") || "Work"}
-                    </p>
-                  </div>
-                  <div className="text-right">
                     <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">
                       {t("reminderFollowUp") || "Follow Up"}
                     </p>
-                    <p className="text-gray-300 font-bold text-[10px] mt-0.5 flex items-center gap-1 justify-end">
-                      <FaCalendarAlt size={8} className="text-[var(--primary)]" />
+                    <p className="text-gray-300 font-bold text-[11px] mt-0.5 flex items-center gap-1">
+                      <FaCalendarAlt size={9} className="text-[var(--primary)]" />
                       {rem.reminderDate
                         ? format(new Date(rem.reminderDate), "dd MMM yyyy")
                         : "N/A"}
                     </p>
                   </div>
-                </div>
-
-                {/* Amount Row */}
-                <div className="flex justify-between items-center pl-1 border-t border-[#2a2a2a] pt-3">
-                  <div>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">
+                  <div className="text-right">
+                    <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">
                       {t("reminderPendingDues") || "Pending Dues"}
                     </p>
-                    <p className="text-red-500 text-base font-extrabold tracking-tight mt-0.5">
-                      ₹{rem.pendingAmount.toLocaleString()}
+                    <p className="text-emerald-400 text-base font-extrabold tracking-tight mt-0.5 flex items-center gap-1 justify-end">
+                      <FaMoneyBillWave size={11} className="text-emerald-500/60" />
+                      ₹{rem.pendingAmount?.toLocaleString()}
                     </p>
                   </div>
+                </div>
 
-                  {/* Actions Column */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleOpenEdit(rem)}
-                      className="w-8 h-8 rounded-full bg-[#2a2a2a] hover:bg-[#3a3a3a] text-gray-300 flex items-center justify-center border border-[#3b3b3b] active:scale-90 transition-transform"
-                      title={t("reminderEditTitle") || "Edit Reminder"}
-                    >
-                      <FaEdit size={10} />
-                    </button>
-                    <button
-                      onClick={() => handleAction(rem._id, "DELETE")}
-                      className="w-8 h-8 rounded-full bg-red-950/40 hover:bg-red-900/60 text-red-400 flex items-center justify-center border border-red-900/30 active:scale-90 transition-transform"
-                      title={t("reminderDeleteTitle") || "Delete Reminder"}
-                    >
-                      <FaTrashAlt size={10} />
-                    </button>
-                    <button
-                      onClick={() => {
-                        navigate("/payment-tracking", {
-                          state: {
-                            fromReminder: true,
-                            customerName: rem.customerName,
-                            mobileNumber: rem.customerMobile || rem.mobileNumber,
-                            pendingAmount: rem.pendingAmount,
-                            machineId: rem.machineId || rem.rentType,
-                            reminderId: rem._id,
-                            paidAmount: rem.paidAmount || 0
-                          }
-                        });
-                      }}
-                      className="px-3 h-8 bg-green-500 text-white rounded-lg text-[10px] font-black flex items-center gap-1 active:scale-95 transition-transform shadow-md shadow-green-500/10"
-                    >
-                      <FaCheckCircle size={10} /> {t("reminderCompleteBtn") || "Complete"}
-                    </button>
-                  </div>
+                {/* Actions Row */}
+                <div className="flex justify-end items-center pl-1 pt-2 gap-2">
+                  <button
+                    onClick={() => handleOpenEdit(rem)}
+                    className="w-8 h-8 rounded-full bg-[#2a2a2a] hover:bg-[#3a3a3a] text-gray-300 flex items-center justify-center border border-[#3b3b3b] active:scale-90 transition-transform"
+                    title={t("reminderEditTitle") || "Edit Reminder"}
+                  >
+                    <FaEdit size={10} />
+                  </button>
+                  <button
+                    onClick={() => handleAction(rem._id, "DELETE")}
+                    className="w-8 h-8 rounded-full bg-red-950/40 hover:bg-red-900/60 text-red-400 flex items-center justify-center border border-red-900/30 active:scale-90 transition-transform"
+                    title={t("reminderDeleteTitle") || "Delete Reminder"}
+                  >
+                    <FaTrashAlt size={10} />
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate("/payment-tracking", {
+                        state: {
+                          fromReminder: true,
+                          customerName: rem.customerName,
+                          mobileNumber: rem.customerMobile || rem.mobileNumber,
+                          pendingAmount: rem.pendingAmount,
+                          machineId: rem.machineId || rem.rentType,
+                          reminderId: rem._id,
+                          paidAmount: rem.paidAmount || 0
+                        }
+                      });
+                    }}
+                    className="px-3 h-8 bg-green-500 text-white rounded-lg text-[10px] font-black flex items-center gap-1 active:scale-95 transition-transform shadow-md shadow-green-500/10"
+                  >
+                    <FaCheckCircle size={10} /> {t("reminderCompleteBtn") || "Complete"}
+                  </button>
                 </div>
               </motion.div>
             );
