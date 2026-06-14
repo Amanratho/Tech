@@ -29,9 +29,26 @@ const EditMachine = () => {
   // Automatically fetch existing machine data if you want (optional enhancement)
   // For now, keeping your exact logic
 
-  useEffect(() => {
-    console.log("Machine ID from URL:", id);
-  }, [id]);
+
+useEffect(() => {
+  const fetchMachineData = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/machine/machines/${id}`);
+      const machine = response.data;
+
+      setFormData({
+        machineName: machine.Machine_name || "",
+        rentType: machine.RentType || "",
+      });
+
+      setPreview(machine.image || null);
+
+    } catch (error) {
+      toast.error("Failed to load machine details");
+    }
+  };
+  fetchMachineData();
+}, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -150,13 +167,13 @@ const EditMachine = () => {
                   <option value="" disabled className="text-gray-500">
                     {t('rentTypePlaceholder') || "Select Unit"}
                   </option>
-                  <option value="Acre">{t('rentTypeOptions.acre') || "Per Acre"}</option>
-                  <option value="Hour">{t('rentTypeOptions.hour') || "Per Hour"}</option>
-                  <option value="Quantity">{t('rentTypeOptions.quantity') || "Per Quantity"}</option>
-                  <option value="Days">{t('rentTypeOptions.days') || "Per Day"}</option>
-                  <option value="Contract">{t('rentTypeOptions.contract') || "Contract Basis"}</option>
-                  <option value="Kilometers">{t('rentTypeOptions.kilometers') || "Per Kilometer"}</option>
-                  <option value="Foot">{t('rentTypeOptions.foot') || "Per Foot"}</option>
+                  <option value="Acre">Per Acre</option>
+                    <option value="Hour">Per Hour</option>
+                    <option value="Quantity">Per Quantity</option>
+                    <option value="Days">Per Day</option>
+                    <option value="Contract">Contract Basis</option>
+                    <option value="Kilometers">Per Kilometer</option>
+                    <option value="Foot">Per Foot</option>
                 </select>
                 {/* Custom dropdown arrow */}
                 <div className="absolute right-4 top-4 pointer-events-none text-gray-500 text-xs">▼</div>
