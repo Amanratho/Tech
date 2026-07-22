@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useGetPendingRemindersQuery } from "../../redux/functional/paymentApiSlice";
-import { isToday, isPast } from "date-fns";
 import {
   FaHome,
   FaPhoneAlt,
@@ -29,11 +28,14 @@ function NotificationDropdown({ uid }) {
   // Fetch reminders using RTK Query
   const { data: reminders = [] } = useGetPendingRemindersQuery(uid, { skip: !uid });
 
-  // Filter for today or past
+  // STRICT: Only show reminders where reminderDate <= today (due or overdue)
   const actionableReminders = reminders.filter(rem => {
     if (!rem.reminderDate) return false;
-    const date = new Date(rem.reminderDate);
-    return isToday(date) || (isPast(date) && !isToday(date));
+    const reminderDate = new Date(rem.reminderDate);
+    // Strip time: compare date-only against start of today
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // end of today
+    return reminderDate <= today;
   });
 
   const displayReminders = actionableReminders.slice(0, 10);
@@ -53,8 +55,8 @@ function NotificationDropdown({ uid }) {
   if (!uid) return null;
 
   return (
-    <div className="relative flex items-center" ref={dropdownRef}>
-      {/* 1. Bell Icon with Sleek Unread Dot */}
+    <div className="relative flex items-center" ref={dropdownRef} style={{ zIndex: 999 }}>
+      {/* Bell Icon with Unread Dot */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 transition-colors rounded-full text-yellow-400 active:scale-95 hover:bg-[#1E1E1E]"
@@ -66,13 +68,22 @@ function NotificationDropdown({ uid }) {
         )}
       </button>
 
-      {/* 2. Premium Native Mobile Pop-up Tray */}
+      {/* Notification Tray — Solid isolated overlay */}
       {isOpen && (
-        <div className="absolute top-[50px] right-0 w-[calc(100vw-32px)] max-w-[340px] bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden z-[100] flex flex-col transform origin-top-right transition-all">
+        <div
+          className="absolute top-[50px] right-0 w-[calc(100vw-32px)] max-w-[340px] rounded-2xl overflow-hidden flex flex-col transform origin-top-right transition-all"
+          style={{
+            zIndex: 999,
+            backgroundColor: '#1E1E1E',
+            border: '1px solid #2a2a2a',
+            boxShadow: '0 12px 48px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.5)',
+            isolation: 'isolate',
+          }}
+        >
           
-          {/* 3. Clean & Professional Heading */}
-          <div className="flex justify-between items-center px-4 py-3 border-b border-[#2a2a2a]">
-            <h3 className="text-[#E0E0E0] text-sm font-semibold tracking-wide">Notifications</h3>
+          {/* Header */}
+          <div className="flex justify-between items-center px-4 py-3 border-b border-[#2a2a2a]" style={{ backgroundColor: '#1E1E1E' }}>
+            <h3 className="text-[#E0E0E0] text-sm font-semibold tracking-wide">Pending Collections</h3>
             <button 
               onClick={() => setIsOpen(false)} 
               className="text-gray-500 hover:text-white transition-colors p-1 rounded-full hover:bg-[#2a2a2a]"
@@ -82,17 +93,24 @@ function NotificationDropdown({ uid }) {
           </div>
 
           {/* Body */}
-          <div className="max-h-[60vh] overflow-y-auto no-scrollbar bg-[#1a1a1a]">
+          <div className="max-h-[60vh] overflow-y-auto no-scrollbar" style={{ backgroundColor: '#1E1E1E' }}>
             {!hasUnread ? (
               <div className="text-center py-8 text-xs text-gray-500 font-medium">
-                No pending notifications
+                No dues to collect today
               </div>
             ) : (
               displayReminders.map(rem => (
-                <div key={rem._id} className="px-4 py-3 border-b border-[#222] hover:bg-[#222] transition-colors cursor-pointer active:bg-[#2a2a2a]">
-                  <div className="flex justify-between items-center mb-0.5">
+                <div key={rem._id} className="px-4 py-3 border-b border-[#2a2a2a] hover:bg-[#262626] transition-colors cursor-pointer active:bg-[#2a2a2a]" style={{ backgroundColor: '#1E1E1E' }}>
+                  {/* Customer name — owner perspective */}
+                  <p className="text-[#c0c0c0] text-[11px] font-medium tracking-wide mb-0.5">
+                    Due from:
+                  </p>
+                  <div className="flex justify-between items-center mb-1">
                     <p className="text-[#f0f0f0] text-sm font-semibold truncate max-w-[160px]">{rem.customerName}</p>
-                    <p className="text-red-400 text-sm font-bold tracking-tight">₹{rem.pendingAmount.toLocaleString()}</p>
+                    {/* Amount in green — money incoming to owner */}
+                    <p className="text-emerald-400 text-sm font-bold tracking-tight">
+                      To Collect: ₹{rem.pendingAmount?.toLocaleString()}
+                    </p>
                   </div>
                   <p className="text-[11px] text-gray-500 font-medium tracking-wide">{rem.mobileNumber || rem.customerMobile}</p>
                 </div>
@@ -100,9 +118,9 @@ function NotificationDropdown({ uid }) {
             )}
           </div>
 
-          {/* 4. Small & Minimal Footer Link */}
+          {/* Footer */}
           {hasUnread && (
-            <div className="p-2 bg-[#161616] flex justify-center border-t border-[#2a2a2a]">
+            <div className="p-2 flex justify-center border-t border-[#2a2a2a]" style={{ backgroundColor: '#181818' }}>
               <button 
                 onClick={() => {
                   setIsOpen(false);
@@ -110,7 +128,7 @@ function NotificationDropdown({ uid }) {
                 }}
                 className="w-full py-1.5 text-xs font-semibold text-yellow-400 hover:text-yellow-300 active:scale-95 transition-all"
               >
-                See All Dues
+                View All Pending Dues
               </button>
             </div>
           )}
