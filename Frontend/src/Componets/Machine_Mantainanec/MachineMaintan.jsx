@@ -3,7 +3,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { useGetMaintenanceByMachineQuery } from "../../redux/functional/maintenanceApiSlice";
+import { useGetMachineSummaryQuery } from "../../redux/functional/machineApiSlice";
 import {
   FaChevronDown,
   FaChevronUp,
@@ -18,23 +18,18 @@ import {
 import FinancialTracker from "./FinancialTracker";
 
 // ─── Machine Card ────────────────────────────────────────────
-const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) => {
+const MachineCard = ({ machine, toggleShowDetails, showDetails }) => {
   const { t } = useTranslation();
   const uid = localStorage.getItem("uid");
   const isArchived = machine.isActive === false;
 
-  // Rental aggregations
-  const totalPaidAmount = rentalData?.reduce((acc, r) => acc + r.paidAmount, 0) || 0;
-  const totalPendingAmount = rentalData?.reduce((acc, r) => acc + r.pendingAmount, 0) || 0;
+  // Rental and Maintenance aggregations from backend summary
+  const totalPaidAmount = machine.totalPaidAmount || 0;
+  const totalPendingAmount = machine.totalPendingAmount || 0;
   const totalAmount = machine.calculatedTotalAmount || 0;
   const totalWork = machine.calculatedTotalWork || 0;
-
-  // Maintenance data via RTK Query (same cache FinancialTracker uses)
-  const { data: mData } = useGetMaintenanceByMachineQuery(machine.Machine_id, {
-    skip: !machine.Machine_id,
-  });
-  const totalExpense = mData?.totalExpense || 0;
-  const totalExtraIncome = mData?.totalIncome || 0;
+  const totalExpense = machine.totalExpense || 0;
+  const totalExtraIncome = machine.totalIncome || 0;
 
   // NET PROFIT = Rent Billed + Extra Income - Expenses
   const netProfit = totalAmount + totalExtraIncome - totalExpense;
@@ -66,7 +61,7 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
               <span className="text-[10px] text-[var(--text-muted)] font-bold tracking-wider bg-white/80 px-2 py-0.5 rounded border border-[var(--border-color)] flex items-center gap-1.5 backdrop-blur-sm shadow-md">
                 <FaTools size={9} /> {totalWork}{" "}
                 <span className="text-[8px] font-normal text-[var(--text-muted)] uppercase">
-                  {rentalData[0]?.rentType || "Units"}
+                  {machine.RentType || "Units"}
                 </span>
               </span>
               {/* Net Profit Badge */}
@@ -156,59 +151,18 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
 // ─── Main Page ───────────────────────────────────────────────
 const MachineMaintenanceApp = () => {
   const { t } = useTranslation();
-  const [machines, setMachines] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const uid = localStorage.getItem("uid");
+  const { data: machines = [], isLoading, error } = useGetMachineSummaryQuery({ uid, includeArchived: true }, { skip: !uid });
   const [showDetails, setShowDetails] = useState({});
-  const [rentalData, setRentalData] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
-
-  const fetchRentalsByMachineId = async (machineId) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/rentals-by-machine-id`, { machineId });
-      setRentalData((prev) => ({
-        ...prev,
-        [machineId]: Array.isArray(response.data) ? response.data : [],
-      }));
-    } catch (error) {
-      console.error(`Error fetching rental data for ${machineId}:`, error.message);
-      setRentalData((prev) => ({ ...prev, [machineId]: [] }));
-    }
-  };
-
-  const fetchMachines = async () => {
-    try {
-      const uid = localStorage.getItem("uid");
-      const response = await axios.post(`${API_BASE_URL}/api/machines?includeArchived=true`, { uid });
-      if (response.data && Array.isArray(response.data)) {
-        setMachines(response.data);
-        response.data.forEach((machine) => fetchRentalsByMachineId(machine.Machine_id));
-      } else {
-        throw new Error("No machine data found");
-      }
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMachines();
-  }, []);
 
   const toggleShowDetails = (machineId) => {
     setShowDetails((prev) => ({ ...prev, [machineId]: !prev[machineId] }));
   };
 
   const processedMachines = useMemo(() => {
-    let mapped = machines.map((machine) => {
-      const rData = rentalData[machine.Machine_id] || [];
-      const calculatedTotalAmount = rData.reduce((acc, curr) => acc + (Number(curr.paidAmount) + Number(curr.pendingAmount)), 0);
-      const calculatedTotalWork = rData.reduce((acc, curr) => acc + curr.quantity, 0);
-      return { ...machine, calculatedTotalAmount, calculatedTotalWork };
-    });
+    let mapped = [...machines]; // Create a copy of RTK Query immutable array
 
     if (searchQuery) {
       mapped = mapped.filter(
@@ -226,7 +180,7 @@ const MachineMaintenanceApp = () => {
       mapped.sort((a, b) => b.calculatedTotalWork - a.calculatedTotalWork);
 
     return mapped;
-  }, [machines, rentalData, searchQuery, filterType]);
+  }, [machines, searchQuery, filterType]);
 
   return (
     <div className="bg-[var(--bg-main)] min-h-screen pb-20 relative overflow-hidden">
@@ -284,7 +238,7 @@ const MachineMaintenanceApp = () => {
           </div>
         ) : error ? (
           <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-400 text-xs text-center">
-            {error}
+            {error.message || "Failed to load machines"}
           </div>
         ) : processedMachines.length > 0 ? (
           processedMachines.map((machine) => (
@@ -293,7 +247,6 @@ const MachineMaintenanceApp = () => {
               machine={machine}
               toggleShowDetails={toggleShowDetails}
               showDetails={showDetails[machine.Machine_id] || false}
-              rentalData={rentalData[machine.Machine_id] || []}
             />
           ))
         ) : (

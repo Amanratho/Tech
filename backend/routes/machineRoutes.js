@@ -8,6 +8,7 @@ const {
 
 // Routes
 router.get("/machines", machineController.getAllMachines);
+router.post("/machines/summary", machineController.getMachineSummaryByUid);
 
 router.post(
   "/addMachine",

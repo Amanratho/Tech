@@ -23,6 +23,7 @@ export const maintenanceApi = createApi({
       invalidatesTags: (result, error, { machineId }) => [
         { type: "Maintenance", id: machineId },
         { type: "Maintenance", id: "LIST" },
+        { type: "Machine" },
       ],
     }),
 
@@ -34,6 +35,7 @@ export const maintenanceApi = createApi({
       invalidatesTags: (result, error, { machineId }) => [
         { type: "Maintenance", id: machineId },
         { type: "Maintenance", id: "LIST" },
+        { type: "Machine" },
       ],
     }),
   }),

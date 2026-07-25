@@ -14,7 +14,15 @@ export const machineApi = createApi({
       }),
       providesTags: ["Machine"],
     }),
+    getMachineSummary: builder.query({
+      query: ({ uid, includeArchived = false }) => ({
+        url: `/api/machines/summary${includeArchived ? '?includeArchived=true' : ''}`,
+        method: "POST",
+        body: { uid },
+      }),
+      providesTags: ["Machine"],
+    }),
   }),
 });
 
-export const { useGetMachinesQuery } = machineApi;
+export const { useGetMachinesQuery, useGetMachineSummaryQuery } = machineApi;
