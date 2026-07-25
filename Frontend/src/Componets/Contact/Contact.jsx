@@ -1,6 +1,6 @@
   import React, { useState } from "react";
   import { motion } from "framer-motion";
-  import { toast } from "react-toastify";
+  import { toast } from "../../utils/toastService";
   import { useTranslation } from "react-i18next";
   import { FaUser, FaEnvelope, FaCommentDots, FaPaperPlane, FaChevronLeft } from "react-icons/fa";
 

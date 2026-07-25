@@ -13,15 +13,19 @@ import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import "./Loader.css";
 
+import { useTranslation } from "react-i18next";
+
 // ─── 1. FULL-SCREEN OVERLAY LOADER ────────────────────────────────────────────
 /**
  * @param {boolean}  show    - Controls visibility (use AnimatePresence for unmount animation)
- * @param {string}   label   - Optional sub-label, e.g. "Generating Invoice…"
+ * @param {string}   labelKey - Optional translation key, e.g. "pleaseWait"
  *
  * Usage:
- *   <FullScreenLoader show={isLoading} label="Saving Entry…" />
+ *   <FullScreenLoader show={isLoading} labelKey="loading" />
  */
-export const FullScreenLoader = ({ show = true, label = "Please wait…" }) => {
+export const FullScreenLoader = ({ show = true, labelKey = "pleaseWait" }) => {
+  const { t } = useTranslation();
+  
   return (
     <AnimatePresence>
       {show && (
@@ -43,14 +47,14 @@ export const FullScreenLoader = ({ show = true, label = "Please wait…" }) => {
           </div>
 
           {/* Sub-label */}
-          {label && (
+          {labelKey && (
             <motion.p
               className="rv-overlay-label"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.25 }}
             >
-              {label}
+              {t(labelKey)}
             </motion.p>
           )}
         </motion.div>

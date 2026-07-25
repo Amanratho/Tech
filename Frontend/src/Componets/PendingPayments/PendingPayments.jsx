@@ -5,7 +5,7 @@ import {
   useUpdateReminderDetailsMutation,
   useDeleteOrCompleteReminderMutation,
 } from "../../redux/functional/paymentApiSlice";
-import { toast } from "react-toastify";
+import { toast } from "../../utils/toastService";
 import { useTranslation } from "react-i18next";
 import { format, isPast, isToday } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";

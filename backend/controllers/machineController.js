@@ -144,3 +144,109 @@ exports.deleteMachine = async (req, res) => {
   }
 };
 
+// Get all machines with their financial summaries (rentals & maintenance) for a specific user
+exports.getMachineSummaryByUid = async (req, res) => {
+  const { uid } = req.body;
+  const { includeArchived = false } = req.query;
+  
+  if (!uid) {
+    return res.status(400).json({ success: false, message: "uid is required" });
+  }
+
+  try {
+    const matchStage = { uid };
+    if (includeArchived !== 'true' && includeArchived !== true) {
+      matchStage.isActive = { $ne: false };
+    }
+
+    const summary = await machineRegModel.aggregate([
+      { $match: matchStage },
+      {
+        $lookup: {
+          from: "rentals",
+          localField: "Machine_id",
+          foreignField: "machineId",
+          as: "rentalsData"
+        }
+      },
+      {
+        $lookup: {
+          from: "maintenances",
+          localField: "Machine_id",
+          foreignField: "machineId",
+          as: "maintenanceData"
+        }
+      },
+      {
+        $addFields: {
+          calculatedTotalAmount: {
+            $reduce: {
+              input: "$rentalsData",
+              initialValue: 0,
+              in: { $add: ["$$value", { $add: [{ $ifNull: ["$$this.paidAmount", 0] }, { $ifNull: ["$$this.pendingAmount", 0] }] }] }
+            }
+          },
+          totalPaidAmount: {
+            $reduce: {
+              input: "$rentalsData",
+              initialValue: 0,
+              in: { $add: ["$$value", { $ifNull: ["$$this.paidAmount", 0] }] }
+            }
+          },
+          totalPendingAmount: {
+            $reduce: {
+              input: "$rentalsData",
+              initialValue: 0,
+              in: { $add: ["$$value", { $ifNull: ["$$this.pendingAmount", 0] }] }
+            }
+          },
+          calculatedTotalWork: {
+            $reduce: {
+              input: "$rentalsData",
+              initialValue: 0,
+              in: { $add: ["$$value", { $ifNull: ["$$this.quantity", 0] }] }
+            }
+          },
+          totalIncome: {
+            $reduce: {
+              input: {
+                $filter: {
+                  input: "$maintenanceData",
+                  as: "m",
+                  cond: { $eq: ["$$m.type", "income"] }
+                }
+              },
+              initialValue: 0,
+              in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] }
+            }
+          },
+          totalExpense: {
+            $reduce: {
+              input: {
+                $filter: {
+                  input: "$maintenanceData",
+                  as: "m",
+                  cond: { $eq: ["$$m.type", "expense"] }
+                }
+              },
+              initialValue: 0,
+              in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] }
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          rentalsData: 0, // Exclude heavy raw data
+          maintenanceData: 0
+        }
+      }
+    ]);
+
+    // Send array directly to match existing component logic which checks Array.isArray(response.data)
+    res.status(200).json(summary); 
+  } catch (error) {
+    console.error("Error in getMachineSummaryByUid:", error);
+    res.status(500).json({ success: false, message: "Server Error", error: error.message });
+  }
+};

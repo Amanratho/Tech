@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
-import { toast } from "react-toastify";
+import { toast } from "../../utils/toastService";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import {

@@ -431,5 +431,22 @@
     "profileUpdateFailed": "Failed to update profile.",
     "accountDeletedSuccess": "Your account has been deleted successfully.",
     "accountDeleteFailed": "Failed to delete account. Please try again.",
-    "deleteAccountButton": "Delete Account"
+    "deleteAccountButton": "Delete Account",
+    "okButton": "OK",
+    "pleaseWait": "Please wait...",
+    "loading": "Loading...",
+    "deleteBillTitle": "Delete Bill?",
+    "deleteBillMessage": "Are you sure you want to delete the bill for",
+    "billAmount": "Amount: ₹",
+    "deleting": "Deleting...",
+    "saving": "Saving...",
+    "successUpdated": "Updated successfully!",
+    "errorFailed": "Failed to perform action.",
+    "transactionHistory": "Transaction History",
+    "statusPaid": "Paid",
+    "statusDue": "Due",
+    "collectPaymentTitle": "Collect Payment",
+    "customerNameLabel": "Customer Name",
+    "mobileNumberLabel": "Mobile Number",
+    "totalPendingBalance": "Total Pending Balance"
   }

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
-import { toast } from "react-toastify";
+import { toast } from "../../utils/toastService";
 import { useTranslation } from "react-i18next";
 import { FaPen, FaTrashAlt, FaArrowLeft, FaArchive } from "react-icons/fa";
 import ConfirmModal from "../ConfirmModal/ConfirmModal";

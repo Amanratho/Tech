@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaPlay, FaPause, FaCheck, FaHistory, FaPlus, FaMinus, FaMapMarkerAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
+import { toast } from "../../utils/toastService";
 
 const Tracker = () => {
   const { t } = useTranslation();

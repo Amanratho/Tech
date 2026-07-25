@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import { v4 as uuidv4 } from "uuid";
-import "react-toastify/dist/ReactToastify.css";
-import { toast } from "react-toastify";
+
+import { toast } from "../../utils/toastService";
 import { useTranslation } from 'react-i18next';
 import { motion } from "framer-motion";
 import {

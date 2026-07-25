@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
-import { toast } from "react-toastify";
+import { toast } from "../../utils/toastService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { FaFilePdf, FaCalendarAlt, FaFilter, FaDownload, FaHistory } from "react-icons/fa";

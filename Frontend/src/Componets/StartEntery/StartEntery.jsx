@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
-import { toast } from "react-toastify";
+import { toast } from "../../utils/toastService";
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from "framer-motion";
 import { cleanStringInput, cleanNumberInput, blockInvalidNumberKeys } from "../../utils/inputValidation";
