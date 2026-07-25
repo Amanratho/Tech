@@ -15,7 +15,7 @@ import {
   FaTimes
 } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { ToastContainer } from "react-toastify";
+
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
@@ -175,7 +175,7 @@ function Navbar() {
 
   return (
     <>
-      <ToastContainer style={{ zIndex: "9999" }} theme="light" /> 
+       
 
       <div className="fixed top-0 left-0 w-full h-16 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] z-50 flex items-center justify-between px-4 sm:px-6">
 

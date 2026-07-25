@@ -17,8 +17,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "../../utils/toastService";
+
 import { useTranslation } from "react-i18next";
 
 const Profile = () => {

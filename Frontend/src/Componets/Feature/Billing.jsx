@@ -486,15 +486,15 @@ const Billing = () => {
                 <div className="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
                   <FaExclamationTriangle size={24} className="text-red-500" />
                 </div>
-                <h3 className="text-[var(--text-main)] font-bold text-base mb-2">Delete Bill?</h3>
+                <h3 className="text-[var(--text-main)] font-bold text-base mb-2">{t('deleteBillTitle')}</h3>
                 <p className="text-[var(--text-muted)] text-xs mb-1">
-                  Are you sure you want to delete the bill for
+                  {t('deleteBillMessage')}
                 </p>
                 <p className="text-[var(--primary)] font-bold text-sm mb-1">
                   {billToDelete?.customerName}
                 </p>
                 <p className="text-[var(--text-muted)] text-[10px] mb-5">
-                  Amount: ₹{((billToDelete?.paidAmount || 0) + (billToDelete?.pendingAmount || 0)).toLocaleString()}
+                  {t('billAmount')}{((billToDelete?.paidAmount || 0) + (billToDelete?.pendingAmount || 0)).toLocaleString()}
                 </p>
               </div>
 
@@ -503,7 +503,7 @@ const Billing = () => {
                   onClick={() => { setIsDeleteModalOpen(false); setBillToDelete(null); }}
                   className="flex-1 py-3 bg-[var(--bg-main)] border border-[var(--border-color)] text-[var(--text-main)] rounded-xl font-bold text-sm transition-all active:scale-95"
                 >
-                  Cancel
+                  {t('cancelButton')}
                 </button>
                 <button
                   onClick={confirmDelete}
@@ -511,9 +511,9 @@ const Billing = () => {
                   className="flex-1 py-3 bg-red-500 text-[var(--text-main)] rounded-xl font-bold text-sm transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isDeleting ? (
-                    <><FaSpinner className="animate-spin" size={14} /> Deleting...</>
+                    <><FaSpinner className="animate-spin" size={14} /> {t('deleting')}</>
                   ) : (
-                    <><FaTrashAlt size={12} /> Delete</>
+                    <><FaTrashAlt size={12} /> {t('deleteButton')}</>
                   )}
                 </button>
               </div>

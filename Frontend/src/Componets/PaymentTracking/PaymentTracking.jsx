@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useGetPaymentsQuery, useUpdatePaymentMutation } from "../../redux/functional/paymentApiSlice";
 import { openPhoneDialer } from "../../utils/capacitorLinks";
-import { toast } from "react-toastify";
+import { toast } from "../../utils/toastService";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
@@ -295,7 +295,7 @@ const PaymentTracking = () => {
                                 <h2 className="text-[var(--text-main)] text-sm font-bold">
                                     {selectedUserEntries[0]?.customerName || "Client"}
                                 </h2>
-                                <p className="text-[10px] text-[var(--text-muted)]">Transaction History</p>
+                                <p className="text-[10px] text-[var(--text-muted)]">{t('transactionHistory')}</p>
                             </div>
                         </div>
 
@@ -310,29 +310,29 @@ const PaymentTracking = () => {
 
                                         {entry.pendingAmount <= 0 ? (
                                             <span className="flex items-center gap-1 text-[10px] text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
-                                                <FaCheckCircle size={10} /> Paid
+                                                <FaCheckCircle size={10} /> {t('statusPaid')}
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-1 text-[10px] text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">
-                                                <FaExclamationCircle size={10} /> Due
+                                                <FaExclamationCircle size={10} /> {t('statusDue')}
                                             </span>
                                         )}
                                     </div>
 
                                     <div className="flex justify-between items-end mb-3">
                                         <div>
-                                            <p className="text-[10px] text-[var(--text-muted)]">Total Bill</p>
+                                            <p className="text-[10px] text-[var(--text-muted)]">{t('totalBillAmount') || "Total Bill"}</p>
                                             <p className="text-[var(--text-main)] text-sm font-bold">₹{entry.totalAmount}</p>
                                         </div>
                                         <div className="text-right">
                                             {entry.pendingAmount > 0 ? (
                                                 <>
-                                                    <p className="text-[10px] text-[var(--text-muted)]">Pending Due</p>
+                                                    <p className="text-[10px] text-[var(--text-muted)]">{t('pendingDue')}</p>
                                                     <p className="text-red-500 text-base font-bold">₹{entry.pendingAmount}</p>
                                                 </>
                                             ) : (
                                                 // Changed: No "Amount Paid" text needed if fully paid, simplifies view
-                                                <span className="text-green-500 text-sm font-bold">Paid</span>
+                                                <span className="text-green-500 text-sm font-bold">{t('statusPaid')}</span>
                                             )}
                                         </div>
                                     </div>
@@ -363,11 +363,11 @@ const PaymentTracking = () => {
                             className="bg-white w-full max-w-xs rounded-2xl p-5 border border-[var(--border-color)]"
                         >
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-[var(--text-main)] text-sm font-bold">Collect Payment</h3>
+                                <h3 className="text-[var(--text-main)] text-sm font-bold">{t('collectPaymentTitle')}</h3>
                                 <button onClick={() => setIsModalOpen(false)} className="text-[var(--text-muted)]"><FaTimes /></button>
                             </div>
 
-                            <label className="text-[var(--text-muted)] text-[10px] block mb-1">Customer Name</label>
+                            <label className="text-[var(--text-muted)] text-[10px] block mb-1">{t('customerNameLabel')}</label>
                             <input
                                 type="text"
                                 value={editCustomerName}
@@ -375,7 +375,7 @@ const PaymentTracking = () => {
                                 className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
                             />
 
-                            <label className="text-[var(--text-muted)] text-[10px] block mb-1">Mobile Number</label>
+                            <label className="text-[var(--text-muted)] text-[10px] block mb-1">{t('mobileNumberLabel')}</label>
                             <input
                                 type="text"
                                 value={editMobileNumber}
@@ -391,7 +391,7 @@ const PaymentTracking = () => {
                                 className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
                             /> */}
 
-                            <p className="text-[var(--text-muted)] text-xs mb-1">Total Pending Balance</p>
+                            <p className="text-[var(--text-muted)] text-xs mb-1">{t('totalPendingBalance')}</p>
                             <p className="text-red-500 text-lg font-bold mb-4">₹{selectedEntry.pendingAmount}</p>
 
                             <label className="text-[var(--text-muted)] text-xs mb-1 block">{t('enterPaymentAmount')}</label>

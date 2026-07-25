@@ -433,5 +433,22 @@
   "profileUpdateFailed": "प्रोफ़ाइल अपडेट करने में विफल।",
   "accountDeletedSuccess": "आपका खाता सफलतापूर्वक हटा दिया गया।",
   "accountDeleteFailed": "खाता हटाने में विफल। कृपया पुनः प्रयास करें।",
-  "deleteAccountButton": "खाता हटाएं"
+  "deleteAccountButton": "खाता हटाएं",
+  "okButton": "ठीक है",
+  "pleaseWait": "कृपया प्रतीक्षा करें...",
+  "loading": "लोड हो रहा है...",
+  "deleteBillTitle": "बिल हटाएं?",
+  "deleteBillMessage": "क्या आप वाकई इसके लिए बिल हटाना चाहते हैं",
+  "billAmount": "राशि: ₹",
+  "deleting": "हटाया जा रहा है...",
+  "saving": "सहेजा जा रहा है...",
+  "successUpdated": "सफलतापूर्वक अपडेट किया गया!",
+  "errorFailed": "कार्रवाई करने में विफल।",
+  "transactionHistory": "लेनदेन का इतिहास",
+  "statusPaid": "भुगतान किया",
+  "statusDue": "बाकी",
+  "collectPaymentTitle": "भुगतान प्राप्त करें",
+  "customerNameLabel": "ग्राहक का नाम",
+  "mobileNumberLabel": "मोबाइल नंबर",
+  "totalPendingBalance": "कुल बकाया शेष"
 }
