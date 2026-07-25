@@ -71,7 +71,7 @@ const SummaryCard = ({ icon: Icon, label, value, color, bg, border, glow, delay 
         <Icon size={16} />
       </div>
 
-      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">{label}</p>
+      <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1">{label}</p>
       <p className={`text-xl font-extrabold tracking-tight ${color === "green" ? "text-green-400" : color === "red" ? "text-red-400" : color === "amber" ? "text-amber-400" : "text-blue-400"}`}>
         <AnimatedNumber value={value} />
       </p>
@@ -170,25 +170,25 @@ const EODDashboard = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-[#121212] min-h-screen pb-28 pt-4 mt-12 font-sans"
+      className="bg-[var(--bg-main)] min-h-screen pb-28 pt-4 mt-12 font-sans"
     >
       {/* ── STICKY HEADER ── */}
-      <div className="sticky top-0 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] px-4 py-2 flex items-center justify-between mb-4 shadow-sm">
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] px-4 py-2 flex items-center justify-between mb-4 shadow-sm">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-[var(--primary)]/15 flex items-center justify-center">
             <FaChartBar size={13} className="text-[var(--primary)]" />
           </div>
           <div>
-            <h2 className="text-white text-xs font-black uppercase tracking-widest leading-tight">
+            <h2 className="text-[var(--text-main)] text-xs font-black uppercase tracking-widest leading-tight">
               {t("eodBusinessSummary") || "Business Summary"}
             </h2>
-            <p className="text-gray-600 text-[9px] font-semibold uppercase tracking-wider">
+            <p className="text-[var(--text-muted)] text-[9px] font-semibold uppercase tracking-wider">
               {t("eodDashboardTitle") || "EOD Dashboard"}
             </p>
           </div>
         </div>
         {rangeLabel && (
-          <span className="text-[9px] font-bold text-gray-500 bg-[#1E1E1E] border border-[#2C2C2C] px-2 py-1 rounded-full">
+          <span className="text-[9px] font-bold text-[var(--text-muted)] bg-white border border-[var(--border-color)] px-2 py-1 rounded-full">
             {rangeLabel}
           </span>
         )}
@@ -198,7 +198,7 @@ const EODDashboard = () => {
 
         {/* ── QUICK DATE FILTER PILLS ── */}
         <div>
-          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mb-2 pl-1">
+          <p className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-widest mb-2 pl-1">
             {t("eodSelectPeriod") || "Select Period"}
           </p>
           <div className="grid grid-cols-5 gap-1.5">
@@ -212,7 +212,7 @@ const EODDashboard = () => {
                   onClick={() => handleQuickFilter(f)}
                   className={`flex flex-col items-center justify-center gap-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 border ${isActive
                     ? "bg-[var(--primary)] text-black border-[var(--primary)] shadow-md shadow-[var(--primary)]/20"
-                    : "bg-[#1E1E1E] text-gray-500 border-[#2C2C2C] hover:border-[#444]"
+                    : "bg-white text-[var(--text-muted)] border-[var(--border-color)] hover:border-[var(--primary)]"
                     }`}
                 >
                   <Icon size={12} />
@@ -233,13 +233,13 @@ const EODDashboard = () => {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="bg-[#1A1A1A] border border-[#2C2C2C] rounded-2xl p-4 space-y-3">
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t("eodCustomRange") || "Custom Range"}</p>
+              <div className="bg-white border border-[var(--border-color)] rounded-2xl p-4 space-y-3">
+                <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{t("eodCustomRange") || "Custom Range"}</p>
 
                 <div className="grid grid-cols-2 gap-3">
                   {/* Start Date */}
                   <div>
-                    <label className="block text-gray-400 text-[10px] font-semibold mb-1 pl-1">{t("eodFrom") || "From"}</label>
+                    <label className="block text-[var(--text-muted)] text-[10px] font-semibold mb-1 pl-1">{t("eodFrom") || "From"}</label>
                     <input
                       type="date"
                       value={customStart}
@@ -249,20 +249,20 @@ const EODDashboard = () => {
                         // Reset end if it's now invalid
                         if (customEnd && e.target.value > customEnd) setCustomEnd("");
                       }}
-                      className="w-full bg-[#121212] text-white border border-[#333] rounded-xl py-2 px-3 focus:border-[var(--primary)] outline-none text-xs [color-scheme:dark] transition-colors"
+                      className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-2 px-3 focus:border-[var(--primary)] outline-none text-xs [color-scheme:dark] transition-colors"
                     />
                   </div>
 
                   {/* End Date — min is always customStart to prevent invalid ranges */}
                   <div>
-                    <label className="block text-gray-400 text-[10px] font-semibold mb-1 pl-1">{t("eodTo") || "To"}</label>
+                    <label className="block text-[var(--text-muted)] text-[10px] font-semibold mb-1 pl-1">{t("eodTo") || "To"}</label>
                     <input
                       type="date"
                       value={customEnd}
                       min={customStart || undefined}
                       max={todayISO}
                       onChange={(e) => setCustomEnd(e.target.value)}
-                      className={`w-full bg-[#121212] text-white border rounded-xl py-2 px-3 focus:border-[var(--primary)] outline-none text-xs [color-scheme:dark] transition-colors ${!customStart ? "border-[#222] opacity-50 cursor-not-allowed" : "border-[#333]"
+                      className={`w-full bg-[var(--bg-main)] text-[var(--text-main)] border rounded-xl py-2 px-3 focus:border-[var(--primary)] outline-none text-xs [color-scheme:dark] transition-colors ${!customStart ? "border-[var(--border-color)] opacity-50 cursor-not-allowed" : "border-[var(--border-color)]"
                         }`}
                       disabled={!customStart}
                     />
@@ -289,7 +289,7 @@ const EODDashboard = () => {
             className="grid grid-cols-2 gap-3"
           >
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-28 bg-[#1E1E1E] rounded-2xl border border-[#2C2C2C] animate-pulse" />
+              <div key={i} className="h-28 bg-white rounded-2xl border border-[var(--border-color)] animate-pulse" />
             ))}
           </motion.div>
         )}
@@ -299,9 +299,9 @@ const EODDashboard = () => {
           <>
             {/* Entry count pill */}
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 bg-[#1A1A1A] border border-[#2C2C2C] rounded-full px-3 py-1">
+              <div className="flex items-center gap-1.5 bg-white border border-[var(--border-color)] rounded-full px-3 py-1">
                 <FaReceipt size={9} className="text-[var(--primary)]" />
-                <span className="text-[10px] font-bold text-gray-400">
+                <span className="text-[10px] font-bold text-[var(--text-muted)]">
                   {summary.entryCount} {summary.entryCount === 1 ? (t("eodEntry") || "entry") : (t("eodEntries") || "entries")} {t("eodInPeriod") || "in period"}
                 </span>
               </div>
@@ -314,7 +314,7 @@ const EODDashboard = () => {
                 label={t("eodTotalIncome") || "Total Income"}
                 value={summary.totalIncome}
                 color="green"
-                bg="from-[#0D1F0D] to-[#111]"
+                bg="from-[#0D1F0D] to-gray-200"
                 border="border-green-900/40"
                 glow="bg-green-500"
                 delay={0}
@@ -324,7 +324,7 @@ const EODDashboard = () => {
                 label={t("eodExpenses") || "Expenses"}
                 value={summary.totalExpenses}
                 color="red"
-                bg="from-[#1F0D0D] to-[#111]"
+                bg="from-[#1F0D0D] to-gray-200"
                 border="border-red-900/40"
                 glow="bg-red-500"
                 delay={0.07}
@@ -334,7 +334,7 @@ const EODDashboard = () => {
                 label={t("eodPendingDues") || "Pending Dues"}
                 value={summary.totalPending}
                 color="amber"
-                bg="from-[#1F1700] to-[#111]"
+                bg="from-[#1F1700] to-gray-200"
                 border="border-amber-900/40"
                 glow="bg-amber-500"
                 delay={0.12}
@@ -344,7 +344,7 @@ const EODDashboard = () => {
                 label={t("eodNetProfit") || "Net Profit"}
                 value={summary.netProfit}
                 color={netIsPositive ? "green" : "red"}
-                bg={netIsPositive ? "from-[#0D1F0D] to-[#111]" : "from-[#1F0D0D] to-[#111]"}
+                bg={netIsPositive ? "from-[#0D1F0D] to-gray-200" : "from-[#1F0D0D] to-gray-200"}
                 border={netIsPositive ? "border-green-900/40" : "border-red-900/40"}
                 glow={netIsPositive ? "bg-green-500" : "bg-red-500"}
                 delay={0.18}
@@ -356,10 +356,10 @@ const EODDashboard = () => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25, duration: 0.35 }}
-              className="bg-[#1A1A1A] border border-[#2C2C2C] rounded-2xl overflow-hidden"
+              className="bg-white border border-[var(--border-color)] rounded-2xl overflow-hidden"
             >
-              <div className="px-4 py-3 border-b border-[#2C2C2C] flex items-center justify-between">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t("eodBreakdown") || "Breakdown"}</p>
+              <div className="px-4 py-3 border-b border-[var(--border-color)] flex items-center justify-between">
+                <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">{t("eodBreakdown") || "Breakdown"}</p>
                 <FaChartBar size={11} className="text-[var(--primary)]" />
               </div>
 
@@ -377,10 +377,10 @@ const EODDashboard = () => {
               ].map((row, i) => (
                 <div
                   key={i}
-                  className={`flex justify-between items-center px-4 py-3 text-xs ${i < 4 ? "border-b border-[#222]" : ""
-                    } ${row.bold ? "bg-[#111]" : ""}`}
+                  className={`flex justify-between items-center px-4 py-3 text-xs ${i < 4 ? "border-b border-[var(--border-color)]" : ""
+                    } ${row.bold ? "bg-gray-100" : ""}`}
                 >
-                  <span className={`text-gray-500 ${row.bold ? "font-black text-gray-300" : "font-semibold"}`}>
+                  <span className={`text-[var(--text-muted)] ${row.bold ? "font-black text-[var(--text-muted)]" : "font-semibold"}`}>
                     {row.label}
                   </span>
                   <span className={`font-extrabold ${row.color}`}>
@@ -399,10 +399,10 @@ const EODDashboard = () => {
             animate={{ opacity: 1 }}
             className="flex flex-col items-center justify-center py-20 text-center"
           >
-            <div className="w-16 h-16 rounded-2xl bg-[#1E1E1E] border border-[#2C2C2C] flex items-center justify-center mb-4 shadow-lg">
+            <div className="w-16 h-16 rounded-2xl bg-white border border-[var(--border-color)] flex items-center justify-center mb-4 shadow-lg">
               <FaChartBar size={24} className="text-gray-700" />
             </div>
-            <p className="text-gray-500 text-sm font-bold">{t("eodEmptyTitle") || "Select a time period"}</p>
+            <p className="text-[var(--text-muted)] text-sm font-bold">{t("eodEmptyTitle") || "Select a time period"}</p>
             <p className="text-gray-700 text-xs mt-1">{t("eodEmptySubtitle") || "Tap one of the filters above to load your summary"}</p>
           </motion.div>
         )}

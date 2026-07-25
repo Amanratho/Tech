@@ -163,12 +163,12 @@ const Statement = () => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="bg-[#121212] min-h-screen pb-24 pt-4 mt-12 font-sans relative overflow-hidden"
+      className="bg-[var(--bg-main)] min-h-screen pb-24 pt-4 mt-12 font-sans relative overflow-hidden"
     >
 
       {/* STICKY TOP HEADER */}
-      <div className="sticky top-0 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] px-4 py-2 flex items-center justify-between mb-4 shadow-sm">
-        <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest text-center w-full m-0">
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] px-4 py-2 flex items-center justify-between mb-4 shadow-sm">
+        <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest text-center w-full m-0">
           {t('statementTitle') || "ACCOUNT STATEMENT"}
         </h2>
       </div>
@@ -176,18 +176,18 @@ const Statement = () => {
       <div className="px-4 max-w-md mx-auto">
 
         {/* PREMIUM HERO CARD */}
-        <div className="relative bg-gradient-to-br from-[#1E1E1E] to-[#161616] rounded-2xl p-4 mb-6 border border-[#2C2C2C] shadow-lg overflow-hidden">
+        <div className="relative bg-gradient-to-br from-white to-gray-50 rounded-2xl p-4 mb-6 border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--primary)]/10 rounded-full blur-[30px] pointer-events-none"></div>
 
           <div className="relative z-10 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#121212] border border-[#333] flex items-center justify-center text-[var(--primary)] shadow-md shadow-[var(--primary)]/10">
+            <div className="w-10 h-10 rounded-xl bg-[var(--bg-main)] border border-[var(--border-color)] flex items-center justify-center text-[var(--primary)] shadow-md shadow-[var(--primary)]/10">
               <FaFilePdf size={18} />
             </div>
             <div>
-              <h1 className="text-white font-bold text-lg tracking-tight m-0 leading-tight">
+              <h1 className="text-[var(--text-main)] font-bold text-lg tracking-tight m-0 leading-tight">
                 {t('generateReport') || "Generate Report"}
               </h1>
-              <p className="text-gray-500 text-[9px] uppercase font-bold tracking-wider mt-0.5 m-0">
+              <p className="text-[var(--text-muted)] text-[9px] uppercase font-bold tracking-wider mt-0.5 m-0">
                 {t('downloadPdfDesc') || "Download PDF Statements"}
               </p>
             </div>
@@ -201,50 +201,50 @@ const Statement = () => {
           <div className="flex gap-2">
             <button
               onClick={setThisMonth}
-              className="flex-1 py-2 bg-[#1E1E1E] border border-[#333] hover:border-[var(--primary)] rounded-xl text-gray-300 text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2"
+              className="flex-1 py-2 bg-white border border-[var(--border-color)] hover:border-[var(--primary)] rounded-xl text-[var(--text-muted)] text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2"
             >
               <FaHistory className="text-[var(--primary)]" /> {t('thisMonth') || "This Month"}
             </button>
             <button
               onClick={setLastMonth}
-              className="flex-1 py-2 bg-[#1E1E1E] border border-[#333] hover:border-[var(--primary)] rounded-xl text-gray-300 text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2"
+              className="flex-1 py-2 bg-white border border-[var(--border-color)] hover:border-[var(--primary)] rounded-xl text-[var(--text-muted)] text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2"
             >
-              <FaHistory className="text-gray-500" /> {t('lastMonth') || "Last Month"}
+              <FaHistory className="text-[var(--text-muted)]" /> {t('lastMonth') || "Last Month"}
             </button>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             {/* From Date */}
             <div>
-              <label className="block text-gray-400 text-[10px] font-semibold mb-1 pl-1">
+              <label className="block text-[var(--text-muted)] text-[10px] font-semibold mb-1 pl-1">
                 {t('fromDate') || "From Date"}
               </label>
               <div className="relative">
-                <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs" />
+                <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-xs" />
                 <input
                   type="date"
                   value={startDate}
                   max={today}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full bg-[#1E1E1E] text-white border border-[#333] rounded-xl py-2.5 pl-8 pr-2 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none text-xs transition-all [color-scheme:dark] shadow-inner"
+                  className="w-full bg-white text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-2.5 pl-8 pr-2 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none text-xs transition-all [color-scheme:dark] shadow-inner"
                 />
               </div>
             </div>
 
             {/* To Date */}
             <div>
-              <label className="block text-gray-400 text-[10px] font-semibold mb-1 pl-1">
+              <label className="block text-[var(--text-muted)] text-[10px] font-semibold mb-1 pl-1">
                 {t('toDate') || "To Date"}
               </label>
               <div className="relative">
-                <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs" />
+                <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-xs" />
                 <input
                   type="date"
                   value={endDate}
                   min={startDate}
                   max={today}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full bg-[#1E1E1E] text-white border border-[#333] rounded-xl py-2.5 pl-8 pr-2 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none text-xs transition-all [color-scheme:dark] shadow-inner"
+                  className="w-full bg-white text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-2.5 pl-8 pr-2 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none text-xs transition-all [color-scheme:dark] shadow-inner"
                 />
               </div>
             </div>
@@ -252,7 +252,7 @@ const Statement = () => {
 
           {/* Filter Type */}
           <div>
-            <label className="block text-gray-400 text-[10px] font-semibold mb-1 pl-1">
+            <label className="block text-[var(--text-muted)] text-[10px] font-semibold mb-1 pl-1">
               {t('recordType') || "Record Type"}
             </label>
             <div className="relative">
@@ -260,13 +260,13 @@ const Statement = () => {
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="w-full bg-[#1E1E1E] text-[var(--primary)] font-bold border border-[#333] rounded-xl py-2.5 pl-9 pr-4 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none text-xs appearance-none transition-all cursor-pointer shadow-inner"
+                className="w-full bg-white text-[var(--primary)] font-bold border border-[var(--border-color)] rounded-xl py-2.5 pl-9 pr-4 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none text-xs appearance-none transition-all cursor-pointer shadow-inner"
               >
-                <option value="All" className="bg-[#121212] text-white">{t('allBills') || "All Bills"}</option>
-                <option value="Paid" className="bg-[#121212] text-white">{t('fullyPaidOnly') || "Fully Paid Only"}</option>
-                <option value="Pending" className="bg-[#121212] text-white">{t('pendingDuesOnly') || "Pending Dues Only"}</option>
+                <option value="All" className="bg-[var(--bg-main)] text-[var(--text-main)]">{t('allBills') || "All Bills"}</option>
+                <option value="Paid" className="bg-[var(--bg-main)] text-[var(--text-main)]">{t('fullyPaidOnly') || "Fully Paid Only"}</option>
+                <option value="Pending" className="bg-[var(--bg-main)] text-[var(--text-main)]">{t('pendingDuesOnly') || "Pending Dues Only"}</option>
               </select>
-              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-[10px] pointer-events-none">▼</div>
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-[10px] pointer-events-none">▼</div>
             </div>
           </div>
 
@@ -275,7 +275,7 @@ const Statement = () => {
             onClick={generatePDFStatement}
             disabled={isGenerating}
             className={`w-full mt-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${isGenerating
-              ? "bg-[#333] text-gray-400 cursor-not-allowed"
+              ? "bg-gray-300 text-[var(--text-muted)] cursor-not-allowed"
               : "bg-[var(--primary)] text-black hover:bg-yellow-500 shadow-md shadow-[var(--primary)]/20 active:scale-95"
               }`}
           >

@@ -13,18 +13,33 @@ body
 }
 
 :root {
-  --bg-main: #121212;      /* Very dark grey, almost black */
-  --bg-card: #1E1E1E;      /* Slightly lighter for cards */
-  --bg-input: #2C2C2C;     /* Distinct input background */
+  /* ── Backgrounds (Light Mode) ── */
+  --bg-main: #F3F4F6;       /* Light grey page background */
+  --bg-card: #FFFFFF;        /* Pure white cards/containers */
+  --bg-input: #F9FAFB;      /* Subtle off-white for inputs */
 
-  /* Brand Colors */
-  --primary: #FEC111;      /* RentVeda Gold */
-  --primary-hover: #D9A507; /* Darker Gold for hover effects */
-  
-  /* Text Colors */
-  --text-main: #FFFFFF;
-  --text-muted: #A3A3A3;
-  --text-error: #FF4D4D;
+  /* ── Brand Colors ── */
+  --primary: #F59E0B;        /* RentVeda Yellow (high-contrast) */
+  --primary-hover: #D97706;  /* Darker amber for hover effects */
+
+  /* ── Text Colors ── */
+  --text-main: #1F2937;      /* Dark charcoal — primary text */
+  --text-muted: #6B7280;     /* Medium grey — secondary text */
+  --text-error: #DC2626;     /* High-contrast red for errors */
+  --text-on-primary: #111827;/* Very dark text ON yellow buttons/badges */
+
+  /* ── Borders & Shadows ── */
+  --border-color: #E5E7EB;   /* Light grey borders */
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Soft card shadow */
+
+  /* ── Navigation ── */
+  --nav-active: #F59E0B;     /* Active tab icon/text */
+  --nav-inactive: #9CA3AF;   /* Inactive tab icon/text */
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
 }
 
 /* Hide scrollbar for horizontal scroll areas (mobile-app pattern) */

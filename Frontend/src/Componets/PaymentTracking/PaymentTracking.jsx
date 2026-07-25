@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useGetPaymentsQuery, useUpdatePaymentMutation } from "../../redux/functional/paymentApiSlice";
+import { openPhoneDialer } from "../../utils/capacitorLinks";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
@@ -174,32 +175,32 @@ const PaymentTracking = () => {
         exit: { y: "100%" }
     };
 
-    if (isLoading) return <div className="p-5 text-white">Loading Khata...</div>;
+    if (isLoading) return <div className="p-5 text-[var(--text-main)]">Loading Khata...</div>;
     if (error) return <div className="p-5 text-red-500">Error loading data</div>;
 
     return (
-        <div className="bg-[#121212] min-h-screen pb-20 relative overflow-hidden">
+        <div className="bg-[var(--bg-main)] min-h-screen pb-20 relative overflow-hidden">
 
             {/* 1. MAIN SCREEN */}
-            <div className="sticky top-0 mt-16 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] pb-2">
+            <div className="sticky top-0 mt-16 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] pb-2">
                 <div className="px-4 py-3 flex justify-between items-center">
-                    <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+                    <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">
                         {t('paymentTrackingTitle') || "PAYMENT TRACKING"}
                     </h2>
-                    <span className="text-[9px] bg-[#1E1E1E] text-[var(--primary)] px-2 py-0.5 rounded border border-[#333]">
+                    <span className="text-[9px] bg-white text-[var(--primary)] px-2 py-0.5 rounded border border-[var(--border-color)]">
                         {filteredUsers.length} Clients
                     </span>
                 </div>
 
                 <div className="px-4 mb-3">
                     <div className="relative">
-                        <FaSearch className="absolute left-3 top-2.5 text-gray-500 text-xs" />
+                        <FaSearch className="absolute left-3 top-2.5 text-[var(--text-muted)] text-xs" />
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder={t('searchPlaceholder') || "Search client..."}
-                            className="w-full bg-[#1E1E1E] text-white pl-9 pr-3 py-2 rounded-full text-xs outline-none border border-[#333] focus:border-[var(--primary)] transition-colors placeholder-gray-600"
+                            className="w-full bg-white text-[var(--text-main)] pl-9 pr-3 py-2 rounded-full text-xs outline-none border border-[var(--border-color)] focus:border-[var(--primary)] transition-colors placeholder-[var(--text-muted)]"
                         />
                     </div>
                 </div>
@@ -215,7 +216,7 @@ const PaymentTracking = () => {
                             onClick={() => setFilterType(f.val)}
                             className={`px-3 py-1 rounded-full text-[10px] font-bold border transition-all ${filterType === f.val
                                 ? "bg-[var(--primary)] text-black border-[var(--primary)]"
-                                : "bg-transparent text-gray-500 border-[#333]"
+                                : "bg-transparent text-[var(--text-muted)] border-[var(--border-color)]"
                                 }`}
                         >
                             {f.label}
@@ -226,7 +227,7 @@ const PaymentTracking = () => {
 
             <div className="px-3 mt-3 space-y-2">
                 {filteredUsers.length === 0 ? (
-                    <div className="text-center text-gray-600 mt-10 text-xs">No clients found</div>
+                    <div className="text-center text-[var(--text-muted)] mt-10 text-xs">No clients found</div>
                 ) : (
                     filteredUsers.map((user, index) => (
                         <motion.div
@@ -235,21 +236,20 @@ const PaymentTracking = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
                             onClick={() => handleViewSummary(user.mobileNumber)}
-                            className="bg-[#1E1E1E] p-3 rounded-xl border border-[#2C2C2C] active:bg-[#252525] flex justify-between items-center group cursor-pointer"
+                            className="bg-white p-3 rounded-xl border border-[var(--border-color)] active:bg-gray-100 flex justify-between items-center group cursor-pointer"
                         >
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-[#121212] border border-[#333] flex items-center justify-center text-gray-400">
+                                <div className="w-10 h-10 rounded-full bg-[var(--bg-main)] border border-[var(--border-color)] flex items-center justify-center text-[var(--text-muted)]">
                                     <FaUser />
                                 </div>
                                 <div>
-                                    <h3 className="text-white text-sm font-bold">{user.customerName}</h3>
-                                    <a
-                                        href={`tel:${user.mobileNumber}`}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5"
+                                    <h3 className="text-[var(--text-main)] text-sm font-bold">{user.customerName}</h3>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); openPhoneDialer(user.mobileNumber); }}
+                                        className="text-[10px] text-[var(--text-muted)] flex items-center gap-1 mt-0.5"
                                     >
                                         <FaPhoneAlt size={8} /> {user.mobileNumber}
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
 
@@ -270,7 +270,7 @@ const PaymentTracking = () => {
                                         </span>
                                     )}
                                 </div>
-                                <FaChevronRight className="text-gray-600 text-xs" />
+                                <FaChevronRight className="text-[var(--text-muted)] text-xs" />
                             </div>
                         </motion.div>
                     ))
@@ -285,26 +285,26 @@ const PaymentTracking = () => {
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        className="fixed inset-0 z-40 bg-[#121212] flex flex-col"
+                        className="fixed inset-0 z-40 bg-[var(--bg-main)] flex flex-col"
                     >
-                        <div className="px-4 mt-16 py-3 border-b border-[#2C2C2C] flex items-center gap-3 bg-[#121212]">
-                            <button onClick={handleHideSummary} className="p-2 -ml-2 text-white">
+                        <div className="px-4 mt-16 py-3 border-b border-[var(--border-color)] flex items-center gap-3 bg-[var(--bg-main)]">
+                            <button onClick={handleHideSummary} className="p-2 -ml-2 text-[var(--text-main)]">
                                 <FaArrowLeft />
                             </button>
                             <div>
-                                <h2 className="text-white text-sm font-bold">
+                                <h2 className="text-[var(--text-main)] text-sm font-bold">
                                     {selectedUserEntries[0]?.customerName || "Client"}
                                 </h2>
-                                <p className="text-[10px] text-gray-500">Transaction History</p>
+                                <p className="text-[10px] text-[var(--text-muted)]">Transaction History</p>
                             </div>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-3 space-y-3">
                             {selectedUserEntries.map((entry) => (
-                                <div key={entry._id} className="bg-[#1E1E1E] p-3 rounded-xl border border-[#2C2C2C]">
+                                <div key={entry._id} className="bg-white p-3 rounded-xl border border-[var(--border-color)]">
 
                                     <div className="flex justify-between items-center mb-1">
-                                        <span className="text-gray-400 text-[10px]">
+                                        <span className="text-[var(--text-muted)] text-[10px]">
                                             {format(new Date(entry.createdAt), "dd MMM yyyy")}
                                         </span>
 
@@ -321,13 +321,13 @@ const PaymentTracking = () => {
 
                                     <div className="flex justify-between items-end mb-3">
                                         <div>
-                                            <p className="text-[10px] text-gray-500">Total Bill</p>
-                                            <p className="text-white text-sm font-bold">₹{entry.totalAmount}</p>
+                                            <p className="text-[10px] text-[var(--text-muted)]">Total Bill</p>
+                                            <p className="text-[var(--text-main)] text-sm font-bold">₹{entry.totalAmount}</p>
                                         </div>
                                         <div className="text-right">
                                             {entry.pendingAmount > 0 ? (
                                                 <>
-                                                    <p className="text-[10px] text-gray-500">Pending Due</p>
+                                                    <p className="text-[10px] text-[var(--text-muted)]">Pending Due</p>
                                                     <p className="text-red-500 text-base font-bold">₹{entry.pendingAmount}</p>
                                                 </>
                                             ) : (
@@ -360,56 +360,56 @@ const PaymentTracking = () => {
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-[#1E1E1E] w-full max-w-xs rounded-2xl p-5 border border-[#333]"
+                            className="bg-white w-full max-w-xs rounded-2xl p-5 border border-[var(--border-color)]"
                         >
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-white text-sm font-bold">Collect Payment</h3>
-                                <button onClick={() => setIsModalOpen(false)} className="text-gray-500"><FaTimes /></button>
+                                <h3 className="text-[var(--text-main)] text-sm font-bold">Collect Payment</h3>
+                                <button onClick={() => setIsModalOpen(false)} className="text-[var(--text-muted)]"><FaTimes /></button>
                             </div>
 
-                            <label className="text-gray-400 text-[10px] block mb-1">Customer Name</label>
+                            <label className="text-[var(--text-muted)] text-[10px] block mb-1">Customer Name</label>
                             <input
                                 type="text"
                                 value={editCustomerName}
                                 onChange={(e) => setEditCustomerName(e.target.value)}
-                                className="w-full bg-[#121212] text-white border border-[#333] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
+                                className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
                             />
 
-                            <label className="text-gray-400 text-[10px] block mb-1">Mobile Number</label>
+                            <label className="text-[var(--text-muted)] text-[10px] block mb-1">Mobile Number</label>
                             <input
                                 type="text"
                                 value={editMobileNumber}
                                 onChange={(e) => setEditMobileNumber(e.target.value)}
-                                className="w-full bg-[#121212] text-white border border-[#333] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
+                                className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
                             />
 
-                            {/* <label className="text-gray-400 text-[10px] block mb-1">Machine/Rent Type</label>
+                            {/* <label className="text-[var(--text-muted)] text-[10px] block mb-1">Machine/Rent Type</label>
                             <input
                                 type="text"
                                 value={editMachineId}
                                 onChange={(e) => setEditMachineId(e.target.value)}
-                                className="w-full bg-[#121212] text-white border border-[#333] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
+                                className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-lg py-2 px-3 mb-3 focus:border-[var(--primary)] outline-none text-xs"
                             /> */}
 
-                            <p className="text-gray-400 text-xs mb-1">Total Pending Balance</p>
+                            <p className="text-[var(--text-muted)] text-xs mb-1">Total Pending Balance</p>
                             <p className="text-red-500 text-lg font-bold mb-4">₹{selectedEntry.pendingAmount}</p>
 
-                            <label className="text-gray-400 text-xs mb-1 block">{t('enterPaymentAmount')}</label>
+                            <label className="text-[var(--text-muted)] text-xs mb-1 block">{t('enterPaymentAmount')}</label>
                             <div className="relative mb-6">
-                                <span className="absolute left-3 top-2 text-gray-400">₹</span>
+                                <span className="absolute left-3 top-2 text-[var(--text-muted)]">₹</span>
                                 <input
                                     type="number"
                                     min={0}
                                     value={paymentAmount}
                                     onChange={(e) => setPaymentAmount(e.target.value)}
-                                    className="w-full bg-[#121212] text-white border border-[#333] rounded-lg py-2 pl-7 pr-3 focus:border-[var(--primary)] outline-none"
+                                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-lg py-2 pl-7 pr-3 focus:border-[var(--primary)] outline-none"
                                     autoFocus
                                 />
                             </div>
 
                             <button
                                 onClick={handlePaymentSubmit}
-                                className="w-full py-3 bg-green-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-green-500/20 active:scale-95 transition-transform"
+                                className="w-full py-3 bg-green-500 text-[var(--text-main)] rounded-xl font-bold text-sm shadow-lg shadow-green-500/20 active:scale-95 transition-transform"
                             >
                                 {t('submitButton') || "Confirm Payment"}
                             </button>

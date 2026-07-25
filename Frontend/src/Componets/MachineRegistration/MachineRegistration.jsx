@@ -25,7 +25,7 @@ function MachineRegistration() {
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
-      theme: "dark", // Changed to dark theme
+      theme: "light", // Changed to dark theme
     });
   };
 
@@ -37,7 +37,7 @@ function MachineRegistration() {
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
-      theme: "dark",
+      theme: "light",
     });
   };
 
@@ -129,14 +129,14 @@ function MachineRegistration() {
   };
 
   return (
-    <div className="bg-[#121212] min-h-screen pb-20 flex flex-col relative overflow-hidden">
+    <div className="bg-[var(--bg-main)] min-h-screen pb-20 flex flex-col relative overflow-hidden">
 
       {/* Top Header */}
-      <div className="sticky top-0 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] mt-16 px-4 py-3 flex items-center gap-3">
-        <button onClick={() => window.history.back()} className="text-gray-400 hover:text-white p-1">
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] mt-16 px-4 py-3 flex items-center gap-3">
+        <button onClick={() => window.history.back()} className="text-[var(--text-muted)] hover:text-[var(--text-main)] p-1">
           <FaArrowLeft size={14} />
         </button>
-        <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+        <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">
           {t("registerMachine") || "REGISTER MACHINE"}
         </h2>
       </div>
@@ -145,22 +145,22 @@ function MachineRegistration() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1E1E1E] w-full max-w-md rounded-2xl p-5 border border-[#2C2C2C] shadow-lg mt-2 h-fit"
+          className="bg-white w-full max-w-md rounded-2xl p-5 border border-[var(--border-color)] shadow-lg mt-2 h-fit"
         >
           <div className="mb-6 text-center">
-            <h1 className="text-white text-xl font-bold mb-1">Add New Machine</h1>
-            <p className="text-gray-500 text-xs">Enter details to list your machine for rent</p>
+            <h1 className="text-[var(--text-main)] text-xl font-bold mb-1">Add New Machine</h1>
+            <p className="text-[var(--text-muted)] text-xs">Enter details to list your machine for rent</p>
           </div>
 
           <form className="space-y-5" onSubmit={handleSubmit}>
 
             {/* Machine Name */}
             <div>
-              <label htmlFor="MachineName" className="block text-gray-400 text-xs font-semibold mb-1.5 pl-1">
+              <label htmlFor="MachineName" className="block text-[var(--text-muted)] text-xs font-semibold mb-1.5 pl-1">
                 {t("machineName") || "Machine Name"}
               </label>
               <div className="relative">
-                <FaTractor className="absolute left-3.5 top-3.5 text-gray-500 text-sm" />
+                <FaTractor className="absolute left-3.5 top-3.5 text-[var(--text-muted)] text-sm" />
                 <input
                   type="text"
                   id="MachineName"
@@ -168,7 +168,7 @@ function MachineRegistration() {
                   value={formData.machineName}
                   onChange={handleChange}
                   placeholder={t("enterMachineName") || "e.g. John Deere 5310"}
-                  className="w-full bg-[#121212] text-white border border-[#333] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none transition-all text-sm placeholder-gray-600"
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none transition-all text-sm placeholder-[var(--text-muted)]"
                   required
                 />
               </div>
@@ -176,20 +176,20 @@ function MachineRegistration() {
 
             {/* Rent Type */}
             <div>
-              <label htmlFor="rentType" className="block text-gray-400 text-xs font-semibold mb-1.5 pl-1">
+              <label htmlFor="rentType" className="block text-[var(--text-muted)] text-xs font-semibold mb-1.5 pl-1">
                 {t("rentType") || "Rent Type (Pricing Unit)"}
               </label>
               <div className="relative">
-                <FaCogs className="absolute left-3.5 top-3.5 text-gray-500 text-sm z-10" />
+                <FaCogs className="absolute left-3.5 top-3.5 text-[var(--text-muted)] text-sm z-10" />
                 <select
                   id="rentType"
                   name="rentType"
                   value={formData.rentType}
                   onChange={handleChange}
-                  className="w-full bg-[#121212] text-white border border-[#333] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none transition-all text-sm appearance-none cursor-pointer"
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none transition-all text-sm appearance-none cursor-pointer"
                   required
                 >
-                  <option value="" disabled className="text-gray-500">{t("selectRentType") || "Select Unit"}</option>
+                  <option value="" disabled className="text-[var(--text-muted)]">{t("selectRentType") || "Select Unit"}</option>
                   <option value="Acre">{t("byAcre") || "Per Acre"}</option>
                   <option value="Hour">{t("byHour") || "Per Hour"}</option>
                   <option value="Quantity">{t("byQuantity") || "Per Quantity"}</option>
@@ -199,7 +199,7 @@ function MachineRegistration() {
                   <option value="Foot">{t("byFoot") || "Per Foot"}</option>
                 </select>
                 {/* Custom dropdown arrow */}
-                <div className="absolute right-4 top-4 pointer-events-none text-gray-500 text-xs">
+                <div className="absolute right-4 top-4 pointer-events-none text-[var(--text-muted)] text-xs">
                   ▼
                 </div>
               </div>
@@ -207,11 +207,11 @@ function MachineRegistration() {
 
             {/* Image Upload Area */}
             <div>
-              <label className="block text-gray-400 text-xs font-semibold mb-1.5 pl-1">
+              <label className="block text-[var(--text-muted)] text-xs font-semibold mb-1.5 pl-1">
                 {t("uploadMachineImage") || "Machine Image"}
               </label>
 
-              <div className="relative w-full h-36 bg-[#121212] border-2 border-dashed border-[#333] hover:border-gray-500 rounded-xl transition-colors overflow-hidden group">
+              <div className="relative w-full h-36 bg-[var(--bg-main)] border-2 border-dashed border-[var(--border-color)] hover:border-gray-500 rounded-xl transition-colors overflow-hidden group">
                 <input
                   type="file"
                   id="machineImage"
@@ -229,18 +229,18 @@ function MachineRegistration() {
                       className="w-full h-full object-cover opacity-90 group-hover:opacity-70 transition-opacity"
                     />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                      <div className="bg-black/60 px-3 py-1.5 rounded-lg flex items-center gap-2 text-white text-xs font-bold backdrop-blur-sm">
+                      <div className="bg-black/60 px-3 py-1.5 rounded-lg flex items-center gap-2 text-[var(--text-main)] text-xs font-bold backdrop-blur-sm">
                         <FaPen size={10} /> Change Image
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 pointer-events-none">
-                    <div className="w-10 h-10 bg-[#1E1E1E] rounded-full flex items-center justify-center mb-2 shadow-inner">
-                      <FaCloudUploadAlt size={20} className="text-gray-400" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-[var(--text-muted)] pointer-events-none">
+                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mb-2 shadow-inner">
+                      <FaCloudUploadAlt size={20} className="text-[var(--text-muted)]" />
                     </div>
                     <span className="text-xs font-semibold">Tap to upload photo</span>
-                    <span className="text-[9px] mt-1 text-gray-600">JPG, PNG, GIF up to 5MB</span>
+                    <span className="text-[9px] mt-1 text-[var(--text-muted)]">JPG, PNG, GIF up to 5MB</span>
                   </div>
                 )}
               </div>
@@ -258,7 +258,7 @@ function MachineRegistration() {
               type="submit"
               disabled={isSubmitting}
               className={`w-full mt-4 py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-[var(--primary)]/10 flex items-center justify-center transition-all ${isSubmitting
-                  ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                  ? "bg-gray-600 text-[var(--text-muted)] cursor-not-allowed"
                   : "bg-[var(--primary)] text-black active:scale-[0.98] hover:bg-yellow-500"
                 }`}
             >

@@ -128,14 +128,14 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#121212] mt-16 pb-20 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[var(--bg-main)] mt-16 pb-20 relative overflow-hidden font-sans">
 
       {/* HEADER */}
-      <div className="sticky top-0 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] px-4 py-3 flex items-center justify-between">
-        <button onClick={() => window.history.back()} className="text-gray-400 hover:text-white p-2 -ml-2 transition-colors">
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] px-4 py-3 flex items-center justify-between">
+        <button onClick={() => window.history.back()} className="text-[var(--text-muted)] hover:text-[var(--text-main)] p-2 -ml-2 transition-colors">
           <FaArrowLeft size={16} />
         </button>
-        <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest text-center mr-6">
+        <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest text-center mr-6">
           {t('editProfileTitle') || "EDIT PROFILE"}
         </h2>
         <div></div> {/* Empty div for flex spacing */}
@@ -146,7 +146,7 @@ const EditProfile = () => {
           variants={slideUp}
           initial="hidden"
           animate="visible"
-          className="bg-[#1E1E1E] rounded-2xl p-5 sm:p-6 border border-[#2C2C2C] shadow-2xl relative"
+          className="bg-white rounded-2xl p-5 sm:p-6 border border-[var(--border-color)] shadow-2xl relative"
         >
           <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
 
@@ -157,11 +157,11 @@ const EditProfile = () => {
               { key: "companyName", label: t('companyNameLabel') || "Company Name", icon: FaBuilding, type: "text" },
             ].map(({ key, label, icon: Icon, type }) => (
               <div key={key}>
-                <label htmlFor={key} className="block text-gray-400 text-xs font-semibold mb-1.5 pl-1">
+                <label htmlFor={key} className="block text-[var(--text-muted)] text-xs font-semibold mb-1.5 pl-1">
                   {label}
                 </label>
                 <div className="relative">
-                  <Icon className="absolute left-4 top-3.5 text-gray-500 text-sm" />
+                  <Icon className="absolute left-4 top-3.5 text-[var(--text-muted)] text-sm" />
                   <input
                     type={type}
                     id={key}
@@ -169,19 +169,19 @@ const EditProfile = () => {
                     value={profileData[key] || ""}
                     onChange={handleInputChange}
                     placeholder={`Enter ${label.toLowerCase()}`}
-                    className="w-full bg-[#121212] text-white border border-[#333] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-gray-600"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-[var(--text-muted)]"
                   />
                 </div>
               </div>
             ))}
 
             {/* QR Code Upload Section */}
-            <div className="pt-2 border-t border-[#333]">
-              <label className="block text-gray-400 text-xs font-semibold mb-1.5 pl-1 flex items-center gap-2">
+            <div className="pt-2 border-t border-[var(--border-color)]">
+              <label className="block text-[var(--text-muted)] text-xs font-semibold mb-1.5 pl-1 flex items-center gap-2">
                 <FaQrcode className="text-[var(--primary)]" /> {t('qrCodeLabel') || "Payment QR Code"}
               </label>
 
-              <div className="relative w-full h-40 bg-[#121212] border-2 border-dashed border-[#333] hover:border-[var(--primary)]/50 rounded-xl transition-colors overflow-hidden group">
+              <div className="relative w-full h-40 bg-[var(--bg-main)] border-2 border-dashed border-[var(--border-color)] hover:border-[var(--primary)]/50 rounded-xl transition-colors overflow-hidden group">
                 <input
                   type="file"
                   id="qrCode"
@@ -198,18 +198,18 @@ const EditProfile = () => {
                       className="w-full h-full object-contain p-2 opacity-90 group-hover:opacity-60 transition-opacity bg-white"
                     />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                      <div className="bg-black/80 px-3 py-1.5 rounded-lg flex items-center gap-2 text-white text-xs font-bold backdrop-blur-sm">
+                      <div className="bg-black/80 px-3 py-1.5 rounded-lg flex items-center gap-2 text-[var(--text-main)] text-xs font-bold backdrop-blur-sm">
                         <FaPen size={10} /> Change QR
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 pointer-events-none">
-                    <div className="w-12 h-12 bg-[#1E1E1E] rounded-full flex items-center justify-center mb-2 shadow-inner border border-[#333]">
-                      <FaCloudUploadAlt size={22} className="text-gray-400" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-[var(--text-muted)] pointer-events-none">
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-2 shadow-inner border border-[var(--border-color)]">
+                      <FaCloudUploadAlt size={22} className="text-[var(--text-muted)]" />
                     </div>
                     <span className="text-xs font-semibold">Tap to upload QR</span>
-                    <span className="text-[9px] mt-1 text-gray-600">JPG, PNG up to 2MB</span>
+                    <span className="text-[9px] mt-1 text-[var(--text-muted)]">JPG, PNG up to 2MB</span>
                   </div>
                 )}
               </div>
@@ -221,7 +221,7 @@ const EditProfile = () => {
                 onClick={handleUpdate}
                 disabled={isLoading}
                 className={`w-full py-3.5 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center transition-all ${isLoading
-                    ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                    ? "bg-gray-600 text-[var(--text-muted)] cursor-not-allowed"
                     : "bg-[var(--primary)] text-black hover:bg-yellow-500 shadow-[var(--primary)]/20 active:scale-95"
                   }`}
               >

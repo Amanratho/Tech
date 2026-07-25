@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from "framer-motion";
 import { cleanStringInput, cleanNumberInput, blockInvalidNumberKeys } from "../../utils/inputValidation";
+import { Capacitor } from "@capacitor/core";
+import { Contacts } from "@capacitor-community/contacts";
 import {
   FaChevronLeft,
   FaUser,
@@ -53,7 +55,7 @@ const StartEntry = () => {
     const selectedDate = e.target.value;
     if (selectedDate < today) {
       setReminderDate("");
-      toast.warn(t('reminderPastDateError') || "Reminder date cannot be in the past", { theme: "dark" });
+      toast.warn(t('reminderPastDateError') || "Reminder date cannot be in the past", { theme: "light" });
       return;
     }
     setReminderDate(selectedDate);
@@ -83,7 +85,7 @@ const StartEntry = () => {
 
         setQuantity(formattedQuantity);
 
-        toast.info(`⏳ ${hours} ${t('trackerHr') || 'hr'} ${minutes} ${t('trackerMin') || 'min'} ${t('trackerAutoFilled') || 'auto-filled from Tracker!'}`, { theme: "dark" });
+        toast.info(`⏳ ${hours} ${t('trackerHr') || 'hr'} ${minutes} ${t('trackerMin') || 'min'} ${t('trackerAutoFilled') || 'auto-filled from Tracker!'}`, { theme: "light" });
 
         localStorage.removeItem("rentveda_pending_time_entry");
       }
@@ -92,7 +94,7 @@ const StartEntry = () => {
       const savedCount = localStorage.getItem("rentveda_pending_count_entry");
       if (savedCount) {
         setQuantity(savedCount);
-        toast.info(`🔢 ${t('trackerCountAutoFilled') || 'Count'} (${savedCount}) ${t('trackerAutoFilled') || 'auto-filled from Tracker!'}`, { theme: "dark" });
+        toast.info(`🔢 ${t('trackerCountAutoFilled') || 'Count'} (${savedCount}) ${t('trackerAutoFilled') || 'auto-filled from Tracker!'}`, { theme: "light" });
 
         localStorage.removeItem("rentveda_pending_count_entry");
       }
@@ -161,7 +163,7 @@ const StartEntry = () => {
   //       setCustomerName(response.data.customerName);
   //       setAddress(response.data.address);
   //       setIsCustomerFound(true);
-  //       toast.success("Existing Customer Found!", { theme: "dark" });
+  //       toast.success("Existing Customer Found!", { theme: "light" });
   //     }
   //   } catch {
   //     // 404 just means new customer — silently clear
@@ -184,7 +186,7 @@ const StartEntry = () => {
         setCustomerName(response.data.customerName);
         setAddress(response.data.address);
         setIsCustomerFound(true);
-        toast.success(t('existingCustomerFound') || "Existing Customer Found!", { theme: "dark" });
+        toast.success(t('existingCustomerFound') || "Existing Customer Found!", { theme: "light" });
       }
     } catch {
       // 🚨 YAHAN FIX HAI: 
@@ -212,54 +214,99 @@ const StartEntry = () => {
 
   // --- LOGIC: NATIVE CONTACT PICKER ---
   const handleContactPicker = async () => {
-    // Web Contact Picker API — supported on Android Chrome / Samsung Browser
-    if (!navigator.contacts || !navigator.contacts.select) {
-      toast.warn(
-        t('contactPickerUnsupported') || "Contact Picker is not supported on this browser. Please enter manually.",
-        { theme: "dark" }
-      );
+    // ─── WEB FALLBACK: if running in a normal browser (not Capacitor) ───
+    if (!Capacitor.isNativePlatform()) {
+      if (!navigator.contacts || !navigator.contacts.select) {
+        toast.warn(
+          t('contactPickerUnsupported') || "Contact Picker is not supported on this browser. Please enter manually.",
+          { theme: "light" }
+        );
+        return;
+      }
+      try {
+        const contacts = await navigator.contacts.select(
+          ["name", "tel"],
+          { multiple: false }
+        );
+        if (!contacts || contacts.length === 0) return;
+        const contact = contacts[0];
+        const name = Array.isArray(contact.name) && contact.name.length > 0
+          ? contact.name[0]
+          : typeof contact.name === "string" ? contact.name : "";
+        const rawTel = Array.isArray(contact.tel) && contact.tel.length > 0
+          ? contact.tel[0]
+          : typeof contact.tel === "string" ? contact.tel : "";
+        const cleanedTel = rawTel.replace(/[^\d]/g, "").slice(-10);
+        if (name) setCustomerName(name);
+        if (cleanedTel) {
+          setMobileNumber(cleanedTel);
+          setCustomerMobile(cleanedTel);
+          setIsCustomerFound(false);
+          if (cleanedTel.length === 10) fetchCustomerByMobile(cleanedTel, true);
+        }
+        toast.success(`${t('contactImported') || 'Contact'} "${name}" ${t('contactImportedSuffix') || 'imported!'}`, { theme: "light" });
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          toast.error(t('contactPickerError') || "Could not open contact picker.", { theme: "light" });
+        }
+      }
       return;
     }
+
+    // ─── NATIVE CAPACITOR PATH (Android APK) ───
     try {
-      const contacts = await navigator.contacts.select(
-        ["name", "tel"],
-        { multiple: false }
-      );
-      if (!contacts || contacts.length === 0) return; // user cancelled
+      // 1. Request READ_CONTACTS permission
+      const permResult = await Contacts.requestPermissions();
+      if (permResult.contacts !== "granted") {
+        toast.warn(
+          t('contactPermissionDenied') || "Contact permission denied. Please allow it in Settings.",
+          { theme: "light" }
+        );
+        return;
+      }
 
-      const contact = contacts[0];
+      // 2. Open native contact picker
+      const result = await Contacts.pickContact({
+        projection: {
+          name: true,
+          phones: true,
+        },
+      });
 
-      // Extract name
-      const name = Array.isArray(contact.name) && contact.name.length > 0
-        ? contact.name[0]
-        : typeof contact.name === "string"
-          ? contact.name
+      if (!result || !result.contact) return;
+      const contact = result.contact;
+
+      // 3. Extract name
+      const name = contact.name?.display || contact.name?.given || "";
+
+      // 4. Extract & clean phone number (strip spaces, dashes, +91 country code)
+      const rawPhone =
+        contact.phones && contact.phones.length > 0
+          ? contact.phones[0].number || ""
           : "";
+      const cleanedTel = rawPhone.replace(/[^\d]/g, "").slice(-10);
 
-      // Extract & clean phone number (strip spaces, dashes, country code)
-      const rawTel = Array.isArray(contact.tel) && contact.tel.length > 0
-        ? contact.tel[0]
-        : typeof contact.tel === "string"
-          ? contact.tel
-          : "";
-      const cleanedTel = rawTel.replace(/[^\d]/g, "").slice(-10); // keep last 10 digits
-
+      // 5. Update React state
       if (name) setCustomerName(name);
       if (cleanedTel) {
         setMobileNumber(cleanedTel);
         setCustomerMobile(cleanedTel);
         setIsCustomerFound(false);
         if (cleanedTel.length === 10) {
-          // fetchCustomerByMobile(cleanedTel);
           fetchCustomerByMobile(cleanedTel, true);
         }
       }
 
-      toast.success(`${t('contactImported') || 'Contact'} "${name}" ${t('contactImportedSuffix') || 'imported!'}`, { theme: "dark" });
+      toast.success(
+        `${t('contactImported') || 'Contact'} "${name}" ${t('contactImportedSuffix') || 'imported!'}`,
+        { theme: "light" }
+      );
     } catch (err) {
-      if (err.name !== "AbortError") {
-        toast.error(t('contactPickerError') || "Could not open contact picker.", { theme: "dark" });
-      }
+      console.error("Contact Picker Error:", err);
+      toast.error(
+        t('contactPickerError') || "Could not open contact picker.",
+        { theme: "light" }
+      );
     }
   };
 
@@ -335,18 +382,18 @@ const StartEntry = () => {
   };
 
   return (
-    <div className="bg-[#121212] min-h-screen flex flex-col pb-20 relative">
+    <div className="bg-[var(--bg-main)] min-h-screen flex flex-col pb-20 relative">
 
       {/* 1. APP HEADER */}
-      <div className="sticky top-0 z-30 bg-[#121212] border-b border-[#2C2C2C] px-4 py-3 flex items-center gap-3">
+      <div className="sticky top-0 z-30 bg-[var(--bg-main)] border-b border-[var(--border-color)] px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 -ml-2 rounded-full active:bg-[#2C2C2C] text-white"
+          className="p-2 -ml-2 rounded-full active:bg-[var(--bg-input)] text-[var(--text-main)]"
         >
           <FaChevronLeft />
         </button>
         <div>
-          <h1 className="text-white text-lg font-bold tracking-wide">
+          <h1 className="text-[var(--text-main)] text-lg font-bold tracking-wide">
             {t('addNewEntry') || "New Entry"}
           </h1>
           <p className="text-[10px] text-[var(--primary)] font-medium uppercase tracking-wider">
@@ -365,14 +412,14 @@ const StartEntry = () => {
 
         {/* CUSTOMER DETAILS */}
         <div className="space-y-3">
-          <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest pl-1">
+          <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest pl-1">
             {t('rentalDetails') || "CUSTOMER DETAILS"}
           </h2>
 
           <motion.div variants={item} className="relative group flex items-center gap-2">
             {/* Mobile number input */}
             <div className="relative flex-1">
-              <div className="absolute top-3.5 left-4 text-gray-500 group-focus-within:text-[var(--primary)] pointer-events-none">
+              <div className="absolute top-3.5 left-4 text-[var(--text-muted)] group-focus-within:text-[var(--primary)] pointer-events-none">
                 <FaPhoneAlt size={14} />
               </div>
               <input
@@ -381,7 +428,7 @@ const StartEntry = () => {
                 placeholder={t('enterMobileNumber') || "Mobile Number"}
                 value={mobileNumber}
                 onChange={handleMobileNumberChange}
-                className="w-full bg-[#1E1E1E] text-white pl-11 pr-10 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-sm font-medium tracking-wide transition-all"
+                className="w-full bg-white text-[var(--text-main)] pl-11 pr-10 py-3 rounded-xl border border-[var(--border-color)] focus:border-[var(--primary)] outline-none text-sm font-medium tracking-wide transition-all"
               />
               {isCustomerFound && (
                 <div className="absolute top-3.5 right-3 text-green-500 animate-bounce">
@@ -395,14 +442,14 @@ const StartEntry = () => {
               type="button"
               onClick={handleContactPicker}
               title={t('importFromContacts') || "Import from Contacts"}
-              className="flex-shrink-0 w-11 h-11 rounded-xl bg-[#1E1E1E] border border-[#333] flex items-center justify-center text-[var(--primary)] active:bg-[#2C2C2C] hover:border-[var(--primary)] transition-all"
+              className="flex-shrink-0 w-11 h-11 rounded-xl bg-white border border-[var(--border-color)] flex items-center justify-center text-[var(--primary)] active:bg-[var(--bg-input)] hover:border-[var(--primary)] transition-all"
             >
               <FaAddressBook size={16} />
             </button>
           </motion.div>
 
           <motion.div variants={item} className="relative group">
-            <div className="absolute top-3.5 left-4 text-gray-500 group-focus-within:text-[var(--primary)]">
+            <div className="absolute top-3.5 left-4 text-[var(--text-muted)] group-focus-within:text-[var(--primary)]">
               <FaUser size={14} />
             </div>
             <input
@@ -410,12 +457,12 @@ const StartEntry = () => {
               placeholder={t('enterCustomerName') || "Customer Name"}
               value={customerName}
               onChange={(e) => setCustomerName(cleanStringInput(e.target.value))}
-              className="w-full bg-[#1E1E1E] text-white pl-11 pr-4 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-sm transition-all"
+              className="w-full bg-white text-[var(--text-main)] pl-11 pr-4 py-3 rounded-xl border border-[var(--border-color)] focus:border-[var(--primary)] outline-none text-sm transition-all"
             />
           </motion.div>
 
           <motion.div variants={item} className="relative group">
-            <div className="absolute top-3.5 left-4 text-gray-500 group-focus-within:text-[var(--primary)]">
+            <div className="absolute top-3.5 left-4 text-[var(--text-muted)] group-focus-within:text-[var(--primary)]">
               <FaMapMarkerAlt size={14} />
             </div>
             <input
@@ -423,20 +470,20 @@ const StartEntry = () => {
               placeholder={t('clientAddress') || "Address"}
               value={address}
               onChange={(e) => setAddress(cleanStringInput(e.target.value))}
-              className="w-full bg-[#1E1E1E] text-white pl-11 pr-4 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-sm transition-all"
+              className="w-full bg-white text-[var(--text-main)] pl-11 pr-4 py-3 rounded-xl border border-[var(--border-color)] focus:border-[var(--primary)] outline-none text-sm transition-all"
             />
           </motion.div>
         </div>
 
         {/* WORK DETAILS */}
         <div className="space-y-3">
-          <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest pl-1">
+          <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest pl-1">
             {t('jobWork') || "WORK DETAILS"}
           </h2>
 
           <div className="grid grid-cols-2 gap-3">
             <motion.div variants={item} className="relative">
-              <div className="absolute top-3.5 left-3 text-gray-500">
+              <div className="absolute top-3.5 left-3 text-[var(--text-muted)]">
                 <FaHardHat size={12} />
               </div>
               <input
@@ -444,12 +491,12 @@ const StartEntry = () => {
                 placeholder={t('operatorName') || "Operator"}
                 value={operatorName}
                 onChange={(e) => setOperatorName(cleanStringInput(e.target.value))}
-                className="w-full bg-[#1E1E1E] text-white pl-9 pr-2 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-xs"
+                className="w-full bg-white text-[var(--text-main)] pl-9 pr-2 py-3 rounded-xl border border-[var(--border-color)] focus:border-[var(--primary)] outline-none text-xs"
               />
             </motion.div>
 
             <motion.div variants={item} className="relative">
-              <div className="absolute top-3.5 left-3 text-gray-500">
+              <div className="absolute top-3.5 left-3 text-[var(--text-muted)]">
                 <FaWrench size={12} />
               </div>
               <input
@@ -457,7 +504,7 @@ const StartEntry = () => {
                 placeholder={t('jobWork') || "Work Type"}
                 value={jobWork}
                 onChange={(e) => setJobWork(cleanStringInput(e.target.value))}
-                className="w-full bg-[#1E1E1E] text-white pl-9 pr-2 py-3 rounded-xl border border-[#333] focus:border-[var(--primary)] outline-none text-xs"
+                className="w-full bg-white text-[var(--text-main)] pl-9 pr-2 py-3 rounded-xl border border-[var(--border-color)] focus:border-[var(--primary)] outline-none text-xs"
               />
             </motion.div>
           </div>
@@ -466,7 +513,7 @@ const StartEntry = () => {
         {/* CALCULATOR & PAYMENT */}
         <motion.div
           variants={item}
-          className="bg-[#1E1E1E] p-4 rounded-2xl border border-[#333] shadow-lg"
+          className="bg-white p-4 rounded-2xl border border-[var(--border-color)] shadow-lg"
         >
           <h2 className="text-[var(--primary)] text-[10px] font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
             <FaCalculator size={10} /> {t('rentalCalculator')}
@@ -475,19 +522,19 @@ const StartEntry = () => {
           {/* Price & Qty Row */}
           <div className="flex gap-3 mb-5">
             <div className="flex-1">
-              <label className="text-gray-500 text-[10px] font-bold mb-1 block">{t('rateLabel') || "RATE"}</label>
+              <label className="text-[var(--text-muted)] text-[10px] font-bold mb-1 block">{t('rateLabel') || "RATE"}</label>
               <input
                 type="number"
                 placeholder="0"
                 value={price}
                 onChange={(e) => setPrice(cleanNumberInput(e.target.value))}
                 onKeyDown={blockInvalidNumberKeys}
-                className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none font-bold text-sm"
+                className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2 rounded-lg border border-[var(--border-color)] focus:border-[var(--primary)] outline-none font-bold text-sm"
               />
             </div>
 
             <div className="flex-1">
-              <label className="text-gray-500 text-[10px] font-bold mb-1 block">
+              <label className="text-[var(--text-muted)] text-[10px] font-bold mb-1 block">
                 {t('qtyLabel') || "QTY"} ({rentType})
               </label>
               <input
@@ -496,15 +543,15 @@ const StartEntry = () => {
                 value={quantity}
                 onChange={(e) => setQuantity(cleanNumberInput(e.target.value))}
                 onKeyDown={blockInvalidNumberKeys}
-                className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none font-bold text-sm"
+                className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2 rounded-lg border border-[var(--border-color)] focus:border-[var(--primary)] outline-none font-bold text-sm"
               />
             </div>
           </div>
 
           {/* TOTAL BILL (Center) */}
-          <div className="text-center mb-5 pb-5 border-b border-[#333]">
-            <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">{t('totalBillAmount') || "Total Bill Amount"}</p>
-            <div className="text-3xl font-extrabold text-white tracking-tight">
+          <div className="text-center mb-5 pb-5 border-b border-[var(--border-color)]">
+            <p className="text-[var(--text-muted)] text-[10px] uppercase tracking-widest mb-1">{t('totalBillAmount') || "Total Bill Amount"}</p>
+            <div className="text-3xl font-extrabold text-[var(--text-main)] tracking-tight">
               ₹ {total || 0}
             </div>
           </div>
@@ -525,7 +572,7 @@ const StartEntry = () => {
                       value={paidAmount}
                       onChange={handlePaidAmountChange}
                       onKeyDown={blockInvalidNumberKeys}
-                      className="w-full bg-transparent text-green-500 pl-4 py-2 border-b border-[#333] focus:border-green-500 outline-none font-bold text-lg placeholder-green-900"
+                      className="w-full bg-transparent text-green-500 pl-4 py-2 border-b border-[var(--border-color)] focus:border-green-500 outline-none font-bold text-lg placeholder-green-900"
                     />
                   </div>
                 </div>
@@ -542,7 +589,7 @@ const StartEntry = () => {
                       value={pendingAmount}
                       onChange={handlePendingAmountChange}
                       onKeyDown={blockInvalidNumberKeys}
-                      className="w-full bg-transparent text-red-500 pl-4 py-2 border-b border-[#333] focus:border-red-500 outline-none font-bold text-lg placeholder-red-900"
+                      className="w-full bg-transparent text-red-500 pl-4 py-2 border-b border-[var(--border-color)] focus:border-red-500 outline-none font-bold text-lg placeholder-red-900"
                     />
                   </div>
                 </div>
@@ -550,11 +597,11 @@ const StartEntry = () => {
 
               {/* REMINDER SECTION */}
               {pendingAmount > 0 && (
-                <div className="pt-5 border-t border-[#333]">
+                <div className="pt-5 border-t border-[var(--border-color)]">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-white text-xs font-bold">{t('setPaymentReminder') || "Set Payment Reminder"}</h4>
-                      <p className="text-[10px] text-gray-500">{t('reminderNotifyText') || "Get notified when follow-up is due"}</p>
+                      <h4 className="text-[var(--text-main)] text-xs font-bold">{t('setPaymentReminder') || "Set Payment Reminder"}</h4>
+                      <p className="text-[10px] text-[var(--text-muted)]">{t('reminderNotifyText') || "Get notified when follow-up is due"}</p>
                     </div>
                     <button
                       type="button"
@@ -564,7 +611,7 @@ const StartEntry = () => {
                           setCustomerMobile(mobileNumber);
                         }
                       }}
-                      className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${setReminder ? "bg-[var(--primary)]" : "bg-[#333]"
+                      className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${setReminder ? "bg-[var(--primary)]" : "bg-gray-300"
                         }`}
                     >
                       <div
@@ -584,7 +631,7 @@ const StartEntry = () => {
                       >
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="text-gray-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
+                            <label className="text-[var(--text-muted)] text-[10px] font-bold mb-1 block uppercase tracking-wider">
                               {t('reminderModalDateLabel') || "Reminder Date"}
                             </label>
                             <input
@@ -592,12 +639,12 @@ const StartEntry = () => {
                               value={reminderDate}
                               min={today}
                               onChange={handleReminderDateChange}
-                              className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none text-xs font-semibold"
+                              className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2 rounded-lg border border-[var(--border-color)] focus:border-[var(--primary)] outline-none text-xs font-semibold"
                             />
                           </div>
 
                           <div>
-                            <label className="text-gray-500 text-[10px] font-bold mb-1 block uppercase tracking-wider">
+                            <label className="text-[var(--text-muted)] text-[10px] font-bold mb-1 block uppercase tracking-wider">
                               {t('smsMobileLabel') || "SMS Mobile (Optional)"}
                             </label>
                             <input
@@ -606,7 +653,7 @@ const StartEntry = () => {
                               value={customerMobile}
                               onChange={(e) => setCustomerMobile(e.target.value)}
                               placeholder={t('smsMobilePlaceholder') || "SMS Mobile"}
-                              className="w-full bg-[#121212] text-white px-3 py-2 rounded-lg border border-[#333] focus:border-[var(--primary)] outline-none text-xs font-semibold"
+                              className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2 rounded-lg border border-[var(--border-color)] focus:border-[var(--primary)] outline-none text-xs font-semibold"
                             />
                           </div>
                         </div>
@@ -622,7 +669,7 @@ const StartEntry = () => {
       </motion.div>
 
       {/* 3. SLEEK SUBMIT BUTTON (Reduced Size) */}
-      <div className="p-4 bg-[#121212] sticky bottom-0 border-t border-[#222]">
+      <div className="p-4 bg-[var(--bg-main)] sticky bottom-0 border-t border-[var(--border-color)]">
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={handleSubmit}
