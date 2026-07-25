@@ -23,7 +23,7 @@ import {
 } from "react-icons/fa";
 
 const StartEntry = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { rentType, machineId, machineName } = location.state || {};
@@ -213,12 +213,25 @@ const StartEntry = () => {
   };
 
   // --- LOGIC: NATIVE CONTACT PICKER ---
+  // ⚡ KEY FIX: The @capacitor-community/contacts v8 plugin's pickContact()
+  //    method INTERNALLY handles requestPermissions(). Calling requestPermissions()
+  //    separately BEFORE pickContact() creates a double-prompt race condition
+  //    that causes "Could not open contact picker" on some Android devices.
+  //    Solution: Let pickContact() manage permissions on its own, and only
+  //    pre-check with checkPermissions() to show a user-friendly denial message.
+
   const handleContactPicker = async () => {
+    // Derive current language for bilingual alerts
+    const currentLang = i18n.language?.startsWith("hi") ? "hi" : "en";
+
     // ─── WEB FALLBACK: if running in a normal browser (not Capacitor) ───
     if (!Capacitor.isNativePlatform()) {
+      // Try the Web Contact Picker API (Chrome Android only)
       if (!navigator.contacts || !navigator.contacts.select) {
         toast.warn(
-          t('contactPickerUnsupported') || "Contact Picker is not supported on this browser. Please enter manually.",
+          currentLang === "hi"
+            ? "इस ब्राउज़र पर कॉन्टैक्ट पिकर उपलब्ध नहीं है। कृपया मैनुअली भरें।"
+            : (t('contactPickerUnsupported') || "Contact Picker is not supported on this browser. Please enter manually."),
           { theme: "light" }
         );
         return;
@@ -244,28 +257,53 @@ const StartEntry = () => {
           setIsCustomerFound(false);
           if (cleanedTel.length === 10) fetchCustomerByMobile(cleanedTel, true);
         }
-        toast.success(`${t('contactImported') || 'Contact'} "${name}" ${t('contactImportedSuffix') || 'imported!'}`, { theme: "light" });
+        console.log("[ContactPicker] Web: Selected ->", { name, phone: cleanedTel });
+        toast.success(
+          `${t('contactImported') || 'Contact'} "${name}" ${t('contactImportedSuffix') || 'imported!'}`,
+          { theme: "light" }
+        );
       } catch (err) {
         if (err.name !== "AbortError") {
-          toast.error(t('contactPickerError') || "Could not open contact picker.", { theme: "light" });
+          toast.error(
+            currentLang === "hi"
+              ? "कॉन्टैक्ट लोड करने में समस्या हुई।"
+              : (t('contactPickerError') || "Could not open contact picker."),
+            { theme: "light" }
+          );
         }
       }
       return;
     }
 
-    // ─── NATIVE CAPACITOR PATH (Android APK) ───
+    // ─── NATIVE CAPACITOR PATH (Android) ───
     try {
-      // 1. Request READ_CONTACTS permission
-      const permResult = await Contacts.requestPermissions();
-      if (permResult.contacts !== "granted") {
-        toast.warn(
-          t('contactPermissionDenied') || "Contact permission denied. Please allow it in Settings.",
-          { theme: "light" }
+      // Step 1 & 2: Platform check and check current state first
+      const rawCheck = await Contacts.checkPermissions();
+      console.log("[ContactPicker] RAW checkPermissions response:", JSON.stringify(rawCheck));
+      
+      let finalStatus = rawCheck.contacts;
+
+      // Step 3 & 4: Request only if needed, with fallback/safety checks
+      if (finalStatus !== "granted") {
+        console.log("[ContactPicker] Status is not granted, requesting permission...");
+        const rawRequest = await Contacts.requestPermissions();
+        console.log("[ContactPicker] RAW requestPermissions response:", JSON.stringify(rawRequest));
+        finalStatus = rawRequest.contacts;
+      }
+
+      // If still not granted after request, show denial message
+      if (finalStatus !== "granted") {
+        console.warn(`[ContactPicker] Permission still denied. Status: ${finalStatus}`);
+        alert(
+          currentLang === "hi"
+            ? "कृपया सेटिंग्स में जाकर कॉन्टैक्ट की अनुमति दें।\n\nSettings > Apps > RentVeda > Permissions > Contacts"
+            : "Please allow Contact permission from Settings.\n\nSettings > Apps > RentVeda > Permissions > Contacts"
         );
         return;
       }
 
-      // 2. Open native contact picker
+      // Step 5: Execution (Permission granted)
+      console.log("[ContactPicker] Permission granted! Opening native picker...");
       const result = await Contacts.pickContact({
         projection: {
           name: true,
@@ -273,20 +311,36 @@ const StartEntry = () => {
         },
       });
 
-      if (!result || !result.contact) return;
+      // Step 5: Validate result
+      if (!result || !result.contact) {
+        console.log("[ContactPicker] User cancelled or no contact returned.");
+        return;
+      }
       const contact = result.contact;
 
-      // 3. Extract name
-      const name = contact.name?.display || contact.name?.given || "";
+      // Step 6: Extract name (display name > given name > family name)
+      const name =
+        contact.name?.display ||
+        contact.name?.given ||
+        contact.name?.family ||
+        "";
 
-      // 4. Extract & clean phone number (strip spaces, dashes, +91 country code)
+      // Step 7: Extract & clean phone number (strip spaces, dashes, +91 country code)
       const rawPhone =
         contact.phones && contact.phones.length > 0
           ? contact.phones[0].number || ""
           : "";
       const cleanedTel = rawPhone.replace(/[^\d]/g, "").slice(-10);
 
-      // 5. Update React state
+      // Step 8: Log selected contact
+      console.log("[ContactPicker] Native: Selected ->", {
+        name,
+        rawPhone,
+        cleanedPhone: cleanedTel,
+        contactId: contact.contactId,
+      });
+
+      // Step 9: Update React state
       if (name) setCustomerName(name);
       if (cleanedTel) {
         setMobileNumber(cleanedTel);
@@ -302,9 +356,25 @@ const StartEntry = () => {
         { theme: "light" }
       );
     } catch (err) {
-      console.error("Contact Picker Error:", err);
+      console.error("[ContactPicker] Error:", err);
+
+      // Distinguish user cancellation from real errors
+      const errMsg = err?.message || err?.toString() || "";
+      if (
+        errMsg.includes("canceled") ||
+        errMsg.includes("cancelled") ||
+        errMsg.includes("RESULT_CANCELED")
+      ) {
+        // User just tapped "back" on the picker — silently ignore
+        console.log("[ContactPicker] User cancelled the picker.");
+        return;
+      }
+
+      // Real error — show bilingual fallback alert with exact error message
       toast.error(
-        t('contactPickerError') || "Could not open contact picker.",
+        currentLang === "hi"
+          ? `कॉन्टैक्ट पिकर खोलने में त्रुटि: ${errMsg}`
+          : `Could not open contact picker: ${errMsg}`,
         { theme: "light" }
       );
     }
