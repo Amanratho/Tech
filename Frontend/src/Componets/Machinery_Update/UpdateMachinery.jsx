@@ -56,11 +56,11 @@ const MachineryUpdate = () => {
       );
       if (response.status === 200) {
         setMachines((prev) => prev.filter((m) => m.Machine_id !== machineToDelete));
-        toast.success(t('archiveSuccessToast') || "Machine archived successfully! Historical data preserved.", { theme: "dark" });
+        toast.success(t('archiveSuccessToast') || "Machine archived successfully! Historical data preserved.", { theme: "light" });
       }
     } catch (error) {
       console.error("Error archiving machine:", error);
-      toast.error(t('archiveErrorToast') || "Failed to archive machine", { theme: "dark" });
+      toast.error(t('archiveErrorToast') || "Failed to archive machine", { theme: "light" });
     } finally {
       setIsDeleting(false);
       setMachineToDelete(null);
@@ -68,14 +68,14 @@ const MachineryUpdate = () => {
   };
 
   return (
-    <div className="bg-[#121212] min-h-screen pb-20 relative overflow-hidden font-sans">
+    <div className="bg-[var(--bg-main)] min-h-screen pb-20 relative overflow-hidden font-sans">
 
       {/* STICKY HEADER */}
-      <div className="sticky top-0 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] mt-16 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => window.history.back()} className="text-gray-400 hover:text-white p-2 -ml-2 transition-colors">
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] mt-16 px-4 py-3 flex items-center justify-between">
+        <button onClick={() => window.history.back()} className="text-[var(--text-muted)] hover:text-[var(--text-main)] p-2 -ml-2 transition-colors">
           <FaArrowLeft size={14} />
         </button>
-        <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest text-center mr-6">
+        <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest text-center mr-6">
           {t('deleteUpdateMachinesTitle') || "MANAGE MACHINERY"}
         </h2>
         <div></div> {/* Flex spacer */}
@@ -85,11 +85,11 @@ const MachineryUpdate = () => {
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="w-full h-40 bg-[#1E1E1E] rounded-xl animate-pulse border border-[#2C2C2C]"></div>
+              <div key={i} className="w-full h-40 bg-white rounded-xl animate-pulse border border-[var(--border-color)]"></div>
             ))}
           </div>
         ) : machines.length === 0 ? (
-          <div className="text-center text-gray-500 mt-20 text-xs">
+          <div className="text-center text-[var(--text-muted)] mt-20 text-xs">
             No machines found. Register a new machine first.
           </div>
         ) : (
@@ -101,7 +101,7 @@ const MachineryUpdate = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-[#1E1E1E] rounded-xl border border-[#2C2C2C] overflow-hidden shadow-lg relative group"
+                className="bg-white rounded-xl border border-[var(--border-color)] overflow-hidden shadow-lg relative group"
               >
                 {/* Image Section */}
                 <div className="relative h-40 w-full">
@@ -114,14 +114,14 @@ const MachineryUpdate = () => {
 
                   {/* Top Left Badge: ID */}
                   <div className="absolute top-3 left-3">
-                    <span className="text-[9px] text-[var(--primary)] font-bold uppercase tracking-wider bg-[#121212]/80 px-2 py-0.5 rounded border border-[#333] backdrop-blur-sm shadow-md">
+                    <span className="text-[9px] text-[var(--primary)] font-bold uppercase tracking-wider bg-white/80 px-2 py-0.5 rounded border border-[var(--border-color)] backdrop-blur-sm shadow-md">
                       ID: {item.Machine_id}
                     </span>
                   </div>
 
                   {/* Bottom Info Title */}
                   <div className="absolute bottom-3 left-3 right-20">
-                    <h3 className="text-white text-lg font-bold drop-shadow-md truncate">
+                    <h3 className="text-[var(--text-main)] text-lg font-bold drop-shadow-md truncate">
                       {item.Machine_name}
                     </h3>
                   </div>
@@ -130,14 +130,14 @@ const MachineryUpdate = () => {
                   <div className="absolute bottom-3 right-3 flex items-center gap-2">
                     <button
                       onClick={() => handleEditClick(item)}
-                      className="w-9 h-9 rounded-full bg-[#121212]/80 backdrop-blur-sm border border-[var(--primary)] text-[var(--primary)] flex items-center justify-center shadow-lg active:bg-[var(--primary)] active:text-black transition-all"
+                      className="w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm border border-[var(--primary)] text-[var(--primary)] flex items-center justify-center shadow-lg active:bg-[var(--primary)] active:text-black transition-all"
                     >
                       <FaPen size={12} />
                     </button>
 
                     <button
                       onClick={() => handleDeleteClick(item.Machine_id)}
-                      className="w-9 h-9 rounded-full bg-orange-500/10 backdrop-blur-sm border border-orange-500/50 text-orange-500 flex items-center justify-center shadow-lg hover:bg-orange-500/20 active:bg-orange-500 active:text-white transition-all"
+                      className="w-9 h-9 rounded-full bg-orange-500/10 backdrop-blur-sm border border-orange-500/50 text-orange-500 flex items-center justify-center shadow-lg hover:bg-orange-500/20 active:bg-orange-500 active:text-[var(--text-main)] transition-all"
                       title={t('archiveMachineTitle') || "Archive / Mark as Sold"}
                     >
                       <FaArchive size={12} />

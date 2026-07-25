@@ -104,14 +104,14 @@ useEffect(() => {
   };
 
   return (
-    <div className="bg-[#121212] min-h-screen pb-20 flex flex-col relative overflow-hidden font-sans">
+    <div className="bg-[var(--bg-main)] min-h-screen pb-20 flex flex-col relative overflow-hidden font-sans">
 
       {/* 1. Top Sticky Header */}
-      <div className="sticky top-0 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] mt-16 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-white p-2 -ml-2 transition-colors">
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] mt-16 px-4 py-3 flex items-center justify-between">
+        <button onClick={() => navigate(-1)} className="text-[var(--text-muted)] hover:text-[var(--text-main)] p-2 -ml-2 transition-colors">
           <FaArrowLeft size={16} />
         </button>
-        <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mr-6">
+        <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest mr-6">
           {t('updateMachineTitle') || "EDIT MACHINE"}
         </h2>
         <div></div> {/* Spacer */}
@@ -122,7 +122,7 @@ useEffect(() => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1E1E1E] w-full max-w-md rounded-2xl p-5 sm:p-7 border border-[#2C2C2C] shadow-2xl h-fit relative"
+          className="bg-white w-full max-w-md rounded-2xl p-5 sm:p-7 border border-[var(--border-color)] shadow-2xl h-fit relative"
         >
           {/* Subtle Background Glow */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--primary)]/5 rounded-full blur-[50px] pointer-events-none"></div>
@@ -131,11 +131,11 @@ useEffect(() => {
 
             {/* Machine Name */}
             <div>
-              <label htmlFor="MachineName" className="block text-gray-400 text-xs font-semibold mb-1.5 pl-1">
+              <label htmlFor="MachineName" className="block text-[var(--text-muted)] text-xs font-semibold mb-1.5 pl-1">
                 {t('machineNameLabel') || "Machine Name"}
               </label>
               <div className="relative">
-                <FaTractor className="absolute left-4 top-3.5 text-gray-500 text-sm" />
+                <FaTractor className="absolute left-4 top-3.5 text-[var(--text-muted)] text-sm" />
                 <input
                   type="text"
                   id="MachineName"
@@ -143,7 +143,7 @@ useEffect(() => {
                   value={formData.machineName}
                   onChange={handleChange}
                   placeholder={t('machineNamePlaceholder') || "e.g. Harvester 2000"}
-                  className="w-full bg-[#121212] text-white border border-[#333] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-gray-600"
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-[var(--text-muted)]"
                   required
                 />
               </div>
@@ -151,20 +151,20 @@ useEffect(() => {
 
             {/* Rent Type */}
             <div>
-              <label htmlFor="rentType" className="block text-gray-400 text-xs font-semibold mb-1.5 pl-1">
+              <label htmlFor="rentType" className="block text-[var(--text-muted)] text-xs font-semibold mb-1.5 pl-1">
                 {t('rentTypeLabel') || "Rent Type (Pricing Unit)"}
               </label>
               <div className="relative">
-                <FaCogs className="absolute left-4 top-3.5 text-gray-500 text-sm z-10" />
+                <FaCogs className="absolute left-4 top-3.5 text-[var(--text-muted)] text-sm z-10" />
                 <select
                   id="rentType"
                   name="rentType"
                   value={formData.rentType}
                   onChange={handleChange}
-                  className="w-full bg-[#121212] text-white border border-[#333] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm appearance-none cursor-pointer"
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm appearance-none cursor-pointer"
                   required
                 >
-                  <option value="" disabled className="text-gray-500">
+                  <option value="" disabled className="text-[var(--text-muted)]">
                     {t('rentTypePlaceholder') || "Select Unit"}
                   </option>
                   <option value="Acre">Per Acre</option>
@@ -176,17 +176,17 @@ useEffect(() => {
                     <option value="Foot">Per Foot</option>
                 </select>
                 {/* Custom dropdown arrow */}
-                <div className="absolute right-4 top-4 pointer-events-none text-gray-500 text-xs">▼</div>
+                <div className="absolute right-4 top-4 pointer-events-none text-[var(--text-muted)] text-xs">▼</div>
               </div>
             </div>
 
             {/* Image Upload Area */}
-            <div className="pt-2 border-t border-[#333]">
-              <label className="block text-gray-400 text-xs font-semibold mb-1.5 pl-1">
+            <div className="pt-2 border-t border-[var(--border-color)]">
+              <label className="block text-[var(--text-muted)] text-xs font-semibold mb-1.5 pl-1">
                 {t('uploadImageLabel') || "Machine Image"}
               </label>
 
-              <div className="relative w-full h-40 bg-[#121212] border-2 border-dashed border-[#333] hover:border-[var(--primary)]/50 rounded-xl transition-colors overflow-hidden group cursor-pointer">
+              <div className="relative w-full h-40 bg-[var(--bg-main)] border-2 border-dashed border-[var(--border-color)] hover:border-[var(--primary)]/50 rounded-xl transition-colors overflow-hidden group cursor-pointer">
                 <input
                   type="file"
                   id="machineImage"
@@ -203,18 +203,18 @@ useEffect(() => {
                       className="w-full h-full object-cover opacity-90 group-hover:opacity-60 transition-opacity"
                     />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                      <div className="bg-black/80 px-3 py-1.5 rounded-lg flex items-center gap-2 text-white text-xs font-bold backdrop-blur-sm">
+                      <div className="bg-black/80 px-3 py-1.5 rounded-lg flex items-center gap-2 text-[var(--text-main)] text-xs font-bold backdrop-blur-sm">
                         <FaPen size={10} /> Change Image
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 pointer-events-none">
-                    <div className="w-12 h-12 bg-[#1E1E1E] rounded-full flex items-center justify-center mb-2 shadow-inner border border-[#333]">
-                      <FaCloudUploadAlt size={22} className="text-gray-400" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-[var(--text-muted)] pointer-events-none">
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-2 shadow-inner border border-[var(--border-color)]">
+                      <FaCloudUploadAlt size={22} className="text-[var(--text-muted)]" />
                     </div>
                     <span className="text-xs font-semibold">Tap to update photo</span>
-                    <span className="text-[9px] mt-1 text-gray-600">Leave blank to keep old image</span>
+                    <span className="text-[9px] mt-1 text-[var(--text-muted)]">Leave blank to keep old image</span>
                   </div>
                 )}
               </div>
@@ -233,7 +233,7 @@ useEffect(() => {
                 type="submit"
                 disabled={isSubmitting}
                 className={`w-full py-3.5 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center transition-all ${isSubmitting
-                    ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                    ? "bg-gray-600 text-[var(--text-muted)] cursor-not-allowed"
                     : "bg-[var(--primary)] text-black hover:bg-yellow-500 shadow-[var(--primary)]/20 active:scale-95"
                   }`}
               >

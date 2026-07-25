@@ -52,18 +52,18 @@ const Profile = () => {
     toast(
       ({ closeToast }) => (
         <div className="flex flex-col gap-4 p-2">
-          <p className="text-white font-semibold text-sm text-center">
+          <p className="text-[var(--text-main)] font-semibold text-sm text-center">
             {t("logoutConfirmation") || "Are you sure you want to log out?"}
           </p>
           <div className="flex justify-center gap-3 mt-1">
             <button
-              className="bg-transparent text-gray-400 px-5 py-2.5 rounded-full text-xs font-bold hover:text-white hover:bg-white/5 transition-all"
+              className="bg-transparent text-[var(--text-muted)] px-5 py-2.5 rounded-full text-xs font-bold hover:text-[var(--text-main)] hover:bg-gray-50 transition-all"
               onClick={closeToast}
             >
               {t("logoutNo") || "Cancel"}
             </button>
             <button
-              className="bg-red-500 text-white px-6 py-2.5 rounded-full text-xs font-bold shadow-lg shadow-red-500/30 active:scale-95 transition-all"
+              className="bg-red-500 text-[var(--text-main)] px-6 py-2.5 rounded-full text-xs font-bold shadow-lg shadow-red-500/30 active:scale-95 transition-all"
               onClick={() => {
                 dispatch({ type: "LOGOUT" });
                 localStorage.removeItem("token");
@@ -83,7 +83,7 @@ const Profile = () => {
         closeOnClick: false,
         draggable: false,
         hideProgressBar: true,
-        className: "bg-[#1A1A1A] rounded-3xl border-none shadow-2xl", // Boxy toast fixed too
+        className: "bg-white rounded-3xl border-none shadow-2xl", // Boxy toast fixed too
       }
     );
   };
@@ -94,11 +94,11 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#121212] pt-2 mt-12 pb-24 font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--bg-main)] pt-2 mt-12 pb-24 font-sans relative overflow-hidden">
 
       {/* HEADER: Clean, No Borders */}
-      <div className="sticky top-0 z-20 bg-[#121212]/80 backdrop-blur-xl px-4 py-3 mb-4">
-        <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest text-center w-full m-0">
+      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl px-4 py-3 mb-4">
+        <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest text-center w-full m-0">
           {t('profileTitle') || "MY PROFILE"}
         </h2>
       </div>
@@ -106,9 +106,9 @@ const Profile = () => {
       <div className="max-w-md mx-auto px-5">
         {!user ? (
           <div className="flex flex-col items-center justify-center mt-20 space-y-5 animate-pulse">
-            <div className="w-28 h-28 bg-[#1A1A1A] rounded-full"></div>
-            <div className="h-6 w-36 bg-[#1A1A1A] rounded-full"></div>
-            <div className="h-4 w-48 bg-[#1A1A1A] rounded-full"></div>
+            <div className="w-28 h-28 bg-gray-200 rounded-full"></div>
+            <div className="h-6 w-36 bg-gray-200 rounded-full"></div>
+            <div className="h-4 w-48 bg-gray-200 rounded-full"></div>
           </div>
         ) : (
           <>
@@ -124,12 +124,12 @@ const Profile = () => {
 
               {/* Avatar without boxy borders */}
               <div className="relative mb-5 group">
-                <div className="w-28 h-28 bg-gradient-to-br from-[#222] to-[#111] rounded-full flex items-center justify-center text-[var(--primary)] shadow-2xl shadow-[var(--primary)]/10 ring-4 ring-[#121212] ring-offset-2 ring-offset-[var(--primary)]/20">
+                <div className="w-28 h-28 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center text-[var(--primary)] shadow-2xl shadow-[var(--primary)]/10 ring-4 ring-[var(--bg-main)] ring-offset-2 ring-offset-[var(--primary)]/20">
                   <FaUserCircle size={80} className="opacity-90" />
                 </div>
               </div>
 
-              <h1 className="text-2xl font-black text-white tracking-tight text-center z-10 mb-2">
+              <h1 className="text-2xl font-black text-[var(--text-main)] tracking-tight text-center z-10 mb-2">
                 {user.username}
               </h1>
 
@@ -147,26 +147,26 @@ const Profile = () => {
               className="space-y-6 px-2 mb-10"
             >
               <div className="flex items-center gap-5 group">
-                <FaPhoneAlt size={16} className="text-gray-600 group-hover:text-[var(--primary)] transition-colors" />
+                <FaPhoneAlt size={16} className="text-[var(--text-muted)] group-hover:text-[var(--primary)] transition-colors" />
                 <div className="flex-1">
-                  <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-0.5">Mobile</p>
-                  <p className="text-base text-white font-medium tracking-wide">+91 {user.mobileNo}</p>
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase font-bold tracking-wider mb-0.5">Mobile</p>
+                  <p className="text-base text-[var(--text-main)] font-medium tracking-wide">+91 {user.mobileNo}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-5 group">
-                <FaEnvelope size={16} className="text-gray-600 group-hover:text-[var(--primary)] transition-colors" />
+                <FaEnvelope size={16} className="text-[var(--text-muted)] group-hover:text-[var(--primary)] transition-colors" />
                 <div className="flex-1 overflow-hidden">
-                  <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-0.5">Email</p>
-                  <p className="text-base text-white font-medium tracking-wide truncate" title={user.email}>{user.email}</p>
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase font-bold tracking-wider mb-0.5">Email</p>
+                  <p className="text-base text-[var(--text-main)] font-medium tracking-wide truncate" title={user.email}>{user.email}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-5 group">
-                <FaBuilding size={16} className="text-gray-600 group-hover:text-[var(--primary)] transition-colors" />
+                <FaBuilding size={16} className="text-[var(--text-muted)] group-hover:text-[var(--primary)] transition-colors" />
                 <div className="flex-1 overflow-hidden">
-                  <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-0.5">Company</p>
-                  <p className="text-base text-white font-medium tracking-wide truncate" title={user.companyName}>{user.companyName}</p>
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase font-bold tracking-wider mb-0.5">Company</p>
+                  <p className="text-base text-[var(--text-main)] font-medium tracking-wide truncate" title={user.companyName}>{user.companyName}</p>
                 </div>
               </div>
             </motion.div>
@@ -177,57 +177,57 @@ const Profile = () => {
               initial="hidden"
               animate="visible"
               transition={{ delay: 0.2 }}
-              className="bg-[#181818] rounded-[2rem] p-3 shadow-xl mb-8"
+              className="bg-white rounded-[2rem] p-3 shadow-xl mb-8"
             >
               {/* Payment QR (Integrated smoothly) */}
-              <div className="flex items-center p-3 mb-2 bg-[#222]/50 rounded-2xl">
-                <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-[var(--primary)] mr-4">
+              <div className="flex items-center p-3 mb-2 bg-gray-50 rounded-2xl">
+                <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-[var(--primary)] mr-4">
                   <FaQrcode size={22} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-white font-bold text-sm mb-0.5">Payment QR</h3>
-                  <p className="text-[10px] text-gray-500">Receive payments</p>
+                  <h3 className="text-[var(--text-main)] font-bold text-sm mb-0.5">Payment QR</h3>
+                  <p className="text-[10px] text-[var(--text-muted)]">Receive payments</p>
                 </div>
                 <div className="w-12 h-12 bg-white rounded-xl p-1 flex items-center justify-center">
                   {user.qrCodeUrl ? (
                     <img src={user.qrCodeUrl} alt="QR" className="w-full h-full object-cover rounded-lg" />
                   ) : (
-                    <span className="text-[8px] font-bold text-gray-400">NO QR</span>
+                    <span className="text-[8px] font-bold text-[var(--text-muted)]">NO QR</span>
                   )}
                 </div>
               </div>
 
               {/* Menu Links */}
-              <Link to="/EditProfile" className="flex items-center justify-between p-4 no-underline rounded-2xl hover:bg-white/5 active:bg-white/10 transition-colors">
+              <Link to="/EditProfile" className="flex items-center justify-between p-4 no-underline rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors">
                 <div className="flex items-center gap-4">
-                  <FaCog size={18} className="text-gray-400" />
-                  <span className="text-sm font-bold text-white tracking-wide">{t('editProfileButton') || "Edit Profile"}</span>
+                  <FaCog size={18} className="text-[var(--text-muted)]" />
+                  <span className="text-sm font-bold text-[var(--text-main)] tracking-wide">{t('editProfileButton') || "Edit Profile"}</span>
                 </div>
-                <FaChevronRight size={12} className="text-gray-600" />
+                <FaChevronRight size={12} className="text-[var(--text-muted)]" />
               </Link>
 
-              <Link to="/Machinery-Update" className="flex items-center justify-between p-4 no-underline rounded-2xl hover:bg-white/5 active:bg-white/10 transition-colors">
+              <Link to="/Machinery-Update" className="flex items-center justify-between p-4 no-underline rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors">
                 <div className="flex items-center gap-4">
                   <FaPencilAlt size={16} className="text-blue-400" />
-                  <span className="text-sm font-bold text-white tracking-wide">{t('updateMachineryButton') || "Update Machinery"}</span>
+                  <span className="text-sm font-bold text-[var(--text-main)] tracking-wide">{t('updateMachineryButton') || "Update Machinery"}</span>
                 </div>
-                <FaChevronRight size={12} className="text-gray-600" />
+                <FaChevronRight size={12} className="text-[var(--text-muted)]" />
               </Link>
 
-              <Link to="/contact" className="flex items-center justify-between p-4 no-underline rounded-2xl hover:bg-white/5 active:bg-white/10 transition-colors">
+              <Link to="/contact" className="flex items-center justify-between p-4 no-underline rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors">
                 <div className="flex items-center gap-4">
                   <FaHeadset size={18} className="text-green-400" />
-                  <span className="text-sm font-bold text-white tracking-wide">{t('contactSupport') || "Contact Support"}</span>
+                  <span className="text-sm font-bold text-[var(--text-main)] tracking-wide">{t('contactSupport') || "Contact Support"}</span>
                 </div>
-                <FaChevronRight size={12} className="text-gray-600" />
+                <FaChevronRight size={12} className="text-[var(--text-muted)]" />
               </Link>
 
-              <Link to="/about" className="flex items-center justify-between p-4 no-underline rounded-2xl hover:bg-white/5 active:bg-white/10 transition-colors">
+              <Link to="/about" className="flex items-center justify-between p-4 no-underline rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors">
                 <div className="flex items-center gap-4">
                   <FaInfoCircle size={18} className="text-purple-400" />
-                  <span className="text-sm font-bold text-white tracking-wide">{t('aboutUs') || "About RentVeda"}</span>
+                  <span className="text-sm font-bold text-[var(--text-main)] tracking-wide">{t('aboutUs') || "About RentVeda"}</span>
                 </div>
-                <FaChevronRight size={12} className="text-gray-600" />
+                <FaChevronRight size={12} className="text-[var(--text-muted)]" />
               </Link>
             </motion.div>
 
@@ -250,7 +250,7 @@ const Profile = () => {
 
             {/* Ultra-Minimal Footer */}
             <div className="text-center pb-8 opacity-50">
-              <p className="text-[9px] text-white font-bold tracking-[0.2em] uppercase">RentVeda V1.0</p>
+              <p className="text-[9px] text-[var(--text-main)] font-bold tracking-[0.2em] uppercase">RentVeda V1.0</p>
             </div>
           </>
         )}

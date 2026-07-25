@@ -50,16 +50,16 @@ function Machinery() {
   // 1. SKELETON LOADING
   if (isLoading) {
     return (
-      <div className="bg-[#121212] py-4 px-4 pb-24 min-h-screen overflow-x-hidden">
+      <div className="bg-[var(--bg-main)] py-4 px-4 pb-24 min-h-screen overflow-x-hidden">
         {/* Skeleton Search Bar */}
-        <div className="h-12 w-full bg-[#1E1E1E] rounded-xl animate-pulse mb-6 border border-[#2C2C2C]"></div>
+        <div className="h-12 w-full bg-white rounded-xl animate-pulse mb-6 border border-[var(--border-color)]"></div>
         <div className="flex justify-between items-end mb-4">
-          <div className="h-3 w-28 bg-[#1E1E1E] rounded animate-pulse"></div>
-          <div className="h-3 w-16 bg-[#1E1E1E] rounded animate-pulse"></div>
+          <div className="h-3 w-28 bg-white rounded animate-pulse"></div>
+          <div className="h-3 w-16 bg-white rounded animate-pulse"></div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="w-full h-52 bg-[#1E1E1E] rounded-3xl animate-pulse border border-[#2C2C2C]"></div>
+            <div key={i} className="w-full h-52 bg-white rounded-3xl animate-pulse border border-[var(--border-color)]"></div>
           ))}
         </div>
       </div>
@@ -70,22 +70,22 @@ function Machinery() {
 
   return (
     // FIX: Added overflow-x-hidden to completely block horizontal scroll & white space
-    <div className="bg-[#121212] pt-4 pb-24 min-h-screen relative font-sans w-full overflow-x-hidden">
+    <div className="bg-[var(--bg-main)] pt-4 pb-24 min-h-screen relative font-sans w-full overflow-x-hidden">
 
       {/* 2. SEARCH & FILTER BAR */}
       {/* FIX: Removed -mx-4 which was causing the right-side gap */}
-      <div className="sticky top-[60px] z-10 bg-[#121212]/95 backdrop-blur-md py-3 px-4 mb-6 shadow-sm">
+      <div className="sticky top-[60px] z-10 bg-white/95 backdrop-blur-md py-3 px-4 mb-6 shadow-sm">
         <div className="flex gap-2 h-12">
 
           {/* Search Input */}
           <div className="relative flex-1 h-full">
-            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" />
+            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--text-muted)] text-sm" />
             <input
               type="text"
               placeholder={t("searchMachine") || "Search machines..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-full bg-[#1E1E1E] text-white border border-[#333] rounded-full py-2 pl-11 pr-5 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none transition-all text-sm placeholder-gray-600 shadow-inner"
+              className="w-full h-full bg-white text-[var(--text-main)] border border-[var(--border-color)] rounded-full py-2 pl-11 pr-5 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none transition-all text-sm placeholder-[var(--text-muted)] shadow-inner"
             />
           </div>
 
@@ -95,15 +95,15 @@ function Machinery() {
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="w-full h-full bg-[#1E1E1E] text-[var(--primary)] font-bold border border-[#333] rounded-full py-2 pl-9 pr-8 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none transition-all text-xs appearance-none cursor-pointer shadow-inner"
+              className="w-full h-full bg-white text-[var(--primary)] font-bold border border-[var(--border-color)] rounded-full py-2 pl-9 pr-8 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none transition-all text-xs appearance-none cursor-pointer shadow-inner"
             >
               {uniqueRentTypes.map((type) => (
-                <option key={type} value={type} className="bg-[#121212] text-white">
+                <option key={type} value={type} className="bg-[var(--bg-main)] text-[var(--text-main)]">
                   {type}
                 </option>
               ))}
             </select>
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500 text-[10px]">▼</div>
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-[var(--text-muted)] text-[10px]">▼</div>
           </div>
 
         </div>
@@ -111,7 +111,7 @@ function Machinery() {
 
       {/* 3. SECTION HEADER */}
       <div className="px-4 mb-4 flex justify-between items-end">
-        <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+        <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">
           {t("exploreMachines") || "YOUR MACHINES"}
         </h2>
         <span className="text-[10px] text-[var(--primary)] font-bold bg-[var(--primary)]/10 px-2 py-0.5 rounded border border-[var(--primary)]/20">
@@ -125,16 +125,16 @@ function Machinery() {
           // IF NO MACHINES AT ALL
           <div
             onClick={() => navigate("/add-machinery")}
-            className="w-full h-40 border-2 border-dashed border-[#333] hover:border-[var(--primary)] rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors active:scale-95"
+            className="w-full h-40 border-2 border-dashed border-[var(--border-color)] hover:border-[var(--primary)] rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors active:scale-95"
           >
-            <div className="w-12 h-12 bg-[#1E1E1E] rounded-full flex items-center justify-center text-[var(--primary)] shadow-lg shadow-[var(--primary)]/10">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[var(--primary)] shadow-lg shadow-[var(--primary)]/10">
               <FaPlus size={18} />
             </div>
-            <p className="text-gray-400 text-xs font-bold uppercase tracking-wide">Add Your First Machine</p>
+            <p className="text-[var(--text-muted)] text-xs font-bold uppercase tracking-wide">Add Your First Machine</p>
           </div>
         ) : filteredMachines.length === 0 ? (
           // IF SEARCH YIELDS NO RESULTS
-          <div className="text-center py-10 text-gray-500 text-sm font-semibold">
+          <div className="text-center py-10 text-[var(--text-muted)] text-sm font-semibold">
             No machines found matching your search.
           </div>
         ) : (
@@ -150,7 +150,7 @@ function Machinery() {
                   transition={{ delay: index * 0.05 }}
                   whileTap={{ scale: 0.96 }}
                   onClick={() => handleCardClick(item)}
-                  className="relative w-full h-52 rounded-3xl overflow-hidden shadow-xl border border-[#2C2C2C] cursor-pointer group bg-[#1E1E1E]"
+                  className="relative w-full h-52 rounded-3xl overflow-hidden shadow-xl border border-[var(--border-color)] cursor-pointer group bg-white"
                 >
 
                   {/* Background Image */}
@@ -161,7 +161,7 @@ function Machinery() {
                       alt={item.Machine_name}
                     />
                   ) : (
-                    <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center text-gray-700 opacity-50 bg-[#121212]">
+                    <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center text-gray-700 opacity-50 bg-[var(--bg-main)]">
                       <FaTractor size={40} className="mb-2" />
                     </div>
                   )}
@@ -172,17 +172,17 @@ function Machinery() {
                   {/* Top Right 'Live' Badge */}
                   <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/50 backdrop-blur-md px-2 py-1 rounded-full border border-white/10 shadow-lg">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.8)]"></div>
-                    <span className="text-[8px] text-white font-extrabold tracking-widest uppercase">Live</span>
+                    <span className="text-[8px] text-[var(--text-main)] font-extrabold tracking-widest uppercase">Live</span>
                   </div>
 
                   {/* Floating Content at Bottom */}
                   <div className="absolute bottom-0 left-0 w-full p-4 flex flex-col justify-end">
-                    <h5 className="text-white text-base font-extrabold truncate drop-shadow-lg leading-tight mb-1">
+                    <h5 className="text-[var(--text-main)] text-base font-extrabold truncate drop-shadow-lg leading-tight mb-1">
                       {item.Machine_name}
                     </h5>
 
                     <div className="flex items-center justify-between">
-                      <p className="text-[9px] text-gray-300 font-bold uppercase tracking-wider bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded border border-white/5">
+                      <p className="text-[9px] text-[var(--text-muted)] font-bold uppercase tracking-wider bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded border border-white/5">
                         {item.RentType || "Rate"}
                       </p>
 

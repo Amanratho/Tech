@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 
 /**
- * ConfirmModal – Premium dark-themed confirm dialog.
+ * ConfirmModal – Premium light-themed confirm dialog.
  *
  * Props:
  *  isOpen        {bool}   – controlled visibility
@@ -38,26 +38,26 @@ const ConfirmModal = ({
   const variants = {
     danger: {
       icon: FaTrashAlt,
-      iconBg: "bg-red-500/15",
+      iconBg: "bg-red-500/10",
       iconColor: "text-red-500",
-      ringColor: "border-red-500/25",
+      ringColor: "border-red-200",
       btnBg: "bg-red-500 hover:bg-red-600 shadow-red-500/20",
       glowBg: "bg-red-500",
     },
     warning: {
       icon: FaExclamationTriangle,
-      iconBg: "bg-amber-500/15",
-      iconColor: "text-amber-400",
-      ringColor: "border-amber-500/25",
+      iconBg: "bg-amber-500/10",
+      iconColor: "text-amber-500",
+      ringColor: "border-amber-200",
       btnBg: "bg-amber-500 hover:bg-amber-600 shadow-amber-500/20",
       glowBg: "bg-amber-500",
     },
     success: {
       icon: FaInfoCircle,
-      iconBg: "bg-[var(--primary)]/15",
+      iconBg: "bg-[var(--primary)]/10",
       iconColor: "text-[var(--primary)]",
       ringColor: "border-[var(--primary)]/25",
-      btnBg: "bg-[var(--primary)] hover:bg-yellow-500 shadow-[var(--primary)]/20",
+      btnBg: "bg-[var(--primary)] hover:bg-[var(--primary-hover)] shadow-[var(--primary)]/20",
       glowBg: "bg-[var(--primary)]",
     },
   };
@@ -85,7 +85,7 @@ const ConfirmModal = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
-            className="fixed inset-0 z-[999] bg-black/75 backdrop-blur-sm"
+            className="fixed inset-0 z-[999] bg-black/40 backdrop-blur-sm"
             onClick={onCancel}
           />
 
@@ -97,18 +97,18 @@ const ConfirmModal = ({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.92, opacity: 0, y: 40 }}
               transition={{ type: "spring", stiffness: 320, damping: 28 }}
-              className={`relative w-full max-w-xs bg-[#1A1A1A] rounded-2xl border ${v.ringColor} shadow-2xl overflow-hidden`}
+              className={`relative w-full max-w-xs bg-white rounded-2xl border ${v.ringColor} shadow-2xl overflow-hidden`}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Glow blob */}
               <div
-                className={`absolute -top-6 left-1/2 -translate-x-1/2 w-28 h-28 ${v.glowBg} rounded-full blur-3xl opacity-20 pointer-events-none`}
+                className={`absolute -top-6 left-1/2 -translate-x-1/2 w-28 h-28 ${v.glowBg} rounded-full blur-3xl opacity-10 pointer-events-none`}
               />
 
               {/* Close button */}
               <button
                 onClick={onCancel}
-                className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-gray-600 hover:text-gray-300 hover:bg-white/5 transition-all z-10"
+                className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-gray-100 transition-all z-10"
               >
                 <FaTimes size={12} />
               </button>
@@ -122,13 +122,13 @@ const ConfirmModal = ({
                 </div>
 
                 {/* Title */}
-                <h3 className="text-white font-black text-sm tracking-wide mb-2">
+                <h3 className="text-[var(--text-main)] font-black text-sm tracking-wide mb-2">
                   {resolvedTitle}
                 </h3>
 
                 {/* Message */}
                 <p
-                  className="text-gray-400 text-xs leading-relaxed mb-6"
+                  className="text-[var(--text-muted)] text-xs leading-relaxed mb-6"
                   dangerouslySetInnerHTML={{ __html: resolvedMessage }}
                 />
 
@@ -137,7 +137,7 @@ const ConfirmModal = ({
                   <button
                     onClick={onCancel}
                     disabled={isLoading}
-                    className="flex-1 py-2.5 rounded-xl bg-transparent border border-[#333] text-gray-400 font-bold text-xs hover:bg-white/5 active:scale-95 transition-all disabled:opacity-50"
+                    className="flex-1 py-2.5 rounded-xl bg-transparent border border-[var(--border-color)] text-[var(--text-muted)] font-bold text-xs hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-50"
                   >
                     {resolvedCancel}
                   </button>

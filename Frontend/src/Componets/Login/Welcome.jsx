@@ -46,42 +46,22 @@ const Welcome = () => {
 
   const handleCreateAccount = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     if (password !== confirmPassword) {
       toast.error(t("passwordMismatch") || "Passwords do not match!");
-      setLoading(false);
       return;
     }
 
-    handleOtpSend();
-
+    setLoading(true);
     try {
-      const otpres = await axios.post(
-        `${API_BASE_URL}/api/otp/verify-otp`,
-        { otp, email }
-      );
-
-      if (otpres.data.success) {
-        const response = await axios.post(
-          `${API_BASE_URL}/api/auth/signup`,
-          { email, password, username, mobileNo, companyName }
-        );
-
-        if (response.data.success) {
-          toast.success(t("signup_success"));
-          setOtpSent(true);
-        } else {
-          toast.error(t("signup_failed"));
-        }
-      } else {
-        toast.error(t("invalid_otp"));
-      }
+      await handleOtpSend();
     } catch (error) {
+      console.error("Error sending OTP:", error);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleOtpSend = async () => {
     try {
@@ -216,7 +196,7 @@ const Welcome = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen w-full bg-[#121212] p-4 font-sans relative overflow-hidden">
+    <div className="flex justify-center items-center min-h-screen w-full bg-[var(--bg-main)] p-4 font-sans relative overflow-hidden">
 
       <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[var(--primary)]/10 rounded-full blur-[100px] pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none"></div>
@@ -228,15 +208,15 @@ const Welcome = () => {
           initial="hidden"
           animate="visible"
           exit="exit"
-          className="w-full max-w-md p-6 sm:p-8 rounded-3xl bg-[#1E1E1E] border border-[#2C2C2C] shadow-2xl relative z-10"
+          className="w-full max-w-md p-6 sm:p-8 rounded-3xl bg-white border border-[var(--border-color)] shadow-2xl relative z-10"
         >
           {view === "welcome" && (
             <div className="flex flex-col items-center text-center space-y-8 py-4">
               <div>
-                <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">
+                <h1 className="text-3xl font-extrabold text-[var(--text-main)] mb-2 tracking-tight">
                   Welcome to <span className="text-[var(--primary)]">RentVeda</span>
                 </h1>
-                <p className="text-gray-400 text-sm">{t("welcome") || "Manage your machinery effortlessly"}</p>
+                <p className="text-[var(--text-muted)] text-sm">{t("welcome") || "Manage your machinery effortlessly"}</p>
               </div>
 
               <div className="space-y-4 w-full pt-4">
@@ -248,7 +228,7 @@ const Welcome = () => {
                 </button>
                 <button
                   onClick={() => setView("login")}
-                  className="w-full py-3.5 bg-[#121212] border border-[#333] text-white text-sm font-bold rounded-xl hover:border-[var(--primary)] active:scale-95 transition-all"
+                  className="w-full py-3.5 bg-[var(--bg-main)] border border-[var(--border-color)] text-[var(--text-main)] text-sm font-bold rounded-xl hover:border-[var(--primary)] active:scale-95 transition-all"
                 >
                   {t("login") || "Login"}
                 </button>
@@ -259,10 +239,10 @@ const Welcome = () => {
           {view === "createAccount" && !otpSent && (
             <div>
               <div className="flex items-center mb-6">
-                <button onClick={() => setView("welcome")} className="text-gray-500 hover:text-white transition-colors p-2 -ml-2">
+                <button onClick={() => setView("welcome")} className="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors p-2 -ml-2">
                   <FaArrowLeft size={16} />
                 </button>
-                <h1 className="text-xl font-bold text-white ml-2">{t("create_account") || "Create Account"}</h1>
+                <h1 className="text-xl font-bold text-[var(--text-main)] ml-2">{t("create_account") || "Create Account"}</h1>
               </div>
 
               <form onSubmit={handleCreateAccount} className="space-y-4">
@@ -275,7 +255,7 @@ const Welcome = () => {
                   { label: t("confirm_password") || "Confirm Password", icon: FaLock, state: confirmPassword, setState: setConfirmPassword, type: "password", minLength: 6 },
                 ].map(({ label, icon: Icon, state, setState, type, maxLength, pattern }) => (
                   <div key={label} className="relative">
-                    <Icon className={`absolute left-4 top-3.5 text-gray-500 text-sm ${label === (t("mobile_number") || "Mobile No.") ? "scale-x-[-1]" : ""}`} />
+                    <Icon className={`absolute left-4 top-3.5 text-[var(--text-muted)] text-sm ${label === (t("mobile_number") || "Mobile No.") ? "scale-x-[-1]" : ""}`} />
                     <input
                       type={type}
                       placeholder={label}
@@ -284,7 +264,7 @@ const Welcome = () => {
                       onChange={(e) => setState(e.target.value)}
                       maxLength={maxLength}
                       pattern={pattern}
-                      className="w-full bg-[#121212] text-white border border-[#333] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-gray-600"
+                      className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-[var(--text-muted)]"
                     />
                   </div>
                 ))}
@@ -314,13 +294,13 @@ const Welcome = () => {
           {otpSent && !otpVerified && (
             <div className="py-4">
               <div className="flex items-center mb-6">
-                <button onClick={() => setOtpSent(false)} className="text-gray-500 hover:text-white transition-colors p-2 -ml-2">
+                <button onClick={() => setOtpSent(false)} className="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors p-2 -ml-2">
                   <FaArrowLeft size={16} />
                 </button>
-                <h1 className="text-xl font-bold text-white ml-2">{t("verify_otp") || "Verify OTP"}</h1>
+                <h1 className="text-xl font-bold text-[var(--text-main)] ml-2">{t("verify_otp") || "Verify OTP"}</h1>
               </div>
 
-              <p className="text-gray-400 text-xs mb-6 text-center">We've sent an OTP to <span className="text-white font-bold">{email}</span></p>
+              <p className="text-[var(--text-muted)] text-xs mb-6 text-center">We've sent an OTP to <span className="text-[var(--text-main)] font-bold">{email}</span></p>
 
               <form onSubmit={handleOtpVerify} className="space-y-4">
                 <input
@@ -329,7 +309,7 @@ const Welcome = () => {
                   required
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  className="w-full bg-[#121212] text-white text-center tracking-[0.5em] font-bold border border-[#333] rounded-xl py-3 px-4 focus:border-[var(--primary)] outline-none transition-colors text-lg placeholder-gray-600 placeholder:tracking-normal placeholder:font-normal"
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] text-center tracking-[0.5em] font-bold border border-[var(--border-color)] rounded-xl py-3 px-4 focus:border-[var(--primary)] outline-none transition-colors text-lg placeholder-[var(--text-muted)] placeholder:tracking-normal placeholder:font-normal"
                 />
 
                 <button
@@ -348,35 +328,35 @@ const Welcome = () => {
           {view === "forgotPassword" && (
             <div className="py-2">
               <div className="flex items-center mb-6">
-                <button onClick={handleBackToLogin} className="text-gray-500 hover:text-white transition-colors p-2 -ml-2">
+                <button onClick={handleBackToLogin} className="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors p-2 -ml-2">
                   <FaArrowLeft size={16} />
                 </button>
-                <h1 className="text-xl font-bold text-white ml-2">
+                <h1 className="text-xl font-bold text-[var(--text-main)] ml-2">
                   {isEmailSent ? (t("checkInbox") || "Check Inbox") : (t("resetPassword") || "Reset Password")}
                 </h1>
               </div>
 
               {!isEmailSent ? (
                 <form onSubmit={handleForgotPassword} className="space-y-5">
-                  <p className="text-gray-400 text-xs leading-relaxed">
+                  <p className="text-[var(--text-muted)] text-xs leading-relaxed">
                     {t("forgotPasswordDesc") || "Enter your registered email address. We'll send you a link to reset your password."}
                   </p>
 
                   <div className="relative">
-                    <FaEnvelope className="absolute left-4 top-3.5 text-gray-500 text-sm" />
+                    <FaEnvelope className="absolute left-4 top-3.5 text-[var(--text-muted)] text-sm" />
                     <input
                       type="email"
                       placeholder={t("enterYourEmail") || "Enter your email"}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full bg-[#121212] text-white border border-[#333] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-gray-600"
+                      className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-[var(--text-muted)]"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 bg-[#121212] border border-[#333] text-white font-bold rounded-xl hover:border-[var(--primary)] active:scale-95 transition-all"
+                    className="w-full py-3.5 bg-[var(--bg-main)] border border-[var(--border-color)] text-[var(--text-main)] font-bold rounded-xl hover:border-[var(--primary)] active:scale-95 transition-all"
                   >
                     {t("sendResetLink") || "Send Reset Link"}
                   </button>
@@ -390,10 +370,10 @@ const Welcome = () => {
                   <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-2 border border-green-500/20 shadow-lg shadow-green-500/10">
                     <FaCheckCircle size={32} className="text-green-500" />
                   </div>
-                  <h3 className="text-white font-extrabold text-xl tracking-tight">{t("checkInbox") || "Check Inbox"}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed max-w-[280px]">
+                  <h3 className="text-[var(--text-main)] font-extrabold text-xl tracking-tight">{t("checkInbox") || "Check Inbox"}</h3>
+                  <p className="text-[var(--text-muted)] text-sm leading-relaxed max-w-[280px]">
                     {t("emailSentMsg1") || "We have sent a secure password reset link to"} <br />
-                    <span className="text-white font-bold my-2 block">{email}</span>
+                    <span className="text-[var(--text-main)] font-bold my-2 block">{email}</span>
                     {t("emailSentMsg2") || "Click the link in the email to set a new password, then return here to log in."}
                   </p>
 
@@ -411,39 +391,39 @@ const Welcome = () => {
           {view === "login" && (
             <div>
               <div className="flex items-center mb-6">
-                <button onClick={() => setView("welcome")} className="text-gray-500 hover:text-white transition-colors p-2 -ml-2">
+                <button onClick={() => setView("welcome")} className="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors p-2 -ml-2">
                   <FaArrowLeft size={16} />
                 </button>
-                <h1 className="text-xl font-bold text-white ml-2">{t("login") || "Login"}</h1>
+                <h1 className="text-xl font-bold text-[var(--text-main)] ml-2">{t("login") || "Login"}</h1>
               </div>
 
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="relative">
-                  <FaEnvelope className="absolute left-4 top-3.5 text-gray-500 text-sm" />
+                  <FaEnvelope className="absolute left-4 top-3.5 text-[var(--text-muted)] text-sm" />
                   <input
                     type="email"
                     placeholder={t("email") || "Email"}
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-[#121212] text-white border border-[#333] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-gray-600"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-3 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-[var(--text-muted)]"
                   />
                 </div>
 
                 <div className="relative">
-                  <FaLock className="absolute left-4 top-3.5 text-gray-500 text-sm" />
+                  <FaLock className="absolute left-4 top-3.5 text-[var(--text-muted)] text-sm" />
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder={t("password") || "Password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-[#121212] text-white border border-[#333] rounded-xl py-3 pl-10 pr-10 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-gray-600"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-3 pl-10 pr-10 focus:border-[var(--primary)] outline-none transition-colors text-sm placeholder-[var(--text-muted)]"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-3.5 text-gray-500 hover:text-gray-300 transition-colors"
+                    className="absolute right-4 top-3.5 text-[var(--text-muted)] hover:text-[var(--text-muted)] transition-colors"
                   >
                     {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
                   </button>
@@ -451,7 +431,7 @@ const Welcome = () => {
 
                 <div className="flex justify-end">
                   <p
-                    className="text-xs text-gray-400 cursor-pointer hover:text-[var(--primary)] transition-colors"
+                    className="text-xs text-[var(--text-muted)] cursor-pointer hover:text-[var(--primary)] transition-colors"
                     onClick={() => {
                       setView("forgotPassword");
                       setIsEmailSent(false);

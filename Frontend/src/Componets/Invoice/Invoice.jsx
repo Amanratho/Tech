@@ -6,6 +6,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import { openWhatsApp } from "../../utils/capacitorLinks";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   FaArrowLeft, 
@@ -50,7 +51,7 @@ const Invoice = () => {
 
   if (!entryData) {
     return (
-      <div className="min-h-screen bg-[#121212] flex items-center justify-center text-gray-500 text-sm">
+      <div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center text-[var(--text-muted)] text-sm">
         No data found! Please fill the form first.
       </div>
     );
@@ -118,16 +119,11 @@ const Invoice = () => {
             ? `यहाँ ${user?.companyName || "हमारी कंपनी"} से आपका इनवॉइस लिंक है: ${pngUrl}\n\nकुल बकाया राशि: ₹${entryData.pendingAmount}`
             : `Here is your invoice link from ${user?.companyName || "our company"}: ${pngUrl}\n\nTotal Due: ₹${entryData.pendingAmount}`;
 
-          const whatsappMessage = `${greeting} ${entryData.customerName},\n${bodyText}`;
-          
           // 🔥 BUG FIX: 100% Reliable WhatsApp Mobile Deep Link
-          // window.open aur redirect ko hatakar seedha href change kiya hai.
-          // Isse browser popup block nahi karega aur direct WA app open hoga.
-          const whatsappUrl = `https://api.whatsapp.com/send?phone=91${entryData.mobileNumber}&text=${encodeURIComponent(whatsappMessage)}`;
-          
-          // TODO: Uncomment later if notifications are required here.
-          // toast.success("Invoice Ready! Opening WhatsApp...");
-          window.location.href = whatsappUrl; // Redirect is now instant — no toast delay
+          // Uses @capacitor/browser to escape WebView on Android APK
+          const whatsappMessage = `${greeting} ${entryData.customerName},\n${bodyText}`;
+
+          await openWhatsApp(entryData.mobileNumber, whatsappMessage);
           
         }, "image/png");
 
@@ -140,19 +136,19 @@ const Invoice = () => {
 
   return (
     // FIX 1: Added pb-40 so the page can scroll completely above the button
-    <div className="bg-[#121212] min-h-screen pb-40 relative overflow-hidden text-white font-sans">
+    <div className="bg-[var(--bg-main)] min-h-screen pb-40 relative overflow-hidden text-[var(--text-main)] font-sans">
       
       {/* 1. STICKY HEADER FOR MOBILE UI */}
-      <div className="sticky top-0 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] mt-16 px-4 py-3 flex justify-between items-center">
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] mt-16 px-4 py-3 flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <button onClick={() => window.history.back()} className="text-gray-400 hover:text-white p-1">
+          <button onClick={() => window.history.back()} className="text-[var(--text-muted)] hover:text-[var(--text-main)] p-1">
             <FaArrowLeft size={14} />
           </button>
-          <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+          <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">
             {t("invoice") || "INVOICE SUMMARY"}
           </h2>
         </div>
-        <div className="flex items-center gap-1.5 text-gray-400 text-[10px]">
+        <div className="flex items-center gap-1.5 text-[var(--text-muted)] text-[10px]">
           <FaFileInvoiceDollar size={12} className="text-[var(--primary)]" /> #{Date.now().toString().slice(-6)}
         </div>
       </div>
@@ -161,43 +157,43 @@ const Invoice = () => {
         
         {/* MOBILE UI - CARDS */}
         <div className="grid grid-cols-2 gap-3">
-          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="bg-[#1E1E1E] p-3 rounded-xl border border-[#2C2C2C]">
-            <p className="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1">From</p>
-            <h3 className="text-sm font-bold text-white leading-tight">{user?.companyName || t("companyName")}</h3>
-            <p className="text-[10px] text-gray-400 mt-1">{user?.username || "Loading..."}</p>
-            <p className="text-[10px] text-gray-400">+91 {user?.mobileNo || "---"}</p>
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="bg-white p-3 rounded-xl border border-[var(--border-color)]">
+            <p className="text-[9px] text-[var(--text-muted)] uppercase font-bold tracking-wider mb-1">From</p>
+            <h3 className="text-sm font-bold text-[var(--text-main)] leading-tight">{user?.companyName || t("companyName")}</h3>
+            <p className="text-[10px] text-[var(--text-muted)] mt-1">{user?.username || "Loading..."}</p>
+            <p className="text-[10px] text-[var(--text-muted)]">+91 {user?.mobileNo || "---"}</p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="bg-[#1E1E1E] p-3 rounded-xl border border-[#2C2C2C]">
-            <p className="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1">Bill To</p>
+          <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="bg-white p-3 rounded-xl border border-[var(--border-color)]">
+            <p className="text-[9px] text-[var(--text-muted)] uppercase font-bold tracking-wider mb-1">Bill To</p>
             <h3 className="text-sm font-bold text-[var(--primary)] leading-tight">{entryData.customerName}</h3>
-            <p className="text-[10px] text-gray-400 mt-1 truncate">{entryData.address || "No Address"}</p>
-            <p className="text-[10px] text-gray-400">+91 {entryData.mobileNumber}</p>
+            <p className="text-[10px] text-[var(--text-muted)] mt-1 truncate">{entryData.address || "No Address"}</p>
+            <p className="text-[10px] text-[var(--text-muted)]">+91 {entryData.mobileNumber}</p>
           </motion.div>
         </div>
 
         {/* WORK DETAILS */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1E1E1E] rounded-xl border border-[#2C2C2C] overflow-hidden">
-          <div className="p-3 border-b border-[#2C2C2C] bg-[#121212]/50 flex justify-between items-center">
-            <span className="text-xs font-bold text-gray-300">Job Details</span>
-            <span className="text-[10px] text-gray-500">{formattedDate}</span>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-xl border border-[var(--border-color)] overflow-hidden">
+          <div className="p-3 border-b border-[var(--border-color)] bg-[var(--bg-main)]/50 flex justify-between items-center">
+            <span className="text-xs font-bold text-[var(--text-muted)]">Job Details</span>
+            <span className="text-[10px] text-[var(--text-muted)]">{formattedDate}</span>
           </div>
           <div className="p-3 space-y-3">
             <div>
-              <p className="text-sm font-bold text-white">{machineName || "Machine"}</p>
-              <p className="text-[10px] text-gray-400 mt-0.5">Job: {entryData.jobWork || "---"} • Op: {entryData.operatorName || "---"}</p>
+              <p className="text-sm font-bold text-[var(--text-main)]">{machineName || "Machine"}</p>
+              <p className="text-[10px] text-[var(--text-muted)] mt-0.5">Job: {entryData.jobWork || "---"} • Op: {entryData.operatorName || "---"}</p>
             </div>
-            <div className="grid grid-cols-3 gap-2 py-2 border-y border-[#333]">
+            <div className="grid grid-cols-3 gap-2 py-2 border-y border-[var(--border-color)]">
               <div className="text-center">
-                <p className="text-[9px] text-gray-500 uppercase">Work</p>
+                <p className="text-[9px] text-[var(--text-muted)] uppercase">Work</p>
                 <p className="text-xs font-bold mt-0.5">{entryData.quantity} {entryData.rentType}</p>
               </div>
-              <div className="text-center border-l border-r border-[#333]">
-                <p className="text-[9px] text-gray-500 uppercase">Rate</p>
+              <div className="text-center border-l border-r border-[var(--border-color)]">
+                <p className="text-[9px] text-[var(--text-muted)] uppercase">Rate</p>
                 <p className="text-xs font-bold mt-0.5">₹{entryData.price}</p>
               </div>
               <div className="text-center">
-                <p className="text-[9px] text-gray-500 uppercase">Amount</p>
+                <p className="text-[9px] text-[var(--text-muted)] uppercase">Amount</p>
                 <p className="text-xs font-bold mt-0.5">₹{totalAmountVal}</p>
               </div>
             </div>
@@ -214,27 +210,27 @@ const Invoice = () => {
 
         {/* TOTAL AMOUNT & QR */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex gap-3">
-          <div className="w-1/3 bg-[#1E1E1E] rounded-xl border border-[#2C2C2C] flex flex-col items-center justify-center p-2">
+          <div className="w-1/3 bg-white rounded-xl border border-[var(--border-color)] flex flex-col items-center justify-center p-2">
             {user?.qrCodeUrl ? (
               <img src={user.qrCodeUrl} alt="QR" className="w-full h-full object-contain rounded-lg bg-white p-1 mb-1" />
             ) : (
-              <FaQrcode size={24} className="mb-1 text-gray-600" />
+              <FaQrcode size={24} className="mb-1 text-[var(--text-muted)]" />
             )}
-            <p className="text-[8px] text-gray-400 uppercase font-bold text-center">Scan to Pay</p>
+            <p className="text-[8px] text-[var(--text-muted)] uppercase font-bold text-center">Scan to Pay</p>
           </div>
-          <div className="w-2/3 bg-gradient-to-br from-[#1E1E1E] to-[#121212] rounded-xl border border-[#2C2C2C] p-4 flex flex-col justify-center relative overflow-hidden">
+          <div className="w-2/3 bg-gradient-to-br from-white to-gray-50 rounded-xl border border-[var(--border-color)] p-4 flex flex-col justify-center relative overflow-hidden shadow-[var(--shadow-card)]">
             <div className="absolute right-0 top-0 w-16 h-16 bg-[var(--primary)]/10 rounded-full blur-xl -mr-8 -mt-8 pointer-events-none"></div>
-            <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">Grand Total</p>
+            <p className="text-[10px] text-[var(--text-muted)] uppercase font-bold tracking-wider mb-1">Grand Total</p>
             <h1 className="text-3xl font-extrabold text-[var(--primary)] tracking-tight">₹{totalAmountVal.toLocaleString()}</h1>
           </div>
         </motion.div>
       </div>
 
       {/* FIX 2: Moved button UP using bottom-[75px] so it avoids Bottom Nav overlap */}
-      <div className="fixed bottom-[75px] left-0 right-0 p-4 bg-gradient-to-t from-[#121212] via-[#121212] to-transparent z-30 pointer-events-none">
+      <div className="fixed bottom-[75px] left-0 right-0 p-4 bg-gradient-to-t from-[var(--bg-main)] via-[var(--bg-main)] to-transparent z-30 pointer-events-none">
         <button
           onClick={() => setIsLangModalOpen(true)}
-          className="pointer-events-auto w-full max-w-lg mx-auto bg-green-500 hover:bg-green-600 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-green-500/20 flex items-center justify-center gap-2 transition-transform active:scale-95"
+          className="pointer-events-auto w-full max-w-lg mx-auto bg-green-500 hover:bg-green-600 text-[var(--text-main)] py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-green-500/20 flex items-center justify-center gap-2 transition-transform active:scale-95"
         >
           <FaWhatsapp size={18} />
           {t("downloadSharePDF") || "Generate PDF & Share"}
@@ -249,16 +245,16 @@ const Invoice = () => {
                     initial={{ y: "100%", opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: "100%", opacity: 0 }}
-                    className="bg-[#1E1E1E] w-full max-w-sm rounded-3xl p-6 border border-[#333] mb-4 sm:mb-0"
+                    className="bg-white w-full max-w-sm rounded-3xl p-6 border border-[var(--border-color)] mb-4 sm:mb-0"
                 >
                     <div className="flex justify-between items-center mb-5">
-                        <div className="flex items-center gap-2 text-white font-bold">
+                        <div className="flex items-center gap-2 text-[var(--text-main)] font-bold">
                             <FaLanguage size={18} className="text-[var(--primary)]" /> Select Language
                         </div>
-                        <button onClick={() => setIsLangModalOpen(false)} className="text-gray-500 p-1"><FaTimes /></button>
+                        <button onClick={() => setIsLangModalOpen(false)} className="text-[var(--text-muted)] p-1"><FaTimes /></button>
                     </div>
                     <div className="space-y-3">
-                        <button onClick={() => triggerDownload("en")} className="w-full py-3.5 bg-[#121212] border border-[#333] hover:border-[var(--primary)] text-white rounded-xl font-bold text-sm transition-all flex justify-center items-center gap-2">
+                        <button onClick={() => triggerDownload("en")} className="w-full py-3.5 bg-[var(--bg-main)] border border-[var(--border-color)] hover:border-[var(--primary)] text-[var(--text-main)] rounded-xl font-bold text-sm transition-all flex justify-center items-center gap-2">
                             English Invoice
                         </button>
                         <button onClick={() => triggerDownload("hi")} className="w-full py-3.5 bg-[var(--primary)] text-black rounded-xl font-bold text-sm shadow-lg shadow-[var(--primary)]/20 active:scale-95 transition-all flex justify-center items-center gap-2">
@@ -277,35 +273,35 @@ const Invoice = () => {
         <div id="hidden-pdf-template" className="bg-white text-black font-sans relative" style={{ width: '794px', height: '1123px', padding: '40px', boxSizing: 'border-box' }}>
           
           {/* COMPACT Header */}
-          <div className="bg-[#1E1E1E] text-white px-6 py-5 rounded-t-xl flex justify-between items-center border-b-4 border-[var(--primary)]">
+          <div className="bg-white text-[var(--text-main)] px-6 py-5 rounded-t-xl flex justify-between items-center border-b-4 border-[var(--primary)]">
             <div>
               <h1 className="text-2xl font-extrabold text-[var(--primary)] mb-1 uppercase tracking-wide">{user?.companyName || "COMPANY NAME"}</h1>
-              <p className="text-gray-300 text-sm">{user?.username || "Owner Name"}</p>
-              <p className="text-gray-300 text-sm">+91 {user?.mobileNo || "N/A"}</p>
+              <p className="text-[var(--text-muted)] text-sm">{user?.username || "Owner Name"}</p>
+              <p className="text-[var(--text-muted)] text-sm">+91 {user?.mobileNo || "N/A"}</p>
             </div>
             <div className="text-right">
-              <h2 className="text-2xl font-black text-white uppercase tracking-widest mb-1">
+              <h2 className="text-2xl font-black text-[var(--text-main)] uppercase tracking-widest mb-1">
                 {pdfLang === "hi" ? "बिल (BILL)" : "INVOICE"}
               </h2>
-              <p className="text-gray-400 text-xs tracking-wide">Original Copy</p>
+              <p className="text-[var(--text-muted)] text-xs tracking-wide">Original Copy</p>
             </div>
           </div>
 
           {/* Details Row (Compact margins) */}
           <div className="flex justify-between items-start mt-6 px-2">
             <div className="w-1/2">
-              <p className="text-gray-500 font-bold text-xs mb-1">{pdfLang === "hi" ? "बिल किसको (Bill To):" : "Bill To:"}</p>
+              <p className="text-[var(--text-muted)] font-bold text-xs mb-1">{pdfLang === "hi" ? "बिल किसको (Bill To):" : "Bill To:"}</p>
               <h2 className="text-xl font-bold text-[#1E1E1E] mb-1">{entryData.customerName}</h2>
               <p className="text-sm text-gray-700">+91 {entryData.mobileNumber}</p>
               <p className="text-sm text-gray-700 mt-1 max-w-[250px] leading-snug">{entryData.address}</p>
             </div>
             <div className="w-1/2 text-right">
               <div className="mb-2">
-                <p className="text-gray-500 font-bold text-sm inline-block mr-2">{pdfLang === "hi" ? "दिनांक (Date):" : "Date:"}</p>
+                <p className="text-[var(--text-muted)] font-bold text-sm inline-block mr-2">{pdfLang === "hi" ? "दिनांक (Date):" : "Date:"}</p>
                 <span className="text-base font-bold text-[#1E1E1E]">{formattedDate}</span>
               </div>
               <div>
-                <p className="text-gray-500 font-bold text-sm inline-block mr-2">{pdfLang === "hi" ? "इनवॉइस नंबर:" : "Invoice No:"}</p>
+                <p className="text-[var(--text-muted)] font-bold text-sm inline-block mr-2">{pdfLang === "hi" ? "इनवॉइस नंबर:" : "Invoice No:"}</p>
                 <span className="text-base font-bold text-[#1E1E1E]">#INV-{Date.now().toString().slice(-5)}</span>
               </div>
             </div>
@@ -314,15 +310,15 @@ const Invoice = () => {
           {/* Job Details Bar */}
           <div className="bg-[#F5F5F5] rounded-lg p-4 mt-6 flex justify-between items-center border border-gray-200">
             <div>
-              <p className="text-xs text-gray-500 font-bold mb-1">{pdfLang === "hi" ? "मशीन (Machine)" : "Machine"}</p>
+              <p className="text-xs text-[var(--text-muted)] font-bold mb-1">{pdfLang === "hi" ? "मशीन (Machine)" : "Machine"}</p>
               <p className="text-lg font-bold text-black">{machineName || "N/A"}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-gray-500 font-bold mb-1">{pdfLang === "hi" ? "कार्य (Job Work)" : "Job Work"}</p>
+              <p className="text-xs text-[var(--text-muted)] font-bold mb-1">{pdfLang === "hi" ? "कार्य (Job Work)" : "Job Work"}</p>
               <p className="text-lg font-bold text-black">{entryData.jobWork || "N/A"}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-500 font-bold mb-1">{pdfLang === "hi" ? "ऑपरेटर (Operator)" : "Operator"}</p>
+              <p className="text-xs text-[var(--text-muted)] font-bold mb-1">{pdfLang === "hi" ? "ऑपरेटर (Operator)" : "Operator"}</p>
               <p className="text-lg font-bold text-black">{entryData.operatorName || "N/A"}</p>
             </div>
           </div>
@@ -354,21 +350,21 @@ const Invoice = () => {
               {user?.qrCodeUrl ? (
                 <>
                   <img src={user.qrCodeUrl} alt="QR" className="w-28 h-28 object-contain border border-gray-200 rounded-lg p-1" crossOrigin="anonymous" />
-                  <p className="text-gray-500 font-bold mt-1 text-xs">{pdfLang === "hi" ? "भुगतान के लिए स्कैन करें" : "Scan to Pay"}</p>
+                  <p className="text-[var(--text-muted)] font-bold mt-1 text-xs">{pdfLang === "hi" ? "भुगतान के लिए स्कैन करें" : "Scan to Pay"}</p>
                 </>
               ) : (
-                <div className="w-28 h-28 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-xs">No QR</div>
+                <div className="w-28 h-28 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-[var(--text-muted)] text-xs">No QR</div>
               )}
             </div>
 
             {/* Total Box */}
             <div className="bg-[#F5F5F5] rounded-xl p-5 w-72 border border-gray-200">
               <div className="flex justify-between mb-2">
-                <p className="text-gray-600 font-bold text-sm">{pdfLang === "hi" ? "जमा राशि (Paid):" : "Paid Amount:"}</p>
+                <p className="text-[var(--text-muted)] font-bold text-sm">{pdfLang === "hi" ? "जमा राशि (Paid):" : "Paid Amount:"}</p>
                 <p className="text-green-600 font-bold text-sm">Rs {entryData.paidAmount.toLocaleString()}</p>
               </div>
               <div className="flex justify-between mb-3">
-                <p className="text-gray-600 font-bold text-sm">{pdfLang === "hi" ? "बकाया राशि (Due):" : "Pending Due:"}</p>
+                <p className="text-[var(--text-muted)] font-bold text-sm">{pdfLang === "hi" ? "बकाया राशि (Due):" : "Pending Due:"}</p>
                 <p className="text-red-600 font-bold text-sm">Rs {entryData.pendingAmount.toLocaleString()}</p>
               </div>
               <div className="border-t border-gray-300 my-3"></div>
@@ -381,14 +377,14 @@ const Invoice = () => {
 
           {/* FIXED FOOTER POSITIONING */}
           <div className="absolute bottom-[40px] left-[40px] right-[40px] text-center border-t-2 border-gray-200 pt-5">
-              <p className="text-gray-500 font-bold text-lg mb-4">
+              <p className="text-[var(--text-muted)] font-bold text-lg mb-4">
               {pdfLang === "hi" ? "धन्यवाद! पुनः पधारें।" : "Thank you for your business!"}
               </p>
               {/* Promotion Banner */}
               <div className="bg-gray-100 inline-flex items-center justify-center gap-3 px-6 py-2.5 rounded-full border border-gray-300">
-                <span className="text-gray-500 text-xs font-semibold uppercase tracking-widest">Powered By</span>
+                <span className="text-[var(--text-muted)] text-xs font-semibold uppercase tracking-widest">Powered By</span>
                 <span className="text-[#1E1E1E] font-black text-xl tracking-tight">Rent<span className="text-[var(--primary)]">Veda</span></span>
-                <span className="text-gray-400">|</span>
+                <span className="text-[var(--text-muted)]">|</span>
                 <span className="text-blue-600 font-bold text-sm">{currentAppUrl}</span>
               </div>
           </div>

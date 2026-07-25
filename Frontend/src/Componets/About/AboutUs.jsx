@@ -31,7 +31,7 @@
 //       >
 //         {/* Hero / Intro */}
 //         <motion.div
-//           className="bg-[#161616]/80 backdrop-blur-md border border-white/10 text-white p-6 sm:p-10 rounded-2xl shadow-2xl"
+//           className="bg-gray-50/80 backdrop-blur-md border border-white/10 text-[var(--text-main)] p-6 sm:p-10 rounded-2xl shadow-2xl"
 //           initial={{ opacity: 0, y: 24 }}
 //           whileInView={{ opacity: 1, y: 0 }}
 //           viewport={{ once: true, amount: 0.3 }}
@@ -54,10 +54,10 @@
 //             viewport={{ once: true }}
 //             transition={{ duration: 0.6, delay: 0.1 }}
 //           >
-//             <h2 className="text-xl sm:text-3xl font-semibold text-white">
+//             <h2 className="text-xl sm:text-3xl font-semibold text-[var(--text-main)]">
 //               {t("welcomeToTechDiary")}
 //             </h2>
-//             <p className="mt-2 sm:mt-4 text-base sm:text-lg text-gray-300 leading-relaxed mx-auto max-w-3xl">
+//             <p className="mt-2 sm:mt-4 text-base sm:text-lg text-[var(--text-muted)] leading-relaxed mx-auto max-w-3xl">
 //               {t("aboutDescription")}
 //             </p>
 //           </motion.div>
@@ -86,7 +86,7 @@
 //             }].map((card, idx) => (
 //               <motion.div
 //                 key={idx}
-//                 className="group relative overflow-hidden bg-[#1E1E1E] p-6 sm:p-8 rounded-xl shadow-xl border border-white/10"
+//                 className="group relative overflow-hidden bg-white p-6 sm:p-8 rounded-xl shadow-xl border border-white/10"
 //                 variants={{
 //                   hidden: { opacity: 0, y: 24 },
 //                   show: { opacity: 1, y: 0 }
@@ -99,7 +99,7 @@
 //                 <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3" style={{ color: card.accent }}>
 //                   {card.title}
 //                 </h3>
-//                 <p className="text-base sm:text-lg text-gray-300">
+//                 <p className="text-base sm:text-lg text-[var(--text-muted)]">
 //                   {card.desc}
 //                 </p>
 //               </motion.div>
@@ -156,8 +156,8 @@
 //                     transition={{ type: "spring", stiffness: 200, damping: 16, delay: 0.1 }}
 //                   />
 //                 </div>
-//                 <h4 className="text-lg sm:text-xl font-semibold text-white">{member.name}</h4>
-//                 <p className="text-xs sm:text-sm text-gray-400">{member.role}</p>
+//                 <h4 className="text-lg sm:text-xl font-semibold text-[var(--text-main)]">{member.name}</h4>
+//                 <p className="text-xs sm:text-sm text-[var(--text-muted)]">{member.role}</p>
 //               </motion.div>
 //             ))}
 //           </motion.div>
@@ -181,7 +181,7 @@
 
 //           {/* Footer */}
 //           <div className="text-center mt-8 sm:mt-12">
-//             <p className="text-xs sm:text-sm text-gray-400">
+//             <p className="text-xs sm:text-sm text-[var(--text-muted)]">
 //               {t("copyright", { year: new Date().getFullYear() })}
 //             </p>
 //           </div>
@@ -219,15 +219,15 @@ const AboutUs = () => {
 
   return (
     // 1. MAIN CONTAINER
-    <div className="min-h-screen flex flex-col bg-[#121212] text-white font-sans overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-[var(--bg-main)] text-[var(--text-main)] font-sans overflow-hidden">
       
       {/* 2. APP HEADER */}
-      <div className="px-4 py-3 flex items-center justify-between sticky top-0 z-20 bg-[#121212] border-b border-[#2C2C2C]">
+      <div className="px-4 py-3 flex items-center justify-between sticky top-0 z-20 bg-[var(--bg-main)] border-b border-[var(--border-color)]">
         <div className="flex items-center gap-2">
-            <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full active:bg-[#2C2C2C]">
-                <FaChevronLeft className="text-lg text-white" />
+            <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full active:bg-[var(--bg-input)]">
+                <FaChevronLeft className="text-lg text-[var(--text-main)]" />
             </button>
-            <h1 className="text-lg font-bold text-white tracking-wide">{t("aboutUs")}</h1>
+            <h1 className="text-lg font-bold text-[var(--text-main)] tracking-wide">{t("aboutUs")}</h1>
         </div>
       </div>
 
@@ -242,11 +242,11 @@ const AboutUs = () => {
         {/* HERO SECTION */}
         <motion.div variants={item} className="px-5 pt-6 pb-2 text-center">
             {/* Logo Placeholder or Icon */}
-            <div className="w-20 h-20 mx-auto bg-[#1E1E1E] rounded-3xl flex items-center justify-center mb-4 border border-[#333] shadow-[0_0_15px_rgba(254,193,17,0.2)]">
+            <div className="w-20 h-20 mx-auto bg-white rounded-3xl flex items-center justify-center mb-4 border border-[var(--border-color)] shadow-[0_0_15px_rgba(254,193,17,0.2)]">
                 <span className="text-3xl font-bold text-[var(--primary)]">R</span>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">{t("welcomeToTechDiary")}</h2>
-            <p className="text-sm text-gray-400 leading-relaxed">
+            <h2 className="text-2xl font-bold text-[var(--text-main)] mb-2">{t("welcomeToTechDiary")}</h2>
+            <p className="text-sm text-[var(--text-muted)] leading-relaxed">
               {t("aboutDescription")}
             </p>
         </motion.div>
@@ -255,33 +255,33 @@ const AboutUs = () => {
         <div className="px-5 mt-8 space-y-4">
             
             {/* Mission Card */}
-            <motion.div variants={item} className="bg-[#1E1E1E] p-5 rounded-3xl border border-[#2C2C2C] relative overflow-hidden">
+            <motion.div variants={item} className="bg-white p-5 rounded-3xl border border-[var(--border-color)] relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10">
                     <FaBullseye className="text-6xl text-[var(--primary)]" />
                 </div>
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-[#2C2C2C] rounded-full text-[var(--primary)]">
+                    <div className="p-2 bg-[var(--bg-input)] rounded-full text-[var(--primary)]">
                         <FaBullseye />
                     </div>
                     <h3 className="font-bold text-lg">{t("ourMission")}</h3>
                 </div>
-                <p className="text-xs text-gray-400 leading-relaxed relative z-10">
+                <p className="text-xs text-[var(--text-muted)] leading-relaxed relative z-10">
                     {t("missionDescription")}
                 </p>
             </motion.div>
 
             {/* Vision Card */}
-            <motion.div variants={item} className="bg-[#1E1E1E] p-5 rounded-3xl border border-[#2C2C2C] relative overflow-hidden">
+            <motion.div variants={item} className="bg-white p-5 rounded-3xl border border-[var(--border-color)] relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10">
                     <FaEye className="text-6xl text-cyan-400" />
                 </div>
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-[#2C2C2C] rounded-full text-cyan-400">
+                    <div className="p-2 bg-[var(--bg-input)] rounded-full text-cyan-400">
                         <FaEye />
                     </div>
                     <h3 className="font-bold text-lg">{t("ourVision")}</h3>
                 </div>
-                <p className="text-xs text-gray-400 leading-relaxed relative z-10">
+                <p className="text-xs text-[var(--text-muted)] leading-relaxed relative z-10">
                     {t("visionDescription")}
                 </p>
             </motion.div>
@@ -293,7 +293,7 @@ const AboutUs = () => {
                 <h3 className="text-lg font-bold flex items-center gap-2">
                     <FaUsers className="text-[var(--primary)] text-sm"/> {t("meetTheTeam")}
                 </h3>
-                <span className="text-xs text-gray-500">Swipe &rarr;</span>
+                <span className="text-xs text-[var(--text-muted)]">Swipe &rarr;</span>
             </motion.div>
             
             {/* Horizontal Scroll Container */}
@@ -306,17 +306,17 @@ const AboutUs = () => {
                   { img: assets.kuldeepPitcher, name: t("kuldeepName"), role: t("kuldeepRole") },
                   { img: assets.AzharSirPitcher, name: t("azharName"), role: t("azharRole") }
                 ].map((member, index) => (
-                    <div key={index} className="flex-shrink-0 w-36 bg-[#1E1E1E] p-3 rounded-2xl border border-[#2C2C2C] text-center">
+                    <div key={index} className="flex-shrink-0 w-36 bg-white p-3 rounded-2xl border border-[var(--border-color)] text-center">
                         <div className="w-16 h-16 mx-auto mb-3 relative">
                             <img 
                                 src={member.img} 
                                 alt={member.name} 
                                 className="w-full h-full rounded-full object-cover border-2 border-[var(--primary)]"
                             />
-                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border border-[#1E1E1E]"></div>
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border border-white"></div>
                         </div>
-                        <h4 className="text-sm font-bold text-white truncate">{member.name}</h4>
-                        <p className="text-[10px] text-gray-400 truncate">{member.role}</p>
+                        <h4 className="text-sm font-bold text-[var(--text-main)] truncate">{member.name}</h4>
+                        <p className="text-[10px] text-[var(--text-muted)] truncate">{member.role}</p>
                     </div>
                 ))}
             </motion.div>
@@ -324,7 +324,7 @@ const AboutUs = () => {
 
         {/* Footer Info */}
         <div className="text-center mt-6 pb-4">
-             <p className="text-[10px] text-gray-600">
+             <p className="text-[10px] text-[var(--text-muted)]">
                © {new Date().getFullYear()} RentVeda. All rights reserved.
              </p>
         </div>
@@ -332,7 +332,7 @@ const AboutUs = () => {
       </motion.div>
 
       {/* 4. STICKY BOTTOM BUTTON */}
-      <div className="p-4 bg-[#121212] sticky bottom-0 border-t border-[#222]">
+      <div className="p-4 bg-[var(--bg-main)] sticky bottom-0 border-t border-[var(--border-color)]">
         <a 
             href="/contact"
             className="w-full h-11 rounded-full font-semibold text-sm shadow-md flex items-center justify-center gap-2 text-black bg-[var(--primary)]"

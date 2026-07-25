@@ -44,8 +44,8 @@ function MyCarousel() {
               backgroundImage: `url(${slide.image})`,
             }}
           >
-            {/* Smooth dark overlay jo bottom me app ke background se mix ho jayega */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-[#121212]"></div>
+            {/* Smooth overlay that blends into the light app background */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-[var(--bg-main)]"></div>
           </div>
         ))}
       </div>

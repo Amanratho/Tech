@@ -59,60 +59,60 @@ function NotificationDropdown({ uid }) {
       {/* Bell Icon with Unread Dot */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 transition-colors rounded-full text-yellow-400 active:scale-95 hover:bg-[#1E1E1E]"
+        className="relative p-2 transition-colors rounded-full text-[var(--primary)] active:scale-95 hover:bg-gray-100"
         aria-label="Notifications"
       >
         <FaBell size={20} />
         {hasUnread && (
-          <span className="absolute top-[6px] right-[7px] w-2.5 h-2.5 bg-red-500 rounded-full border-[2px] border-[#121212]"></span>
+          <span className="absolute top-[6px] right-[7px] w-2.5 h-2.5 bg-red-500 rounded-full border-[2px] border-white"></span>
         )}
       </button>
 
-      {/* Notification Tray — Solid isolated overlay */}
+      {/* Notification Tray — Light mode */}
       {isOpen && (
         <div
           className="absolute top-[50px] right-0 w-[calc(100vw-32px)] max-w-[340px] rounded-2xl overflow-hidden flex flex-col transform origin-top-right transition-all"
           style={{
             zIndex: 999,
-            backgroundColor: '#1E1E1E',
-            border: '1px solid #2a2a2a',
-            boxShadow: '0 12px 48px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.5)',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid var(--border-color)',
+            boxShadow: '0 12px 48px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)',
             isolation: 'isolate',
           }}
         >
           
           {/* Header */}
-          <div className="flex justify-between items-center px-4 py-3 border-b border-[#2a2a2a]" style={{ backgroundColor: '#1E1E1E' }}>
-            <h3 className="text-[#E0E0E0] text-sm font-semibold tracking-wide">Pending Collections</h3>
+          <div className="flex justify-between items-center px-4 py-3 border-b border-[var(--border-color)]" style={{ backgroundColor: '#FFFFFF' }}>
+            <h3 className="text-[var(--text-main)] text-sm font-semibold tracking-wide">Pending Collections</h3>
             <button 
               onClick={() => setIsOpen(false)} 
-              className="text-gray-500 hover:text-white transition-colors p-1 rounded-full hover:bg-[#2a2a2a]"
+              className="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors p-1 rounded-full hover:bg-gray-100"
             >
               <FaTimes size={12} />
             </button>
           </div>
 
           {/* Body */}
-          <div className="max-h-[60vh] overflow-y-auto no-scrollbar" style={{ backgroundColor: '#1E1E1E' }}>
+          <div className="max-h-[60vh] overflow-y-auto no-scrollbar" style={{ backgroundColor: '#FFFFFF' }}>
             {!hasUnread ? (
-              <div className="text-center py-8 text-xs text-gray-500 font-medium">
+              <div className="text-center py-8 text-xs text-[var(--text-muted)] font-medium">
                 No dues to collect today
               </div>
             ) : (
               displayReminders.map(rem => (
-                <div key={rem._id} className="px-4 py-3 border-b border-[#2a2a2a] hover:bg-[#262626] transition-colors cursor-pointer active:bg-[#2a2a2a]" style={{ backgroundColor: '#1E1E1E' }}>
+                <div key={rem._id} className="px-4 py-3 border-b border-[var(--border-color)] hover:bg-gray-50 transition-colors cursor-pointer active:bg-gray-100" style={{ backgroundColor: '#FFFFFF' }}>
                   {/* Customer name — owner perspective */}
-                  <p className="text-[#c0c0c0] text-[11px] font-medium tracking-wide mb-0.5">
+                  <p className="text-[var(--text-muted)] text-[11px] font-medium tracking-wide mb-0.5">
                     Due from:
                   </p>
                   <div className="flex justify-between items-center mb-1">
-                    <p className="text-[#f0f0f0] text-sm font-semibold truncate max-w-[160px]">{rem.customerName}</p>
+                    <p className="text-[var(--text-main)] text-sm font-semibold truncate max-w-[160px]">{rem.customerName}</p>
                     {/* Amount in green — money incoming to owner */}
-                    <p className="text-emerald-400 text-sm font-bold tracking-tight">
+                    <p className="text-emerald-600 text-sm font-bold tracking-tight">
                       To Collect: ₹{rem.pendingAmount?.toLocaleString()}
                     </p>
                   </div>
-                  <p className="text-[11px] text-gray-500 font-medium tracking-wide">{rem.mobileNumber || rem.customerMobile}</p>
+                  <p className="text-[11px] text-[var(--text-muted)] font-medium tracking-wide">{rem.mobileNumber || rem.customerMobile}</p>
                 </div>
               ))
             )}
@@ -120,13 +120,13 @@ function NotificationDropdown({ uid }) {
 
           {/* Footer */}
           {hasUnread && (
-            <div className="p-2 flex justify-center border-t border-[#2a2a2a]" style={{ backgroundColor: '#181818' }}>
+            <div className="p-2 flex justify-center border-t border-[var(--border-color)]" style={{ backgroundColor: '#FAFAFA' }}>
               <button 
                 onClick={() => {
                   setIsOpen(false);
                   navigate("/pending-payments");
                 }}
-                className="w-full py-1.5 text-xs font-semibold text-yellow-400 hover:text-yellow-300 active:scale-95 transition-all"
+                className="w-full py-1.5 text-xs font-semibold text-[var(--primary)] hover:text-[var(--primary-hover)] active:scale-95 transition-all"
               >
                 View All Pending Dues
               </button>
@@ -175,16 +175,16 @@ function Navbar() {
 
   return (
     <>
-      <ToastContainer style={{ zIndex: "9999" }} theme="dark" /> 
+      <ToastContainer style={{ zIndex: "9999" }} theme="light" /> 
 
-      <div className="fixed top-0 left-0 w-full h-16 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] z-50 flex items-center justify-between px-4 sm:px-6">
+      <div className="fixed top-0 left-0 w-full h-16 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] z-50 flex items-center justify-between px-4 sm:px-6">
 
         {/* Logo - Updated to RentVeda */}
         <NavLink to="/" className="flex items-center gap-2 no-underline hover:no-underline">
           <div className="w-8 h-8 bg-[var(--primary)] rounded-lg flex items-center justify-center shadow-lg shadow-[var(--primary)]/20">
-            <span className="text-black font-black text-lg">R</span>
+            <span className="text-[var(--text-on-primary)] font-black text-lg">R</span>
           </div>
-          <span className="text-white font-extrabold text-lg tracking-wide">
+          <span className="text-[var(--text-main)] font-extrabold text-lg tracking-wide">
             Rent<span className="text-[var(--primary)]">Veda</span>
           </span>
         </NavLink>
@@ -195,7 +195,7 @@ function Navbar() {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `text-sm font-bold no-underline hover:no-underline transition-all ${isActive ? "text-[var(--primary)]" : "text-gray-400 hover:text-white"
+                `text-sm font-bold no-underline hover:no-underline transition-all ${isActive ? "text-[var(--primary)]" : "text-[var(--text-muted)] hover:text-[var(--text-main)]"
                 }`
               }
             >
@@ -208,7 +208,7 @@ function Navbar() {
           {/* Language Toggle Pill */}
           <button
             onClick={toggleLanguage}
-            className="flex items-center gap-1.5 bg-[#1E1E1E] border border-[#333] hover:border-[var(--primary)] px-3 py-1.5 rounded-full transition-all active:scale-95 text-xs font-bold text-gray-300"
+            className="flex items-center gap-1.5 bg-[var(--bg-input)] border border-[var(--border-color)] hover:border-[var(--primary)] px-3 py-1.5 rounded-full transition-all active:scale-95 text-xs font-bold text-[var(--text-main)]"
           >
             <FaLanguage className="text-[var(--primary)]" size={14} />
             {i18n.language === "en" ? "हिन्दी" : "ENG"}
@@ -218,13 +218,13 @@ function Navbar() {
           <NotificationDropdown uid={uid} />
 
           {/* Desktop Profile Icon (Hidden on Mobile) */}
-          <div className="hidden md:block border-l border-[#333] pl-3 ml-1">
+          <div className="hidden md:block border-l border-[var(--border-color)] pl-3 ml-1">
             {uid ? (
               <NavLink to="/profile" className="no-underline hover:no-underline">
-                <FaUserCircle size={26} className="text-gray-400 hover:text-[var(--primary)] transition-colors" />
+                <FaUserCircle size={26} className="text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors" />
               </NavLink>
             ) : (
-              <NavLink to="/login" className="bg-[var(--primary)] text-black px-4 py-1.5 rounded-lg text-sm font-bold no-underline hover:no-underline hover:bg-yellow-500 transition-colors">
+              <NavLink to="/login" className="bg-[var(--primary)] text-[var(--text-on-primary)] px-4 py-1.5 rounded-lg text-sm font-bold no-underline hover:no-underline hover:bg-[var(--primary-hover)] transition-colors">
                 {t("login") || "Login"}
               </NavLink>
             )}
@@ -235,7 +235,7 @@ function Navbar() {
       {/* =========================================
           2. BOTTOM TAB BAR (Mobile Only)
           ========================================= */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full h-16 bg-[#1E1E1E]/95 backdrop-blur-lg border-t border-[#2C2C2C] z-50 flex justify-around items-center px-2 pb-safe">
+      <div className="md:hidden fixed bottom-0 left-0 w-full h-16 bg-white/95 backdrop-blur-lg border-t border-[var(--border-color)] z-50 flex justify-around items-center px-2 pb-safe shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
 
         {/* Render Nav Items */}
         {navItems.map((item) => {
@@ -250,16 +250,16 @@ function Navbar() {
               {isActive && (
                 <motion.div
                   layoutId="bottomNavIndicator"
-                  className="absolute -top-1 w-8 h-1 bg-[var(--primary)] rounded-b-full shadow-[0_2px_10px_var(--primary)]"
+                  className="absolute -top-1 w-8 h-1 bg-[var(--primary)] rounded-b-full shadow-[0_2px_8px_var(--primary)]"
                 />
               )}
 
               <item.icon
                 size={isActive ? 22 : 20}
-                className={`mb-1 transition-all duration-300 ${isActive ? "text-[var(--primary)]" : "text-gray-500"
+                className={`mb-1 transition-all duration-300 ${isActive ? "text-[var(--primary)]" : "text-[var(--nav-inactive)]"
                   }`}
               />
-              <span className={`text-[9px] font-bold no-underline transition-all duration-300 ${isActive ? "text-[var(--primary)]" : "text-gray-500"
+              <span className={`text-[9px] font-bold no-underline transition-all duration-300 ${isActive ? "text-[var(--primary)]" : "text-[var(--nav-inactive)]"
                 }`}>
                 {item.name}
               </span>
@@ -275,16 +275,16 @@ function Navbar() {
           {location.pathname === "/profile" || location.pathname === "/login" ? (
             <motion.div
               layoutId="bottomNavIndicator"
-              className="absolute -top-1 w-8 h-1 bg-[var(--primary)] rounded-b-full shadow-[0_2px_10px_var(--primary)]"
+              className="absolute -top-1 w-8 h-1 bg-[var(--primary)] rounded-b-full shadow-[0_2px_8px_var(--primary)]"
             />
           ) : null}
 
           {uid ? (
-            <FaUserCircle size={location.pathname === "/profile" ? 22 : 20} className={`mb-1 transition-all duration-300 ${location.pathname === "/profile" ? "text-[var(--primary)]" : "text-gray-500"}`} />
+            <FaUserCircle size={location.pathname === "/profile" ? 22 : 20} className={`mb-1 transition-all duration-300 ${location.pathname === "/profile" ? "text-[var(--primary)]" : "text-[var(--nav-inactive)]"}`} />
           ) : (
-            <FaSignInAlt size={location.pathname === "/login" ? 22 : 20} className={`mb-1 transition-all duration-300 ${location.pathname === "/login" ? "text-[var(--primary)]" : "text-gray-500"}`} />
+            <FaSignInAlt size={location.pathname === "/login" ? 22 : 20} className={`mb-1 transition-all duration-300 ${location.pathname === "/login" ? "text-[var(--primary)]" : "text-[var(--nav-inactive)]"}`} />
           )}
-          <span className={`text-[9px] font-bold no-underline transition-all duration-300 ${location.pathname === "/profile" || location.pathname === "/login" ? "text-[var(--primary)]" : "text-gray-500"
+          <span className={`text-[9px] font-bold no-underline transition-all duration-300 ${location.pathname === "/profile" || location.pathname === "/login" ? "text-[var(--primary)]" : "text-[var(--nav-inactive)]"
             }`}>
             {uid ? (t("profile") || "Profile") : (t("login") || "Login")}
           </span>

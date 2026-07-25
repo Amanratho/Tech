@@ -52,7 +52,7 @@ const LoaderButton = ({
     primary:
       "bg-[var(--primary)] text-black shadow-lg shadow-[var(--primary)]/20 hover:bg-[var(--primary-hover)]",
     outline:
-      "bg-transparent border border-[#333] text-white hover:border-[var(--primary)]",
+      "bg-transparent border border-[var(--border-color)] text-[var(--text-main)] hover:border-[var(--primary)]",
   };
 
   // ── Disabled / loading visual override ──

@@ -1,5 +1,6 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { App as CapApp } from "@capacitor/app";
 import Navbar from "./Componets/Navbar/Navbar";
 import Home from "./Componets/Home/Home";
 import Welcome from "./Componets/Login/Welcome";
@@ -28,13 +29,29 @@ import PendingPayments from "./Componets/PendingPayments/PendingPayments";
 import EODDashboard from "./Componets/EODDashboard/EODDashboard";
 
 
-function App() {
+// ─── AppShell: lives INSIDE Router so it can use useNavigate/useLocation ───
+function AppShell() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Hardware Back Button Interception (Android)
+  useEffect(() => {
+    const handler = CapApp.addListener("backButton", () => {
+      const isRoot = location.pathname === "/" || location.pathname === "/home";
+      if (isRoot) {
+        CapApp.exitApp();
+      } else {
+        navigate(-1);
+      }
+    });
+
+    return () => {
+      handler.then((h) => h.remove());
+    };
+  }, [location.pathname, navigate]);
+
   return (
-    <Router
-      future={{
-        v7_startTransition: true, // Enable future flag for v7
-      }}
-    >
+    <>
       <ScrollTop />
       <div className="app">
         <Navbar />
@@ -69,6 +86,18 @@ function App() {
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
         </Routes>
       </div>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router
+      future={{
+        v7_startTransition: true, // Enable future flag for v7
+      }}
+    >
+      <AppShell />
     </Router>
   );
 }

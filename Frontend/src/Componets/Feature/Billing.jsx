@@ -5,6 +5,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { useTranslation } from "react-i18next";
 import { useGetPaymentsQuery, useEditRentalMutation, useDeleteRentalsMutation } from "../../redux/functional/paymentApiSlice";
+import { openPhoneDialer } from "../../utils/capacitorLinks";
 import hindiFont from "../../assets/fonts/hindiFont"; // Make sure this path is correct
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -282,28 +283,28 @@ const Billing = () => {
   };
 
   return (
-    <div className="bg-[#121212] mt-16 min-h-screen pb-20 relative">
+    <div className="bg-[var(--bg-main)] mt-16 min-h-screen pb-20 relative">
 
       {/* --- STICKY HEADER --- */}
-      <div className="sticky top-0 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] pb-2">
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] pb-2">
         <div className="px-4 py-2 flex justify-between items-center">
-          <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+          <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">
             {t('billingHistoryTitle') || "BILLING HISTORY"}
           </h2>
-          <span className="text-[9px] bg-[#1E1E1E] text-[var(--primary)] px-2 py-0.5 rounded border border-[#333]">
+          <span className="text-[9px] bg-white text-[var(--primary)] px-2 py-0.5 rounded border border-[var(--border-color)]">
             Total: {filteredData.length}
           </span>
         </div>
 
         <div className="px-4 mb-2">
           <div className="relative">
-            <FaSearch className="absolute left-3 top-2.5 text-gray-500 text-xs" />
+            <FaSearch className="absolute left-3 top-2.5 text-[var(--text-muted)] text-xs" />
             <input
               type="text"
               value={searchTerm}
               onChange={handleSearch}
               placeholder={`Search by ${searchField.replace('Name', '')}...`}
-              className="w-full bg-[#1E1E1E] text-white pl-9 pr-3 py-2 rounded-full text-xs outline-none border border-[#333] focus:border-[var(--primary)] transition-colors placeholder-gray-600"
+              className="w-full bg-white text-[var(--text-main)] pl-9 pr-3 py-2 rounded-full text-xs outline-none border border-[var(--border-color)] focus:border-[var(--primary)] transition-colors placeholder-[var(--text-muted)]"
             />
           </div>
         </div>
@@ -319,7 +320,7 @@ const Billing = () => {
               onClick={() => handleFilterChange(filter.id)}
               className={`whitespace-nowrap px-3 py-1 rounded-full text-[10px] font-bold tracking-wide border transition-all ${searchField === filter.id
                   ? "bg-[var(--primary)] text-black border-[var(--primary)]"
-                  : "bg-transparent text-gray-500 border-[#333]"
+                  : "bg-transparent text-[var(--text-muted)] border-[var(--border-color)]"
                 }`}
             >
               {filter.label}
@@ -327,7 +328,7 @@ const Billing = () => {
           ))}
           <button
             onClick={toggleSort}
-            className="ml-auto w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-[#1E1E1E] border border-[#333] text-gray-400 active:text-[var(--primary)]"
+            className="ml-auto w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-white border border-[var(--border-color)] text-[var(--text-muted)] active:text-[var(--primary)]"
           >
             <FaSortAmountDown size={10} />
           </button>
@@ -339,11 +340,11 @@ const Billing = () => {
         {isLoading ? (
           <div className="space-y-2">
             {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="h-16 bg-[#1E1E1E] rounded-lg animate-pulse border border-[#222]" />
+              <div key={i} className="h-16 bg-white rounded-lg animate-pulse border border-[var(--border-color)]" />
             ))}
           </div>
         ) : filteredData.length === 0 ? (
-          <div className="text-center py-20 text-gray-600 text-xs">
+          <div className="text-center py-20 text-[var(--text-muted)] text-xs">
             <p>No bills found</p>
           </div>
         ) : (
@@ -357,29 +358,29 @@ const Billing = () => {
               <motion.div
                 key={bill._id || bill.id}
                 variants={listItem}
-                className="bg-[#1E1E1E] p-2.5 rounded-xl border border-[#2C2C2C] flex justify-between items-center active:bg-[#222]"
+                className="bg-white p-2.5 rounded-xl border border-[var(--border-color)] flex justify-between items-center active:bg-gray-100"
               >
                 {/* Left Side: INFO + CALL BUTTON */}
                 <div className="flex items-center gap-2.5 overflow-hidden">
-                  <a
-                    href={`tel:${bill.mobileNumber}`}
-                    className="w-8 h-8 rounded-full bg-[#1A2E1A] border border-[#2C5E2C] flex items-center justify-center flex-shrink-0 text-green-500 active:bg-green-600 active:text-white transition-colors"
+                  <button
+                    onClick={(e) => { e.stopPropagation(); openPhoneDialer(bill.mobileNumber); }}
+                    className="w-8 h-8 rounded-full bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0 text-green-500 active:bg-green-600 active:text-[var(--text-main)] transition-colors"
                   >
                     <FaPhoneAlt size={12} />
-                  </a>
+                  </button>
 
                   <div className="min-w-0">
-                    <h3 className="text-white text-xs font-bold truncate">
+                    <h3 className="text-[var(--text-main)] text-xs font-bold truncate">
                       {bill.customerName}
                     </h3>
 
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <div className="flex items-center gap-1 text-[9px] text-gray-500">
+                      <div className="flex items-center gap-1 text-[9px] text-[var(--text-muted)]">
                         <FaMapMarkerAlt size={8} />
                         <span className="truncate max-w-[70px]">{bill.customerAddress}</span>
                       </div>
                       <span className="text-gray-700 text-[8px]">•</span>
-                      <div className="flex items-center gap-1 text-[9px] text-gray-500">
+                      <div className="flex items-center gap-1 text-[9px] text-[var(--text-muted)]">
                         <FaUserTie size={8} />
                         <span className="truncate max-w-[50px]">{bill.operatorName}</span>
                       </div>
@@ -390,7 +391,7 @@ const Billing = () => {
                 {/* Right Side: Amount & Actions */}
                 <div className="flex items-center gap-2 pl-1">
                   <div className="text-right">
-                    <span className="block text-[10px] text-gray-400">Total</span>
+                    <span className="block text-[10px] text-[var(--text-muted)]">Total</span>
                     <span className="block text-xs font-bold text-[var(--primary)]">
                       ₹{(bill.paidAmount + bill.pendingAmount).toLocaleString()}
                     </span>
@@ -398,7 +399,7 @@ const Billing = () => {
 
                   <button
                     onClick={() => handleEditClick(bill)}
-                    className="w-7 h-7 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20 active:bg-blue-500 active:text-white transition-colors"
+                    className="w-7 h-7 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20 active:bg-blue-500 active:text-[var(--text-main)] transition-colors"
                     title="Edit"
                   >
                     <FaEdit size={11} />
@@ -406,7 +407,7 @@ const Billing = () => {
 
                   <button
                     onClick={() => handleDeleteClick(bill)}
-                    className="w-7 h-7 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20 active:bg-red-500 active:text-white transition-colors"
+                    className="w-7 h-7 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20 active:bg-red-500 active:text-[var(--text-main)] transition-colors"
                     title="Delete"
                   >
                     <FaTrashAlt size={11} />
@@ -414,7 +415,7 @@ const Billing = () => {
 
                   <button
                     onClick={() => handlePdfClick(bill)}
-                    className="w-7 h-7 rounded-full bg-orange-500/10 text-orange-400 flex items-center justify-center border border-orange-500/20 active:bg-orange-500 active:text-white transition-colors"
+                    className="w-7 h-7 rounded-full bg-orange-500/10 text-orange-400 flex items-center justify-center border border-orange-500/20 active:bg-orange-500 active:text-[var(--text-main)] transition-colors"
                     title="PDF"
                   >
                     <FaFilePdf size={11} />
@@ -435,26 +436,26 @@ const Billing = () => {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "100%", opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="bg-[#1E1E1E] w-full max-w-sm rounded-3xl p-6 border border-[#333] mb-4 sm:mb-0"
+              className="bg-white w-full max-w-sm rounded-3xl p-6 border border-[var(--border-color)] mb-4 sm:mb-0"
             >
               <div className="flex justify-between items-center mb-5">
-                <div className="flex items-center gap-2 text-white font-bold">
+                <div className="flex items-center gap-2 text-[var(--text-main)] font-bold">
                   <FaLanguage size={18} className="text-[var(--primary)]" />
                   Select Language
                 </div>
-                <button onClick={() => setIsLangModalOpen(false)} className="text-gray-500 p-1">
+                <button onClick={() => setIsLangModalOpen(false)} className="text-[var(--text-muted)] p-1">
                   <FaTimes />
                 </button>
               </div>
 
-              <p className="text-xs text-gray-400 mb-4 text-center">
-                Choose the language in which you want to generate the PDF invoice for <strong className="text-white">{selectedBill?.customerName}</strong>.
+              <p className="text-xs text-[var(--text-muted)] mb-4 text-center">
+                Choose the language in which you want to generate the PDF invoice for <strong className="text-[var(--text-main)]">{selectedBill?.customerName}</strong>.
               </p>
 
               <div className="space-y-3">
                 <button
                   onClick={() => downloadPDF("en")}
-                  className="w-full py-3.5 bg-[#121212] border border-[#333] hover:border-[var(--primary)] text-white rounded-xl font-bold text-sm transition-all"
+                  className="w-full py-3.5 bg-[var(--bg-main)] border border-[var(--border-color)] hover:border-[var(--primary)] text-[var(--text-main)] rounded-xl font-bold text-sm transition-all"
                 >
                   English Invoice
                 </button>
@@ -479,20 +480,20 @@ const Billing = () => {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "100%", opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="bg-[#1E1E1E] w-full max-w-sm rounded-3xl p-6 border border-[#333] mb-4 sm:mb-0"
+              className="bg-white w-full max-w-sm rounded-3xl p-6 border border-[var(--border-color)] mb-4 sm:mb-0"
             >
               <div className="flex flex-col items-center text-center">
                 <div className="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
                   <FaExclamationTriangle size={24} className="text-red-500" />
                 </div>
-                <h3 className="text-white font-bold text-base mb-2">Delete Bill?</h3>
-                <p className="text-gray-400 text-xs mb-1">
+                <h3 className="text-[var(--text-main)] font-bold text-base mb-2">Delete Bill?</h3>
+                <p className="text-[var(--text-muted)] text-xs mb-1">
                   Are you sure you want to delete the bill for
                 </p>
                 <p className="text-[var(--primary)] font-bold text-sm mb-1">
                   {billToDelete?.customerName}
                 </p>
-                <p className="text-gray-500 text-[10px] mb-5">
+                <p className="text-[var(--text-muted)] text-[10px] mb-5">
                   Amount: ₹{((billToDelete?.paidAmount || 0) + (billToDelete?.pendingAmount || 0)).toLocaleString()}
                 </p>
               </div>
@@ -500,14 +501,14 @@ const Billing = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => { setIsDeleteModalOpen(false); setBillToDelete(null); }}
-                  className="flex-1 py-3 bg-[#121212] border border-[#333] text-white rounded-xl font-bold text-sm transition-all active:scale-95"
+                  className="flex-1 py-3 bg-[var(--bg-main)] border border-[var(--border-color)] text-[var(--text-main)] rounded-xl font-bold text-sm transition-all active:scale-95"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
                   disabled={isDeleting}
-                  className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold text-sm transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-red-500 text-[var(--text-main)] rounded-xl font-bold text-sm transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isDeleting ? (
                     <><FaSpinner className="animate-spin" size={14} /> Deleting...</>
@@ -529,16 +530,16 @@ const Billing = () => {
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-50 bg-[#121212] overflow-y-auto"
+            className="fixed inset-0 z-50 bg-[var(--bg-main)] overflow-y-auto"
           >
             {/* Modal Header */}
-            <div className="sticky top-0 z-10 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] px-4 py-3 flex justify-between items-center">
-              <h2 className="text-white font-bold text-sm flex items-center gap-2">
+            <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] px-4 py-3 flex justify-between items-center">
+              <h2 className="text-[var(--text-main)] font-bold text-sm flex items-center gap-2">
                 <FaEdit className="text-[var(--primary)]" /> Edit Bill
               </h2>
               <button
                 onClick={() => { setIsEditModalOpen(false); setEditFormData({}); }}
-                className="w-8 h-8 rounded-full bg-[#1E1E1E] border border-[#333] flex items-center justify-center text-gray-400"
+                className="w-8 h-8 rounded-full bg-white border border-[var(--border-color)] flex items-center justify-center text-[var(--text-muted)]"
               >
                 <FaTimes size={14} />
               </button>
@@ -547,78 +548,78 @@ const Billing = () => {
             {/* Form Body */}
             <div className="px-4 py-4 space-y-4 pb-28">
               {/* Customer Info Section */}
-              <div className="bg-[#1E1E1E] rounded-2xl p-4 border border-[#2C2C2C] space-y-3">
-                <h3 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Customer Info</h3>
+              <div className="bg-white rounded-2xl p-4 border border-[var(--border-color)] space-y-3">
+                <h3 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest mb-2">Customer Info</h3>
 
                 <div>
-                  <label className="text-gray-400 text-[10px] block mb-1">Customer Name</label>
+                  <label className="text-[var(--text-muted)] text-[10px] block mb-1">Customer Name</label>
                   <input
                     type="text"
                     value={editFormData.customerName || ""}
                     onChange={(e) => handleEditFormChange("customerName", e.target.value)}
-                    className="w-full bg-[#121212] text-white px-3 py-2.5 rounded-xl text-xs border border-[#333] focus:border-[var(--primary)] outline-none transition-colors"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-xs border border-[var(--border-color)] focus:border-[var(--primary)] outline-none transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="text-gray-400 text-[10px] block mb-1">Mobile Number</label>
+                  <label className="text-[var(--text-muted)] text-[10px] block mb-1">Mobile Number</label>
                   <input
                     type="text"
                     value={editFormData.mobileNumber || ""}
                     onChange={(e) => handleEditFormChange("mobileNumber", e.target.value)}
-                    className="w-full bg-[#121212] text-white px-3 py-2.5 rounded-xl text-xs border border-[#333] focus:border-[var(--primary)] outline-none transition-colors"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-xs border border-[var(--border-color)] focus:border-[var(--primary)] outline-none transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="text-gray-400 text-[10px] block mb-1">Address</label>
+                  <label className="text-[var(--text-muted)] text-[10px] block mb-1">Address</label>
                   <input
                     type="text"
                     value={editFormData.address || ""}
                     onChange={(e) => handleEditFormChange("address", e.target.value)}
-                    className="w-full bg-[#121212] text-white px-3 py-2.5 rounded-xl text-xs border border-[#333] focus:border-[var(--primary)] outline-none transition-colors"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-xs border border-[var(--border-color)] focus:border-[var(--primary)] outline-none transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="text-gray-400 text-[10px] block mb-1">Operator Name</label>
+                  <label className="text-[var(--text-muted)] text-[10px] block mb-1">Operator Name</label>
                   <input
                     type="text"
                     value={editFormData.operatorName || ""}
                     onChange={(e) => handleEditFormChange("operatorName", e.target.value)}
-                    className="w-full bg-[#121212] text-white px-3 py-2.5 rounded-xl text-xs border border-[#333] focus:border-[var(--primary)] outline-none transition-colors"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-xs border border-[var(--border-color)] focus:border-[var(--primary)] outline-none transition-colors"
                   />
                 </div>
               </div>
 
               {/* Pricing Section */}
-              <div className="bg-[#1E1E1E] rounded-2xl p-4 border border-[#2C2C2C] space-y-3">
-                <h3 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Pricing</h3>
+              <div className="bg-white rounded-2xl p-4 border border-[var(--border-color)] space-y-3">
+                <h3 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest mb-2">Pricing</h3>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-gray-400 text-[10px] block mb-1">Price (₹)</label>
+                    <label className="text-[var(--text-muted)] text-[10px] block mb-1">Price (₹)</label>
                     <input
                       type="number"
                       value={editFormData.price || ""}
                       onChange={(e) => handleEditFormChange("price", e.target.value)}
-                      className="w-full bg-[#121212] text-white px-3 py-2.5 rounded-xl text-xs border border-[#333] focus:border-[var(--primary)] outline-none transition-colors"
+                      className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-xs border border-[var(--border-color)] focus:border-[var(--primary)] outline-none transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="text-gray-400 text-[10px] block mb-1">Quantity</label>
+                    <label className="text-[var(--text-muted)] text-[10px] block mb-1">Quantity</label>
                     <input
                       type="number"
                       value={editFormData.quantity || ""}
                       onChange={(e) => handleEditFormChange("quantity", e.target.value)}
-                      className="w-full bg-[#121212] text-white px-3 py-2.5 rounded-xl text-xs border border-[#333] focus:border-[var(--primary)] outline-none transition-colors"
+                      className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-xs border border-[var(--border-color)] focus:border-[var(--primary)] outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 {/* Auto-calculated Total */}
-                <div className="bg-[#121212] rounded-xl p-3 border border-[#333] flex justify-between items-center">
-                  <span className="text-gray-400 text-[10px]">Total Amount</span>
+                <div className="bg-[var(--bg-main)] rounded-xl p-3 border border-[var(--border-color)] flex justify-between items-center">
+                  <span className="text-[var(--text-muted)] text-[10px]">Total Amount</span>
                   <span className="text-[var(--primary)] font-bold text-sm">
                     ₹{((Number(editFormData.price) || 0) * (Number(editFormData.quantity) || 0)).toLocaleString()}
                   </span>
@@ -626,47 +627,47 @@ const Billing = () => {
               </div>
 
               {/* Payment Section */}
-              <div className="bg-[#1E1E1E] rounded-2xl p-4 border border-[#2C2C2C] space-y-3">
-                <h3 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Payment</h3>
+              <div className="bg-white rounded-2xl p-4 border border-[var(--border-color)] space-y-3">
+                <h3 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest mb-2">Payment</h3>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-gray-400 text-[10px] block mb-1">Paid (₹)</label>
+                    <label className="text-[var(--text-muted)] text-[10px] block mb-1">Paid (₹)</label>
                     <input
                       type="number"
                       value={editFormData.paidAmount || ""}
                       onChange={(e) => handleEditFormChange("paidAmount", e.target.value)}
-                      className="w-full bg-[#121212] text-white px-3 py-2.5 rounded-xl text-xs border border-[#333] focus:border-green-500 outline-none transition-colors"
+                      className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-xs border border-[var(--border-color)] focus:border-green-500 outline-none transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="text-gray-400 text-[10px] block mb-1">Pending (₹)</label>
+                    <label className="text-[var(--text-muted)] text-[10px] block mb-1">Pending (₹)</label>
                     <input
                       type="number"
                       value={editFormData.pendingAmount || ""}
                       onChange={(e) => handleEditFormChange("pendingAmount", e.target.value)}
-                      className="w-full bg-[#121212] text-white px-3 py-2.5 rounded-xl text-xs border border-[#333] focus:border-red-500 outline-none transition-colors"
+                      className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-xs border border-[var(--border-color)] focus:border-red-500 outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-gray-400 text-[10px] block mb-1">Job Work</label>
+                  <label className="text-[var(--text-muted)] text-[10px] block mb-1">Job Work</label>
                   <input
                     type="text"
                     value={editFormData.jobWork || ""}
                     onChange={(e) => handleEditFormChange("jobWork", e.target.value)}
-                    className="w-full bg-[#121212] text-white px-3 py-2.5 rounded-xl text-xs border border-[#333] focus:border-[var(--primary)] outline-none transition-colors"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-xs border border-[var(--border-color)] focus:border-[var(--primary)] outline-none transition-colors"
                   />
                 </div>
               </div>
             </div>
 
             {/* Sticky Bottom Save/Cancel Buttons */}
-            <div className="fixed bottom-0 left-0 right-0 bg-[#121212]/95 backdrop-blur-md border-t border-[#2C2C2C] p-4 flex gap-3 z-10">
+            <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[var(--border-color)] p-4 flex gap-3 z-10">
               <button
                 onClick={() => { setIsEditModalOpen(false); setEditFormData({}); }}
-                className="flex-1 py-3.5 bg-[#1E1E1E] border border-[#333] text-white rounded-xl font-bold text-sm transition-all active:scale-95"
+                className="flex-1 py-3.5 bg-white border border-[var(--border-color)] text-[var(--text-main)] rounded-xl font-bold text-sm transition-all active:scale-95"
               >
                 Cancel
               </button>

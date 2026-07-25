@@ -37,10 +37,10 @@
         {/* 1. APP HEADER (Top Bar) */}
         <div className="flex items-center px-4 py-4 sticky top-0 z-10" style={{ backgroundColor: 'var(--bg-main)' }}>
           {/* Back Button Simulation (Common in apps) */}
-          <button className="p-2 rounded-full mr-4 active:bg-[#2C2C2C]">
-              <FaChevronLeft className="text-white text-lg" />
+          <button className="p-2 rounded-full mr-4 active:bg-[var(--bg-input)]">
+              <FaChevronLeft className="text-[var(--text-main)] text-lg" />
           </button>
-          <h1 className="text-xl font-bold tracking-wide text-white">
+          <h1 className="text-xl font-bold tracking-wide text-[var(--text-main)]">
             {t('contactUs')}
           </h1>
         </div>
@@ -57,7 +57,7 @@
             {/* Name Input - Rounded Capsule Style */}
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <FaUser className="text-gray-500 text-sm group-focus-within:text-[var(--primary)] transition-colors" />
+                <FaUser className="text-[var(--text-muted)] text-sm group-focus-within:text-[var(--primary)] transition-colors" />
               </div>
               <input
                 type="text"
@@ -77,7 +77,7 @@
             {/* Email Input */}
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <FaEnvelope className="text-gray-500 text-sm group-focus-within:text-[var(--primary)] transition-colors" />
+                <FaEnvelope className="text-[var(--text-muted)] text-sm group-focus-within:text-[var(--primary)] transition-colors" />
               </div>
               <input
                 type="email"
@@ -97,7 +97,7 @@
             {/* Message Input - Standard rounded corners because it's multiline */}
             <div className="relative group">
               <div className="absolute top-4 left-4 pointer-events-none">
-                <FaCommentDots className="text-gray-500 text-sm group-focus-within:text-[var(--primary)] transition-colors" />
+                <FaCommentDots className="text-[var(--text-muted)] text-sm group-focus-within:text-[var(--primary)] transition-colors" />
               </div>
               <textarea
                 name="message"

@@ -43,7 +43,7 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`bg-[#1E1E1E] rounded-xl border overflow-hidden shadow-lg flex flex-col ${isArchived ? 'border-orange-500/30 opacity-75' : 'border-[#2C2C2C]'}`}
+      className={`bg-white rounded-xl border overflow-hidden shadow-lg flex flex-col ${isArchived ? 'border-orange-500/30 opacity-75' : 'border-[var(--border-color)]'}`}
     >
       {/* Image + Badge header */}
       <div
@@ -60,18 +60,18 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
         <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end">
           <div>
             <div className="flex gap-2 items-center mb-1.5 flex-wrap">
-              <span className="text-[10px] text-[var(--primary)] font-bold tracking-wider bg-[#121212]/80 px-2 py-0.5 rounded border border-[#333] flex items-center gap-1.5 backdrop-blur-sm shadow-md">
+              <span className="text-[10px] text-[var(--primary)] font-bold tracking-wider bg-white/80 px-2 py-0.5 rounded border border-[var(--border-color)] flex items-center gap-1.5 backdrop-blur-sm shadow-md">
                 <FaMoneyBillWave size={9} /> ₹{totalAmount.toLocaleString()}
               </span>
-              <span className="text-[10px] text-gray-300 font-bold tracking-wider bg-[#121212]/80 px-2 py-0.5 rounded border border-[#333] flex items-center gap-1.5 backdrop-blur-sm shadow-md">
+              <span className="text-[10px] text-[var(--text-muted)] font-bold tracking-wider bg-white/80 px-2 py-0.5 rounded border border-[var(--border-color)] flex items-center gap-1.5 backdrop-blur-sm shadow-md">
                 <FaTools size={9} /> {totalWork}{" "}
-                <span className="text-[8px] font-normal text-gray-400 uppercase">
+                <span className="text-[8px] font-normal text-[var(--text-muted)] uppercase">
                   {rentalData[0]?.rentType || "Units"}
                 </span>
               </span>
               {/* Net Profit Badge */}
               <span
-                className={`text-[10px] font-bold tracking-wider bg-[#121212]/80 px-2 py-0.5 rounded border flex items-center gap-1.5 backdrop-blur-sm shadow-md ${
+                className={`text-[10px] font-bold tracking-wider bg-white/80 px-2 py-0.5 rounded border flex items-center gap-1.5 backdrop-blur-sm shadow-md ${
                   netProfit >= 0
                     ? "text-green-400 border-green-500/30"
                     : "text-red-400 border-red-500/30"
@@ -81,7 +81,7 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
               </span>
             </div>
 
-            <h3 className="text-white text-base font-bold drop-shadow-md flex items-center gap-2">
+            <h3 className="text-[var(--text-main)] text-base font-bold drop-shadow-md flex items-center gap-2">
               {machine.Machine_name}
               {isArchived && (
                 <span className="text-[9px] text-orange-400 font-bold uppercase tracking-wider bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/30 flex items-center gap-1">
@@ -91,7 +91,7 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
             </h3>
           </div>
 
-          <div className="w-8 h-8 rounded-full bg-[#121212]/80 backdrop-blur-sm border border-[#333] flex items-center justify-center text-gray-400 shadow-md">
+          <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm border border-[var(--border-color)] flex items-center justify-center text-[var(--text-muted)] shadow-md">
             {showDetails ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
           </div>
         </div>
@@ -104,19 +104,19 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden bg-[#1E1E1E]"
+            className="overflow-hidden bg-white"
           >
-            <div className="p-4 border-t border-[#2C2C2C] space-y-4">
+            <div className="p-4 border-t border-[var(--border-color)] space-y-4">
               {/* Rental + Financial Stats Grid */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-[#121212] p-3 rounded-lg border border-[#333]">
-                  <p className="text-[10px] text-gray-500 flex items-center gap-1 mb-1">
+                <div className="bg-[var(--bg-main)] p-3 rounded-lg border border-[var(--border-color)]">
+                  <p className="text-[10px] text-[var(--text-muted)] flex items-center gap-1 mb-1">
                     <FaCheckCircle className="text-green-500" /> {t("doneAmountLabel")}
                   </p>
                   <p className="text-green-500 text-sm font-bold">₹{totalPaidAmount.toLocaleString()}</p>
                 </div>
-                <div className="bg-[#121212] p-3 rounded-lg border border-[#333]">
-                  <p className="text-[10px] text-gray-500 flex items-center gap-1 mb-1">
+                <div className="bg-[var(--bg-main)] p-3 rounded-lg border border-[var(--border-color)]">
+                  <p className="text-[10px] text-[var(--text-muted)] flex items-center gap-1 mb-1">
                     <FaExclamationCircle className="text-red-500" /> {t("dueAmountLabel")}
                   </p>
                   <p className="text-red-500 text-sm font-bold">₹{totalPendingAmount.toLocaleString()}</p>
@@ -124,13 +124,13 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails, rentalData }) =>
               </div>
 
               {/* Net Profit Highlight */}
-              <div className="bg-[#121212] p-4 rounded-xl border border-[var(--primary)]/40 shadow-[0_0_15px_rgba(255,215,0,0.07)] flex justify-between items-center relative overflow-hidden">
+              <div className="bg-[var(--bg-main)] p-4 rounded-xl border border-[var(--primary)]/40 shadow-[0_0_15px_rgba(255,215,0,0.07)] flex justify-between items-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-12 h-12 bg-[var(--primary)]/10 rounded-bl-full pointer-events-none" />
                 <div>
                   <p className="text-[10px] text-[var(--primary)] font-bold uppercase tracking-wider mb-0.5">
                     {t("netProfitLabel") || "Net Profit"}
                   </p>
-                  <p className="text-[9px] text-gray-500">
+                  <p className="text-[9px] text-[var(--text-muted)]">
                     ({t("totalIncomeLabel")} + {t("extraIncomeLabel")} - {t("totalExpenseLabel")})
                   </p>
                 </div>
@@ -229,27 +229,27 @@ const MachineMaintenanceApp = () => {
   }, [machines, rentalData, searchQuery, filterType]);
 
   return (
-    <div className="bg-[#121212] min-h-screen pb-20 relative overflow-hidden">
+    <div className="bg-[var(--bg-main)] min-h-screen pb-20 relative overflow-hidden">
       {/* STICKY HEADER */}
-      <div className="sticky top-0 mt-16 z-20 bg-[#121212]/95 backdrop-blur-md border-b border-[#2C2C2C] pb-2">
+      <div className="sticky top-0 mt-16 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] pb-2">
         <div className="px-4 py-3 flex justify-between items-center">
-          <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+          <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">
             {t("machineStatusTitle")}
           </h2>
-          <span className="text-[9px] bg-[#1E1E1E] text-[var(--primary)] px-2 py-0.5 rounded border border-[#333]">
+          <span className="text-[9px] bg-white text-[var(--primary)] px-2 py-0.5 rounded border border-[var(--border-color)]">
             {processedMachines.length} {t("machinesCount")}
           </span>
         </div>
 
         <div className="px-4 mb-3">
           <div className="relative">
-            <FaSearch className="absolute left-3 top-2.5 text-gray-500 text-xs" />
+            <FaSearch className="absolute left-3 top-2.5 text-[var(--text-muted)] text-xs" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t("searchPlaceholder") || "Search machine..."}
-              className="w-full bg-[#1E1E1E] text-white pl-9 pr-3 py-2 rounded-full text-xs outline-none border border-[#333] focus:border-[var(--primary)] transition-colors placeholder-gray-600"
+              className="w-full bg-white text-[var(--text-main)] pl-9 pr-3 py-2 rounded-full text-xs outline-none border border-[var(--border-color)] focus:border-[var(--primary)] transition-colors placeholder-[var(--text-muted)]"
             />
           </div>
         </div>
@@ -267,7 +267,7 @@ const MachineMaintenanceApp = () => {
               className={`whitespace-nowrap px-3 py-1 rounded-full text-[10px] font-bold border transition-all ${
                 filterType === f.val
                   ? "bg-[var(--primary)] text-black border-[var(--primary)]"
-                  : "bg-transparent text-gray-500 border-[#333]"
+                  : "bg-transparent text-[var(--text-muted)] border-[var(--border-color)]"
               }`}
             >
               {f.label}
@@ -279,7 +279,7 @@ const MachineMaintenanceApp = () => {
       {/* MAIN CONTENT */}
       <div className="px-4 mt-3 space-y-4">
         {isLoading ? (
-          <div className="text-center text-gray-500 mt-10 text-xs animate-pulse">
+          <div className="text-center text-[var(--text-muted)] mt-10 text-xs animate-pulse">
             {t("loadingMachines")}
           </div>
         ) : error ? (
@@ -297,7 +297,7 @@ const MachineMaintenanceApp = () => {
             />
           ))
         ) : (
-          <div className="text-center text-gray-600 mt-10 text-xs">
+          <div className="text-center text-[var(--text-muted)] mt-10 text-xs">
             {t("noMachinesFound")}
           </div>
         )}

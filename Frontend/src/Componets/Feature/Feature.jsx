@@ -22,12 +22,12 @@
 //   };
 
 //   return (
-//     <div className="bg-[#121212] py-2">
+//     <div className="bg-[var(--bg-main)] py-2">
 //       <Tracker />
       
 //       {/* 1. SECTION LABEL (Updated to RentVeda) */}
 //       <div className="px-5 mb-3">
-//         <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+//         <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">
 //           {t('techDiaryFeatures') || "RENTVEDA FEATURES"}
 //         </h2>
 //       </div>
@@ -90,7 +90,7 @@
 //       */}
 //       <Link 
 //         to={link} 
-//         className="block relative group rounded-2xl bg-gradient-to-br from-[#1E1E1E] to-[#161616] border border-[#2C2C2C] overflow-hidden active:scale-95 transition-all duration-300 shadow-lg no-underline hover:no-underline focus:no-underline text-white"
+//         className="block relative group rounded-2xl bg-gradient-to-br from-[#1E1E1E] to-[#161616] border border-[var(--border-color)] overflow-hidden active:scale-95 transition-all duration-300 shadow-lg no-underline hover:no-underline focus:no-underline text-[var(--text-main)]"
 //       >
         
 //         {/* Background Subtle Glow based on feature color */}
@@ -110,14 +110,14 @@
             
 //             {/* Sleek Icon Box */}
 //             <div 
-//                 className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#121212] border border-[#333] shadow-inner mb-3"
+//                 className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--bg-main)] border border-[var(--border-color)] shadow-inner mb-3"
 //                 style={{ color: color }}
 //             >
 //                 <span className="text-lg">{icon}</span>
 //             </div>
 
 //             {/* Title Text (Clean, Bold, No Underline) */}
-//             <h3 className="text-white text-sm font-bold leading-tight m-0 p-0 tracking-wide">
+//             <h3 className="text-[var(--text-main)] text-sm font-bold leading-tight m-0 p-0 tracking-wide">
 //                 {title}
 //             </h3>
 //         </div>
@@ -153,12 +153,12 @@ function Feature() {
   return (
     // 🔥 FIX: Yahan maine 'pb-24' (Padding Bottom) add kar diya hai. 
     // Isse bottom navigation bar ke liye ekdum mast space ban jayegi aur overlap nahi hoga.
-    <div className="bg-[#121212] pt-2 pb-24">
+    <div className="bg-[var(--bg-main)] pt-2 pb-24">
       <Tracker />
       
       {/* 1. SECTION LABEL (Updated to RentVeda) */}
       <div className="px-5 mb-3 mt-2">
-        <h2 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+        <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">
           {t('techDiaryFeatures') || "RENTVEDA FEATURES"}
         </h2>
       </div>
@@ -219,7 +219,7 @@ function FeatureCard({ title, bgImage, link, icon, color, variants }) {
     <motion.div variants={variants}>
       <Link 
         to={link} 
-        className="block relative group rounded-2xl bg-gradient-to-br from-[#1E1E1E] to-[#161616] border border-[#2C2C2C] overflow-hidden active:scale-95 transition-all duration-300 shadow-lg no-underline hover:no-underline focus:no-underline text-white"
+        className="block relative group rounded-2xl bg-gradient-to-br from-white to-gray-50 border border-[var(--border-color)] overflow-hidden active:scale-95 transition-all duration-300 shadow-[var(--shadow-card)] no-underline hover:no-underline focus:no-underline text-[var(--text-main)]"
       >
         
         {/* Background Subtle Glow based on feature color */}
@@ -239,14 +239,14 @@ function FeatureCard({ title, bgImage, link, icon, color, variants }) {
             
             {/* Sleek Icon Box */}
             <div 
-                className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#121212] border border-[#333] shadow-inner mb-3"
+                className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--bg-main)] border border-[var(--border-color)] shadow-inner mb-3"
                 style={{ color: color }}
             >
                 <span className="text-lg">{icon}</span>
             </div>
 
             {/* Title Text */}
-            <h3 className="text-white text-sm font-bold leading-tight m-0 p-0 tracking-wide">
+            <h3 className="text-[var(--text-main)] text-sm font-bold leading-tight m-0 p-0 tracking-wide">
                 {title}
             </h3>
         </div>

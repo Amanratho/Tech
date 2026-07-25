@@ -28,6 +28,16 @@ app.get("/ping", (req, res) => {
   res.send("Server is active!");
 });
 
+// Health check API for Render keep-alive tools (like cron-job.org)
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "ok", 
+    message: "Server is awake and healthy!", 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/user", authRoutes);
 
