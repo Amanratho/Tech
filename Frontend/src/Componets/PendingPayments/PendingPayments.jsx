@@ -170,31 +170,6 @@ const PendingPayments = () => {
       {/* ── UNIFIED STICKY APP HEADER & SEARCH BAR ── */}
       <header className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-[#e2e2e2] shadow-sm">
         <div className="max-w-2xl mx-auto px-4 py-3 space-y-3">
-          {/* Header Title Bar */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="w-9 h-9 rounded-xl bg-[#f9f9f9] hover:bg-[#e8e8e8] text-[#795900] flex items-center justify-center transition-colors cursor-pointer border border-[#e2e2e2]"
-                aria-label="Back"
-              >
-                <FaChevronLeft className="text-sm" />
-              </button>
-              <div>
-                <h1 className="text-[#1a1c1c] text-base font-bold tracking-tight">
-                  {t("pendingReminders") || "Payment Reminders"}
-                </h1>
-                <p className="text-[10px] text-[#4f4633] font-semibold uppercase tracking-wider">
-                  {reminders.length} {t("reminderActiveDues") || "Active Dues"}
-                </p>
-              </div>
-            </div>
-            <div className="w-9 h-9 rounded-xl bg-[#fbc02d] text-[#6c5000] flex items-center justify-center shadow-sm">
-              <FaBell className="text-base" />
-            </div>
-          </div>
-
           {/* Search Input */}
           <div className="relative">
             <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4f4633] text-xs" />
