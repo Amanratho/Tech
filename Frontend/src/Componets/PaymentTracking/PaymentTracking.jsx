@@ -49,21 +49,21 @@ const PaymentTracking = () => {
     React.useEffect(() => {
         if (location.state && location.state.fromReminder) {
             const { customerName, mobileNumber, pendingAmount, machineId, reminderId, paidAmount } = location.state;
-            
+
             setEditCustomerName(customerName || "");
             setEditMobileNumber(mobileNumber || "");
             setEditMachineId(machineId || "");
             setPaymentAmount(pendingAmount || 0);
             setActiveReminderId(reminderId);
-            
+
             setSelectedEntry({
                 _id: reminderId,
                 pendingAmount: pendingAmount || 0,
                 paidAmount: paidAmount || 0
             });
-            
+
             setIsModalOpen(true);
-            
+
             // Clear router state to prevent re-triggering on refresh
             window.history.replaceState({}, document.title);
         }
@@ -179,7 +179,7 @@ const PaymentTracking = () => {
     if (error) return <div className="p-5 text-red-500">Error loading data</div>;
 
     return (
-        <div className="bg-[var(--bg-main)] min-h-screen pt-16 pb-28 relative overflow-hidden">
+        <div className="bg-[var(--bg-main)] min-h-screen pb-28 relative overflow-hidden">
 
             {/* 1. MAIN SCREEN */}
             <div className="sticky top-16 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] pb-2">

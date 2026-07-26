@@ -207,21 +207,6 @@ const MachineMaintenanceApp = () => {
       {/* ── STICKY TOP APP BAR ── */}
       <header className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-[#e2e2e2] shadow-sm">
         <div className="px-4 py-3 max-w-2xl mx-auto space-y-3">
-          {/* Header Title */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-[#fbc02d] text-[#6c5000] flex items-center justify-center shadow-sm">
-                <FaCogs className="text-lg" />
-              </div>
-              <h2 className="text-[#1a1c1c] text-base font-bold tracking-tight">
-                {t("machineStatusTitle") || "Machine Maintenance & Financials"}
-              </h2>
-            </div>
-            <span className="text-xs font-bold text-[#6c5000] bg-[#fbc02d]/20 border border-[#fbc02d] px-2.5 py-1 rounded-full">
-              {processedMachines.length} {t("machinesCount") || "Machines"}
-            </span>
-          </div>
-
           {/* Curved Search Input */}
           <div className="relative">
             <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4f4633] text-xs" />
