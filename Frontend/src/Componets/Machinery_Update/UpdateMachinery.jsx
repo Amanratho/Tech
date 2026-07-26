@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +5,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import { toast } from "../../utils/toastService";
 import { useTranslation } from "react-i18next";
-import { FaPen, FaTrashAlt, FaArrowLeft, FaArchive } from "react-icons/fa";
+import { FaPen, FaTractor, FaArchive, FaPlus } from "react-icons/fa";
 import ConfirmModal from "../ConfirmModal/ConfirmModal";
 
 const MachineryUpdate = () => {
@@ -26,7 +25,7 @@ const MachineryUpdate = () => {
           `${API_BASE_URL}/api/machines`,
           { uid }
         );
-        setMachines(response.data);
+        setMachines(response.data || []);
       } catch (error) {
         console.error("Error fetching machine data:", error);
       } finally {
@@ -68,28 +67,36 @@ const MachineryUpdate = () => {
   };
 
   return (
-    <div className="bg-[var(--bg-main)] min-h-screen pb-20 relative overflow-hidden font-sans">
+    <div className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen pt-16 pb-28 font-body-md relative">
+      <main className="max-w-2xl mx-auto px-4 mt-4 space-y-4">
+        {/* Header Action Row */}
+        <div className="flex justify-between items-center mb-2">
+          <div>
+            <h2 className="text-[#1a1c1c] text-base font-bold tracking-tight">
+              {t("manageMachinery") || "Manage Machines"}
+            </h2>
+            <p className="text-[#4f4633] text-[10px] font-semibold mt-0.5">
+              {machines.length} registered machines
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("/add-machinery")}
+            className="flex items-center gap-1.5 px-3 py-2 bg-[#fbc02d] text-[#6c5000] rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-transform cursor-pointer"
+          >
+            <FaPlus size={11} />
+            <span>{t("addMachine") || "Add New"}</span>
+          </button>
+        </div>
 
-      {/* STICKY HEADER */}
-      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] mt-16 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => window.history.back()} className="text-[var(--text-muted)] hover:text-[var(--text-main)] p-2 -ml-2 transition-colors">
-          <FaArrowLeft size={14} />
-        </button>
-        <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest text-center mr-6">
-          {t('deleteUpdateMachinesTitle') || "MANAGE MACHINERY"}
-        </h2>
-        <div></div> {/* Flex spacer */}
-      </div>
-
-      <div className="px-4 mt-4 max-w-md mx-auto space-y-4">
         {isLoading ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="w-full h-40 bg-white rounded-xl animate-pulse border border-[var(--border-color)]"></div>
+              <div key={i} className="w-full h-36 bg-white rounded-2xl animate-pulse border border-[#e2e2e2]"></div>
             ))}
           </div>
         ) : machines.length === 0 ? (
-          <div className="text-center text-[var(--text-muted)] mt-20 text-xs">
+          <div className="bg-white border border-[#e2e2e2] rounded-2xl p-12 text-center text-[#4f4633] text-xs font-semibold">
             No machines found. Register a new machine first.
           </div>
         ) : (
@@ -100,45 +107,56 @@ const MachineryUpdate = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-xl border border-[var(--border-color)] overflow-hidden shadow-lg relative group"
+                transition={{ delay: index * 0.04 }}
+                className="bg-white rounded-2xl border border-[#e2e2e2] overflow-hidden shadow-sm hover:shadow-md transition-shadow relative group"
               >
                 {/* Image Section */}
-                <div className="relative h-40 w-full">
-                  <img
-                    className="h-full w-full object-cover opacity-80"
-                    src={item.image || "https://via.placeholder.com/400x200"}
-                    alt={item.Machine_name}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent"></div>
+                <div className="relative h-44 w-full bg-gray-100">
+                  {item.image ? (
+                    <img
+                      className="h-full w-full object-cover"
+                      src={item.image}
+                      alt={item.Machine_name}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center text-[#4f4633]/30">
+                      <FaTractor size={48} />
+                    </div>
+                  )}
 
-                  {/* Top Left Badge: ID */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+
+                  {/* Pricing Badge */}
                   <div className="absolute top-3 left-3">
-                    <span className="text-[9px] text-[var(--primary)] font-bold uppercase tracking-wider bg-white/80 px-2 py-0.5 rounded border border-[var(--border-color)] backdrop-blur-sm shadow-md">
-                      ID: {item.Machine_id}
+                    <span className="text-[10px] font-extrabold text-[#6c5000] bg-[#fbc02d] px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                      {item.RentType || "Rate"}
                     </span>
                   </div>
 
-                  {/* Bottom Info Title */}
-                  <div className="absolute bottom-3 left-3 right-20">
-                    <h3 className="text-[var(--text-main)] text-lg font-bold drop-shadow-md truncate">
+                  {/* Machine Name */}
+                  <div className="absolute bottom-3 left-3 right-28">
+                    <h3 className="text-white text-base font-extrabold drop-shadow-sm truncate">
                       {item.Machine_name}
                     </h3>
                   </div>
 
-                  {/* Floating Action Buttons */}
+                  {/* Action Buttons */}
                   <div className="absolute bottom-3 right-3 flex items-center gap-2">
                     <button
+                      type="button"
                       onClick={() => handleEditClick(item)}
-                      className="w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm border border-[var(--primary)] text-[var(--primary)] flex items-center justify-center shadow-lg active:bg-[var(--primary)] active:text-black transition-all"
+                      className="w-9 h-9 rounded-xl bg-white hover:bg-gray-100 text-[#1a1c1c] flex items-center justify-center shadow-md active:scale-90 transition-all cursor-pointer"
+                      title="Edit Machine"
                     >
                       <FaPen size={12} />
                     </button>
 
                     <button
+                      type="button"
                       onClick={() => handleDeleteClick(item.Machine_id)}
-                      className="w-9 h-9 rounded-full bg-orange-500/10 backdrop-blur-sm border border-orange-500/50 text-orange-500 flex items-center justify-center shadow-lg hover:bg-orange-500/20 active:bg-orange-500 active:text-[var(--text-main)] transition-all"
-                      title={t('archiveMachineTitle') || "Archive / Mark as Sold"}
+                      className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 text-[#dc2626] border border-red-200 flex items-center justify-center shadow-md active:scale-90 transition-all cursor-pointer"
+                      title={t('archiveMachineTitle') || "Archive Machine"}
                     >
                       <FaArchive size={12} />
                     </button>
@@ -148,7 +166,7 @@ const MachineryUpdate = () => {
             ))}
           </AnimatePresence>
         )}
-      </div>
+      </main>
 
       {/* CONFIRM DELETE MODAL */}
       <ConfirmModal
@@ -158,7 +176,7 @@ const MachineryUpdate = () => {
         isLoading={isDeleting}
         variant="danger"
         title={t('confirmMachineArchiveTitle') || "Archive Machine?"}
-        message={t('archiveConfirmation') || "This will mark the machine as sold/archived. All historical income & expense data will be preserved for your P&L reports. You can still see this machine in the Maintenance section."}
+        message={t('archiveConfirmation') || "This will mark the machine as sold/archived. All historical income & expense data will be preserved for your reports."}
         confirmText={t('archiveButton') || "Archive"}
         cancelText={t('cancelButton') || "Cancel"}
       />
