@@ -179,10 +179,10 @@ const PaymentTracking = () => {
     if (error) return <div className="p-5 text-red-500">Error loading data</div>;
 
     return (
-        <div className="bg-[var(--bg-main)] min-h-screen pb-20 relative overflow-hidden">
+        <div className="bg-[var(--bg-main)] min-h-screen pt-16 pb-28 relative overflow-hidden">
 
             {/* 1. MAIN SCREEN */}
-            <div className="sticky top-0 mt-16 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] pb-2">
+            <div className="sticky top-16 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] pb-2">
                 <div className="px-4 py-3 flex justify-between items-center">
                     <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">
                         {t('paymentTrackingTitle') || "PAYMENT TRACKING"}

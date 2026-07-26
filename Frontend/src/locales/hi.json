@@ -449,6 +449,12 @@
   "statusDue": "बाकी",
   "collectPaymentTitle": "भुगतान प्राप्त करें",
   "customerNameLabel": "ग्राहक का नाम",
-  "mobileNumberLabel": "मोबाइल नंबर",
-  "totalPendingBalance": "कुल बकाया शेष"
+  "totalPendingBalance": "कुल बकाया शेष",
+  "statementLiveSummary": "सारांश",
+  "statementTotalBills": "कुल बिलों की संख्या",
+  "statementTotalBilled": "कुल बिल राशि",
+  "statementTotalPaid": "कुल भुगतान प्राप्त",
+  "statementTotalPending": "कुल शेष राशि",
+  "statementFetchFailedTitle": "डेटा प्राप्त करने में विफलता",
+  "statementFetchFailedMsg": "स्टेटमेंट सारांश डेटा लोड करने में असमर्थ। कृपया पुनः प्रयास करें।"
 }

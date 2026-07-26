@@ -146,30 +146,8 @@ const EODDashboard = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen flex flex-col font-body-md pb-[80px]"
+      className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen flex flex-col font-body-md pt-16 pb-[112px]"
     >
-      {/* ── STICKY TOP APP BAR ── */}
-      <header className="sticky top-0 z-40 bg-[#f9f9f9] shadow-sm flex justify-between items-center px-4 py-3 w-full max-w-[1280px] mx-auto border-b border-[#e2e2e2]">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#fbc02d] text-[#6c5000] flex items-center justify-center shadow-sm">
-            <FaChartBar className="text-xl text-[#6c5000]" />
-          </div>
-          <div>
-            <h1 className="font-headline-md text-headline-md font-bold text-[#795900] tracking-tight leading-tight text-lg">
-              RentVeda
-            </h1>
-            <span className="text-[#4f4633] font-label-sm text-label-sm uppercase tracking-wider block text-[10px]">
-              {rangeLabel ? rangeLabel : (t("eodBusinessSummary") || "Business Summary • EOD")}
-            </span>
-          </div>
-        </div>
-        {rangeLabel && (
-          <span className="text-xs font-bold text-[#6c5000] bg-[#fbc02d]/20 border border-[#fbc02d] px-3 py-1 rounded-full">
-            {rangeLabel}
-          </span>
-        )}
-      </header>
-
       {/* ── MAIN CONTENT CANVAS ── */}
       <main className="flex-1 w-full max-w-2xl mx-auto p-4 space-y-6">
         {/* ── FILTERS SECTION ── */}

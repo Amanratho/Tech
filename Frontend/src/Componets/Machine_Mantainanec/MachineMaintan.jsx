@@ -203,9 +203,9 @@ const MachineMaintenanceApp = () => {
   }, [machines, searchQuery, filterType]);
 
   return (
-    <div className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen pb-24 font-body-md">
+    <div className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen pt-16 pb-28 font-body-md">
       {/* ── STICKY TOP APP BAR ── */}
-      <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[#e2e2e2] shadow-sm">
+      <header className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-[#e2e2e2] shadow-sm">
         <div className="px-4 py-3 max-w-2xl mx-auto space-y-3">
           {/* Header Title */}
           <div className="flex justify-between items-center">

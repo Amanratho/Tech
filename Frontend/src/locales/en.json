@@ -447,6 +447,12 @@
     "statusDue": "Due",
     "collectPaymentTitle": "Collect Payment",
     "customerNameLabel": "Customer Name",
-    "mobileNumberLabel": "Mobile Number",
-    "totalPendingBalance": "Total Pending Balance"
+    "totalPendingBalance": "Total Pending Balance",
+    "statementLiveSummary": "Summary",
+    "statementTotalBills": "Total Bills",
+    "statementTotalBilled": "Total Billed",
+    "statementTotalPaid": "Total Paid",
+    "statementTotalPending": "Pending Dues",
+    "statementFetchFailedTitle": "Data Fetch Failed",
+    "statementFetchFailedMsg": "Unable to load statement summary data. Please try again."
   }

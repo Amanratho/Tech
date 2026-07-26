@@ -416,10 +416,10 @@ const StartEntry = () => {
   };
 
   return (
-    <div className="bg-[var(--bg-main)] min-h-screen flex flex-col pb-20 relative">
+    <div className="bg-[var(--bg-main)] min-h-screen flex flex-col pt-16 pb-28 relative">
 
       {/* 1. APP HEADER */}
-      <div className="sticky top-0 z-30 bg-[var(--bg-main)] border-b border-[var(--border-color)] px-4 py-3 flex items-center gap-3">
+      <div className="sticky top-16 z-30 bg-[var(--bg-main)] border-b border-[var(--border-color)] px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 rounded-full active:bg-[var(--bg-input)] text-[var(--text-main)]"
