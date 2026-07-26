@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import { toast } from "../../utils/toastService";
@@ -13,12 +13,17 @@ import {
   FaClock,
   FaArrowUp,
   FaArrowDown,
-  FaThLarge,
   FaReceipt,
   FaCalendarCheck,
 } from "react-icons/fa";
+import {
+  MdExpandMore,
+  MdInfo,
+  MdWarning,
+  MdTrendingUp,
+  MdQueryStats,
+} from "react-icons/md";
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
 const toISO = (date) => date.toISOString().split("T")[0];
 
 const getToday = () => {
@@ -43,54 +48,24 @@ const getThisMonth = () => {
   return { start: toISO(first), end: toISO(d) };
 };
 
-// QUICK_FILTERS is now built inside the component so labels are translatable
-
-// ─── Animated Counter ──────────────────────────────────────────────────────────
 const AnimatedNumber = ({ value }) => {
   return (
     <span>
-      {value === null ? "—" : `₹${Number(value).toLocaleString("en-IN")}`}
+      {value === null || value === undefined ? "—" : `₹${Number(value).toLocaleString("en-IN")}`}
     </span>
   );
 };
 
-// ─── Summary Card ─────────────────────────────────────────────────────────────
-const SummaryCard = ({ icon: Icon, label, value, color, bg, border, glow, delay = 0 }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20, scale: 0.97 }}
-    animate={{ opacity: 1, y: 0, scale: 1 }}
-    transition={{ duration: 0.35, delay, ease: "easeOut" }}
-    className={`relative bg-gradient-to-br ${bg} rounded-2xl p-4 border ${border} overflow-hidden shadow-lg`}
-  >
-    {/* Glow blob */}
-    <div className={`absolute -top-4 -right-4 w-20 h-20 ${glow} rounded-full blur-2xl opacity-40 pointer-events-none`} />
-
-    <div className="relative z-10">
-      {/* Icon badge */}
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${color === "green" ? "bg-green-500/15 text-green-400" : color === "red" ? "bg-red-500/15 text-red-400" : color === "amber" ? "bg-amber-500/15 text-amber-400" : "bg-blue-500/15 text-blue-400"}`}>
-        <Icon size={16} />
-      </div>
-
-      <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1">{label}</p>
-      <p className={`text-xl font-extrabold tracking-tight ${color === "green" ? "text-green-400" : color === "red" ? "text-red-400" : color === "amber" ? "text-amber-400" : "text-blue-400"}`}>
-        <AnimatedNumber value={value} />
-      </p>
-    </div>
-  </motion.div>
-);
-
-// ─── Main Component ────────────────────────────────────────────────────────────
 const EODDashboard = () => {
   const { t } = useTranslation();
   const uid = localStorage.getItem("uid");
 
-  // Built here so labels go through t()
   const QUICK_FILTERS = [
     { id: "today",     label: t("eodFilterToday")     || "Today",      icon: FaCalendarDay,   fn: getToday },
     { id: "yesterday", label: t("eodFilterYesterday") || "Yesterday",  icon: FaCalendarCheck, fn: getYesterday },
     { id: "week",      label: t("eodFilterThisWeek")  || "This Week",  icon: FaCalendarWeek,  fn: getThisWeek },
     { id: "month",     label: t("eodFilterThisMonth") || "This Month", icon: FaCalendarAlt,   fn: getThisMonth },
-    { id: "custom",    label: t("eodFilterCustom")    || "Custom",     icon: FaThLarge,       fn: null },
+    { id: "custom",    label: t("eodFilterCustom")    || "Custom",     icon: MdExpandMore,    fn: null },
   ];
 
   const [activeFilter, setActiveFilter] = useState("today");
@@ -98,7 +73,7 @@ const EODDashboard = () => {
   const [customEnd, setCustomEnd] = useState("");
   const [showCustomPicker, setShowCustomPicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [summary, setSummary] = useState(null); // null = not yet fetched
+  const [summary, setSummary] = useState(null);
   const [lastRange, setLastRange] = useState(null);
 
   const todayISO = toISO(new Date());
@@ -113,7 +88,6 @@ const EODDashboard = () => {
       if (!start || !end) return;
 
       setIsLoading(true);
-      setSummary(null);
       try {
         const { data } = await axios.get(`${API_BASE_URL}/api/rentals/eod-summary`, {
           params: { uid, startDate: start, endDate: end },
@@ -127,15 +101,19 @@ const EODDashboard = () => {
         setIsLoading(false);
       }
     },
-    [uid]
+    [uid, t]
   );
 
-  // ── Quick filter click ──
+  // ── Auto-fetch "Today" on initial mount ──
+  useEffect(() => {
+    const range = getToday();
+    fetchSummary(range);
+  }, [fetchSummary]);
+
   const handleQuickFilter = (filter) => {
     setActiveFilter(filter.id);
     if (filter.id === "custom") {
-      setShowCustomPicker(true);
-      setSummary(null);
+      setShowCustomPicker((prev) => !prev);
       return;
     }
     setShowCustomPicker(false);
@@ -143,7 +121,6 @@ const EODDashboard = () => {
     fetchSummary(range);
   };
 
-  // ── Custom range submit ──
   const handleCustomSubmit = () => {
     if (!customStart || !customEnd) {
       toast.error(t("eodSelectBothDates") || "Please select both start and end dates.");
@@ -157,7 +134,6 @@ const EODDashboard = () => {
     setShowCustomPicker(false);
   };
 
-  // ── Derived label for header ──
   const rangeLabel = lastRange
     ? lastRange.start === lastRange.end
       ? lastRange.start
@@ -170,243 +146,309 @@ const EODDashboard = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-[var(--bg-main)] min-h-screen pb-28 pt-4 mt-12 font-sans"
+      className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen flex flex-col font-body-md pb-[80px]"
     >
-      {/* ── STICKY HEADER ── */}
-      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] px-4 py-2 flex items-center justify-between mb-4 shadow-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[var(--primary)]/15 flex items-center justify-center">
-            <FaChartBar size={13} className="text-[var(--primary)]" />
+      {/* ── STICKY TOP APP BAR ── */}
+      <header className="sticky top-0 z-40 bg-[#f9f9f9] shadow-sm flex justify-between items-center px-4 py-3 w-full max-w-[1280px] mx-auto border-b border-[#e2e2e2]">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#fbc02d] text-[#6c5000] flex items-center justify-center shadow-sm">
+            <FaChartBar className="text-xl text-[#6c5000]" />
           </div>
           <div>
-            <h2 className="text-[var(--text-main)] text-xs font-black uppercase tracking-widest leading-tight">
-              {t("eodBusinessSummary") || "Business Summary"}
-            </h2>
-            <p className="text-[var(--text-muted)] text-[9px] font-semibold uppercase tracking-wider">
-              {t("eodDashboardTitle") || "EOD Dashboard"}
-            </p>
+            <h1 className="font-headline-md text-headline-md font-bold text-[#795900] tracking-tight leading-tight text-lg">
+              RentVeda
+            </h1>
+            <span className="text-[#4f4633] font-label-sm text-label-sm uppercase tracking-wider block text-[10px]">
+              {rangeLabel ? rangeLabel : (t("eodBusinessSummary") || "Business Summary • EOD")}
+            </span>
           </div>
         </div>
         {rangeLabel && (
-          <span className="text-[9px] font-bold text-[var(--text-muted)] bg-white border border-[var(--border-color)] px-2 py-1 rounded-full">
+          <span className="text-xs font-bold text-[#6c5000] bg-[#fbc02d]/20 border border-[#fbc02d] px-3 py-1 rounded-full">
             {rangeLabel}
           </span>
         )}
-      </div>
+      </header>
 
-      <div className="px-4 max-w-lg mx-auto space-y-5">
-
-        {/* ── QUICK DATE FILTER PILLS ── */}
-        <div>
-          <p className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-widest mb-2 pl-1">
-            {t("eodSelectPeriod") || "Select Period"}
-          </p>
-          <div className="grid grid-cols-5 gap-1.5">
+      {/* ── MAIN CONTENT CANVAS ── */}
+      <main className="flex-1 w-full max-w-2xl mx-auto p-4 space-y-6">
+        {/* ── FILTERS SECTION ── */}
+        <section className="w-full">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
             {QUICK_FILTERS.map((f) => {
-              const Icon = f.icon;
               const isActive = activeFilter === f.id;
               return (
                 <button
                   key={f.id}
                   id={`filter-${f.id}`}
                   onClick={() => handleQuickFilter(f)}
-                  className={`flex flex-col items-center justify-center gap-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 border ${isActive
-                    ? "bg-[var(--primary)] text-black border-[var(--primary)] shadow-md shadow-[var(--primary)]/20"
-                    : "bg-white text-[var(--text-muted)] border-[var(--border-color)] hover:border-[var(--primary)]"
-                    }`}
+                  className={`flex-shrink-0 px-4 py-2.5 rounded-full border text-xs font-semibold font-label-md transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+                    isActive
+                      ? "border-[#795900] bg-[#fbc02d] text-[#6c5000] shadow-sm font-bold"
+                      : "border-[#d3c5ad] text-[#4f4633] bg-[#eeeeee] hover:bg-[#e8e8e8]"
+                  }`}
                 >
-                  <Icon size={12} />
-                  <span className="leading-none text-center">{f.label}</span>
+                  <span>{f.label}</span>
+                  {f.id === "custom" && (
+                    <MdExpandMore
+                      className={`text-base transition-transform duration-200 ${
+                        showCustomPicker ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
                 </button>
               );
             })}
           </div>
-        </div>
 
-        {/* ── CUSTOM DATE PICKER ── */}
-        <AnimatePresence>
-          {showCustomPicker && (
-            <motion.div
-              key="custom-picker"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="bg-white border border-[var(--border-color)] rounded-2xl p-4 space-y-3">
-                <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{t("eodCustomRange") || "Custom Range"}</p>
+          {/* ── EXPANDABLE CUSTOM DATE PICKER ── */}
+          <AnimatePresence>
+            {showCustomPicker && (
+              <motion.div
+                key="custom-picker"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden mt-3"
+              >
+                <div className="p-5 rounded-2xl bg-[#eeeeee] border border-[#e2e2e2] shadow-sm space-y-4">
+                  <p className="text-xs font-bold text-[#4f4633] uppercase tracking-widest">
+                    {t("eodCustomRange") || "Custom Range"}
+                  </p>
 
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Start Date */}
-                  <div>
-                    <label className="block text-[var(--text-muted)] text-[10px] font-semibold mb-1 pl-1">{t("eodFrom") || "From"}</label>
-                    <input
-                      type="date"
-                      value={customStart}
-                      max={todayISO}
-                      onChange={(e) => {
-                        setCustomStart(e.target.value);
-                        // Reset end if it's now invalid
-                        if (customEnd && e.target.value > customEnd) setCustomEnd("");
-                      }}
-                      className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-2 px-3 focus:border-[var(--primary)] outline-none text-xs [color-scheme:dark] transition-colors"
-                    />
-                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Start Date */}
+                    <div>
+                      <label className="block text-[#4f4633] font-label-sm text-label-sm mb-1.5 text-xs font-medium">
+                        {t("eodFrom") || "From Date"}
+                      </label>
+                      <input
+                        type="date"
+                        value={customStart}
+                        max={todayISO}
+                        onChange={(e) => {
+                          setCustomStart(e.target.value);
+                          if (customEnd && e.target.value > customEnd) setCustomEnd("");
+                        }}
+                        className="w-full bg-white border border-[#d3c5ad] rounded-2xl p-3 text-[#1a1c1c] font-label-md text-label-md focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all cursor-pointer shadow-inner"
+                      />
+                    </div>
 
-                  {/* End Date — min is always customStart to prevent invalid ranges */}
-                  <div>
-                    <label className="block text-[var(--text-muted)] text-[10px] font-semibold mb-1 pl-1">{t("eodTo") || "To"}</label>
-                    <input
-                      type="date"
-                      value={customEnd}
-                      min={customStart || undefined}
-                      max={todayISO}
-                      onChange={(e) => setCustomEnd(e.target.value)}
-                      className={`w-full bg-[var(--bg-main)] text-[var(--text-main)] border rounded-xl py-2 px-3 focus:border-[var(--primary)] outline-none text-xs [color-scheme:dark] transition-colors ${!customStart ? "border-[var(--border-color)] opacity-50 cursor-not-allowed" : "border-[var(--border-color)]"
+                    {/* End Date */}
+                    <div>
+                      <label className="block text-[#4f4633] font-label-sm text-label-sm mb-1.5 text-xs font-medium">
+                        {t("eodTo") || "To Date"}
+                      </label>
+                      <input
+                        type="date"
+                        value={customEnd}
+                        min={customStart || undefined}
+                        max={todayISO}
+                        onChange={(e) => setCustomEnd(e.target.value)}
+                        className={`w-full bg-white border border-[#d3c5ad] rounded-2xl p-3 text-[#1a1c1c] font-label-md text-label-md focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all cursor-pointer shadow-inner ${
+                          !customStart ? "opacity-50 cursor-not-allowed" : ""
                         }`}
-                      disabled={!customStart}
-                    />
+                        disabled={!customStart}
+                      />
+                    </div>
                   </div>
+
+                  <button
+                    id="apply-custom-range-btn"
+                    onClick={handleCustomSubmit}
+                    className="w-full py-3.5 bg-[#fbc02d] text-[#6c5000] rounded-2xl font-label-md text-label-md font-bold transition-all duration-200 active:scale-95 shadow-md hover:bg-[#f8bd2a] cursor-pointer"
+                  >
+                    {t("eodApplyRange") || "Apply Date Range"}
+                  </button>
                 </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
 
-                <button
-                  id="apply-custom-range-btn"
-                  onClick={handleCustomSubmit}
-                  className="w-full py-2.5 bg-[var(--primary)] text-black rounded-xl font-black text-xs tracking-wide active:scale-95 transition-all shadow-md shadow-[var(--primary)]/20"
-                >
-                  {t("eodApplyRange") || "Apply Range"}
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── LOADING STATE ── */}
+        {/* ── LOADING SKELETON ── */}
         {isLoading && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="grid grid-cols-2 gap-3"
+            className="grid grid-cols-2 gap-4"
           >
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-28 bg-white rounded-2xl border border-[var(--border-color)] animate-pulse" />
+              <div
+                key={i}
+                className="h-36 bg-white rounded-2xl border border-[#e2e2e2] animate-pulse"
+              />
             ))}
           </motion.div>
         )}
 
-        {/* ── SUMMARY CARDS ── */}
+        {/* ── METRIC GRID & BREAKDOWN TABLE ── */}
         {!isLoading && summary && (
           <>
-            {/* Entry count pill */}
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 bg-white border border-[var(--border-color)] rounded-full px-3 py-1">
-                <FaReceipt size={9} className="text-[var(--primary)]" />
-                <span className="text-[10px] font-bold text-[var(--text-muted)]">
-                  {summary.entryCount} {summary.entryCount === 1 ? (t("eodEntry") || "entry") : (t("eodEntries") || "entries")} {t("eodInPeriod") || "in period"}
+            <section className="grid grid-cols-2 gap-4">
+              {/* Total Income */}
+              <div className="bg-white rounded-2xl p-4 border border-[#e2e2e2] relative overflow-hidden flex flex-col justify-between min-h-[140px] shadow-[0_2px_12px_rgba(22,163,74,0.1)] hover:shadow-[0_4px_18px_rgba(22,163,74,0.15)] transition-shadow">
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#dcfce7] rounded-full blur-2xl opacity-70"></div>
+                <div className="flex justify-between items-start z-10">
+                  <span className="text-[#4f4633] font-label-sm text-label-sm uppercase font-semibold">
+                    {t("eodTotalIncome") || "Total Income"}
+                  </span>
+                  <div className="bg-[#dcfce7] p-2 rounded-xl flex items-center justify-center">
+                    <FaWallet className="text-[#16a34a] text-lg" />
+                  </div>
+                </div>
+                <div className="z-10 mt-3">
+                  <div className="font-headline-lg-mobile text-headline-lg-mobile text-[#16a34a] text-2xl font-extrabold">
+                    <AnimatedNumber value={summary.totalIncome} />
+                  </div>
+                  <div className="flex items-center gap-1 text-[#16a34a] font-label-sm text-label-sm mt-1 text-xs font-medium">
+                    <FaArrowUp className="text-[10px]" />
+                    <span>{summary.entryCount} {summary.entryCount === 1 ? (t("eodEntry") || "entry") : (t("eodEntries") || "entries")}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Total Expenses */}
+              <div className="bg-white rounded-2xl p-4 border border-[#e2e2e2] relative overflow-hidden flex flex-col justify-between min-h-[140px] shadow-[0_2px_12px_rgba(220,38,38,0.1)] hover:shadow-[0_4px_18px_rgba(220,38,38,0.15)] transition-shadow">
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#fee2e2] rounded-full blur-2xl opacity-70"></div>
+                <div className="flex justify-between items-start z-10">
+                  <span className="text-[#4f4633] font-label-sm text-label-sm uppercase font-semibold">
+                    {t("eodExpenses") || "Total Expenses"}
+                  </span>
+                  <div className="bg-[#fee2e2] p-2 rounded-xl flex items-center justify-center">
+                    <FaArrowDown className="text-[#dc2626] text-lg" />
+                  </div>
+                </div>
+                <div className="z-10 mt-3">
+                  <div className="font-headline-lg-mobile text-headline-lg-mobile text-[#dc2626] text-2xl font-extrabold">
+                    <AnimatedNumber value={summary.totalExpenses} />
+                  </div>
+                  <div className="flex items-center gap-1 text-[#4f4633] font-label-sm text-label-sm mt-1 text-xs font-medium">
+                    <MdInfo className="text-xs opacity-70" />
+                    <span>{t("eodMaintExpenses") || "Maintenance & Costs"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pending Dues */}
+              <div className="bg-white rounded-2xl p-4 border border-[#e2e2e2] relative overflow-hidden flex flex-col justify-between min-h-[140px] shadow-[0_2px_12px_rgba(217,119,6,0.1)] hover:shadow-[0_4px_18px_rgba(217,119,6,0.15)] transition-shadow">
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#fef3c7] rounded-full blur-2xl opacity-70"></div>
+                <div className="flex justify-between items-start z-10">
+                  <span className="text-[#4f4633] font-label-sm text-label-sm uppercase font-semibold">
+                    {t("eodPendingDues") || "Pending Dues"}
+                  </span>
+                  <div className="bg-[#fef3c7] p-2 rounded-xl flex items-center justify-center">
+                    <FaClock className="text-[#d97706] text-lg" />
+                  </div>
+                </div>
+                <div className="z-10 mt-3">
+                  <div className="font-headline-lg-mobile text-headline-lg-mobile text-[#d97706] text-2xl font-extrabold">
+                    <AnimatedNumber value={summary.totalPending} />
+                  </div>
+                  <div className="flex items-center gap-1 text-[#d97706] font-label-sm text-label-sm mt-1 text-xs font-medium">
+                    <MdWarning className="text-xs" />
+                    <span>Requires follow-up</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Net Profit (Highlighted) */}
+              <div className="bg-gradient-to-br from-white via-[#fffbeb] to-[#fbc02d]/25 rounded-2xl p-4 border-2 border-[#fbc02d] relative overflow-hidden flex flex-col justify-between min-h-[140px] shadow-[0_4px_20px_rgba(251,192,45,0.25)] hover:shadow-[0_6px_25px_rgba(251,192,45,0.35)] transition-shadow">
+                <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-[#fbc02d] rounded-full blur-2xl opacity-50"></div>
+                <div className="flex justify-between items-start z-10">
+                  <span className="text-[#6c5000] font-label-sm text-label-sm uppercase font-bold tracking-widest">
+                    {t("eodNetProfit") || "Net Profit"}
+                  </span>
+                  <div className="bg-[#fbc02d] text-[#6c5000] p-2 rounded-xl flex items-center justify-center shadow-sm">
+                    <MdTrendingUp className="text-xl text-[#6c5000]" />
+                  </div>
+                </div>
+                <div className="z-10 mt-3">
+                  <div className="font-headline-lg-mobile text-headline-lg-mobile text-[#6c5000] text-2xl font-extrabold">
+                    <AnimatedNumber value={summary.netProfit} />
+                  </div>
+                  <div className="flex items-center gap-1 text-[#6c5000] font-label-sm text-label-sm mt-1 font-semibold text-xs">
+                    <span>{netIsPositive ? "Net Profit" : "Net Deficit"}</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ── BREAKDOWN TABLE ── */}
+            <section className="bg-white rounded-2xl border border-[#e2e2e2] overflow-hidden shadow-sm mt-6">
+              <div className="p-4 border-b border-[#e2e2e2] bg-[#f9f9f9] flex items-center justify-between">
+                <h2 className="font-headline-md text-headline-md text-[#1a1c1c] flex items-center gap-2 text-base font-bold">
+                  <FaReceipt className="text-[#795900] text-[20px]" />
+                  {t("eodBreakdown") || "Financial Breakdown"}
+                </h2>
+                <span className="text-xs font-semibold text-[#4f4633] bg-[#eeeeee] px-2.5 py-1 rounded-full border border-[#e2e2e2]">
+                  {summary.entryCount} {summary.entryCount === 1 ? (t("eodEntry") || "entry") : (t("eodEntries") || "entries")}
                 </span>
               </div>
-            </div>
-
-            {/* 2×2 metric grid */}
-            <div className="grid grid-cols-2 gap-3">
-              <SummaryCard
-                icon={FaWallet}
-                label={t("eodTotalIncome") || "Total Income"}
-                value={summary.totalIncome}
-                color="green"
-                bg="from-[#0D1F0D] to-gray-200"
-                border="border-green-900/40"
-                glow="bg-green-500"
-                delay={0}
-              />
-              <SummaryCard
-                icon={FaArrowDown}
-                label={t("eodExpenses") || "Expenses"}
-                value={summary.totalExpenses}
-                color="red"
-                bg="from-[#1F0D0D] to-gray-200"
-                border="border-red-900/40"
-                glow="bg-red-500"
-                delay={0.07}
-              />
-              <SummaryCard
-                icon={FaClock}
-                label={t("eodPendingDues") || "Pending Dues"}
-                value={summary.totalPending}
-                color="amber"
-                bg="from-[#1F1700] to-gray-200"
-                border="border-amber-900/40"
-                glow="bg-amber-500"
-                delay={0.12}
-              />
-              <SummaryCard
-                icon={FaArrowUp}
-                label={t("eodNetProfit") || "Net Profit"}
-                value={summary.netProfit}
-                color={netIsPositive ? "green" : "red"}
-                bg={netIsPositive ? "from-[#0D1F0D] to-gray-200" : "from-[#1F0D0D] to-gray-200"}
-                border={netIsPositive ? "border-green-900/40" : "border-red-900/40"}
-                glow={netIsPositive ? "bg-green-500" : "bg-red-500"}
-                delay={0.18}
-              />
-            </div>
-
-            {/* ── BREAKDOWN CARD ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25, duration: 0.35 }}
-              className="bg-white border border-[var(--border-color)] rounded-2xl overflow-hidden"
-            >
-              <div className="px-4 py-3 border-b border-[var(--border-color)] flex items-center justify-between">
-                <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">{t("eodBreakdown") || "Breakdown"}</p>
-                <FaChartBar size={11} className="text-[var(--primary)]" />
-              </div>
-
-              {[
-                { label: t("eodTotalBilled")    || "Total Billed",                    value: summary.totalBilled,   color: "text-[var(--primary)]" },
-                { label: t("eodCollected")      || "Collected (Income)",              value: summary.totalIncome,   color: "text-green-400" },
-                { label: t("eodMaintExpenses")  || "Maintenance Expenses",            value: summary.totalExpenses, color: "text-red-400" },
-                { label: t("eodStillPending")   || "Still Pending",                   value: summary.totalPending,  color: "text-amber-400" },
-                {
-                  label: t("eodNetProfitRow") || "Net Profit (Income − Expenses)",
-                  value: summary.netProfit,
-                  color: netIsPositive ? "text-green-400" : "text-red-400",
-                  bold: true,
-                },
-              ].map((row, i) => (
-                <div
-                  key={i}
-                  className={`flex justify-between items-center px-4 py-3 text-xs ${i < 4 ? "border-b border-[var(--border-color)]" : ""
-                    } ${row.bold ? "bg-gray-100" : ""}`}
-                >
-                  <span className={`text-[var(--text-muted)] ${row.bold ? "font-black text-[var(--text-muted)]" : "font-semibold"}`}>
-                    {row.label}
-                  </span>
-                  <span className={`font-extrabold ${row.color}`}>
-                    ₹{Number(row.value).toLocaleString("en-IN")}
-                  </span>
+              <div className="divide-y divide-[#e2e2e2]">
+                <div className="flex justify-between items-center p-4 hover:bg-[#f9f9f9] transition-colors">
+                  <div className="text-[#1a1c1c] font-body-md text-body-md font-medium">
+                    {t("eodTotalBilled") || "Total Billed"}
+                  </div>
+                  <div className="text-[#1a1c1c] font-label-md text-label-md font-bold">
+                    ₹{Number(summary.totalBilled || 0).toLocaleString("en-IN")}
+                  </div>
                 </div>
-              ))}
-            </motion.div>
+                <div className="flex justify-between items-center p-4 hover:bg-[#f9f9f9] transition-colors">
+                  <div className="text-[#1a1c1c] font-body-md text-body-md font-medium flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#16a34a]"></div>
+                    {t("eodCollected") || "Collected (Income)"}
+                  </div>
+                  <div className="text-[#16a34a] font-label-md text-label-md font-bold">
+                    + ₹{Number(summary.totalIncome || 0).toLocaleString("en-IN")}
+                  </div>
+                </div>
+                <div className="flex justify-between items-center p-4 hover:bg-[#f9f9f9] transition-colors">
+                  <div className="text-[#1a1c1c] font-body-md text-body-md font-medium flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#dc2626]"></div>
+                    {t("eodMaintExpenses") || "Maintenance Expenses"}
+                  </div>
+                  <div className="text-[#dc2626] font-label-md text-label-md font-bold">
+                    - ₹{Number(summary.totalExpenses || 0).toLocaleString("en-IN")}
+                  </div>
+                </div>
+                <div className="flex justify-between items-center p-4 hover:bg-[#f9f9f9] transition-colors">
+                  <div className="text-[#1a1c1c] font-body-md text-body-md font-medium flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#d97706]"></div>
+                    {t("eodStillPending") || "Still Pending"}
+                  </div>
+                  <div className="text-[#d97706] font-label-md text-label-md font-bold">
+                    ₹{Number(summary.totalPending || 0).toLocaleString("en-IN")}
+                  </div>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-[#fbc02d]/15 border-t-2 border-[#fbc02d]">
+                  <div className="text-[#1a1c1c] font-headline-md text-headline-md font-bold">
+                    {t("eodNetProfitRow") || "Net Profit"}
+                  </div>
+                  <div className="text-[#6c5000] font-headline-md text-headline-md font-extrabold text-lg">
+                    ₹{Number(summary.netProfit || 0).toLocaleString("en-IN")}
+                  </div>
+                </div>
+              </div>
+            </section>
           </>
         )}
 
         {/* ── EMPTY STATE ── */}
         {!isLoading && !summary && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center py-20 text-center"
-          >
-            <div className="w-16 h-16 rounded-2xl bg-white border border-[var(--border-color)] flex items-center justify-center mb-4 shadow-lg">
-              <FaChartBar size={24} className="text-gray-700" />
+          <section className="flex flex-col items-center justify-center p-12 mt-6 text-center">
+            <div className="w-20 h-20 bg-[#eeeeee] rounded-full flex items-center justify-center mb-4 text-[#817661] border border-[#e2e2e2]">
+              <MdQueryStats className="text-4xl text-[#817661]" />
             </div>
-            <p className="text-[var(--text-muted)] text-sm font-bold">{t("eodEmptyTitle") || "Select a time period"}</p>
-            <p className="text-gray-700 text-xs mt-1">{t("eodEmptySubtitle") || "Tap one of the filters above to load your summary"}</p>
-          </motion.div>
+            <h3 className="font-headline-md text-headline-md text-[#1a1c1c] mb-1 text-lg font-bold">
+              {t("eodEmptyTitle") || "No data for selected period"}
+            </h3>
+            <p className="font-body-md text-body-md text-[#4f4633] text-sm max-w-xs">
+              {t("eodEmptySubtitle") || "Select a time period from the filters above to view your end of day dashboard."}
+            </p>
+          </section>
         )}
-      </div>
+      </main>
     </motion.div>
   );
 };

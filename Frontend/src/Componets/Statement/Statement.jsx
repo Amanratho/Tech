@@ -4,12 +4,25 @@ import { API_BASE_URL } from "../../config";
 import { toast } from "../../utils/toastService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { FaFilePdf, FaCalendarAlt, FaFilter, FaDownload, FaHistory } from "react-icons/fa";
+import {
+  FaFilePdf,
+  FaDownload,
+  FaHistory,
+  FaArrowLeft,
+} from "react-icons/fa";
+import {
+  MdUpdate,
+  MdCalendarMonth,
+  MdEvent,
+  MdFilterList,
+} from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const Statement = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [filterType, setFilterType] = useState("All");
@@ -18,7 +31,7 @@ const Statement = () => {
   const today = new Date().toISOString().split("T")[0];
   const uid = localStorage.getItem("uid");
 
-  // --- QUICK DATE SETTERS ---
+  // ── QUICK DATE SETTERS ──
   const setThisMonth = () => {
     const date = new Date();
     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split("T")[0];
@@ -34,6 +47,7 @@ const Statement = () => {
     setEndDate(lastDay);
   };
 
+  // ── PDF GENERATOR LOGIC ──
   const generatePDFStatement = async () => {
     if (!startDate || !endDate) {
       toast.error(t('errorSelectDates') || "Please select both Start and End dates.");
@@ -160,136 +174,179 @@ const Statement = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      className="bg-[var(--bg-main)] min-h-screen pb-24 pt-4 mt-12 font-sans relative overflow-hidden"
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen font-body-md pb-[90px]"
     >
-
-      {/* STICKY TOP HEADER */}
-      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] px-4 py-2 flex items-center justify-between mb-4 shadow-sm">
-        <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest text-center w-full m-0">
-          {t('statementTitle') || "ACCOUNT STATEMENT"}
-        </h2>
-      </div>
-
-      <div className="px-4 max-w-md mx-auto">
-
-        {/* PREMIUM HERO CARD */}
-        <div className="relative bg-gradient-to-br from-white to-gray-50 rounded-2xl p-4 mb-6 border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--primary)]/10 rounded-full blur-[30px] pointer-events-none"></div>
-
-          <div className="relative z-10 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--bg-main)] border border-[var(--border-color)] flex items-center justify-center text-[var(--primary)] shadow-md shadow-[var(--primary)]/10">
-              <FaFilePdf size={18} />
-            </div>
+      {/* ── STICKY TOP APP BAR ── */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e2e2e2] shadow-sm">
+        <div className="flex justify-between items-center px-4 py-3 max-w-2xl mx-auto">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="w-9 h-9 rounded-xl bg-[#f9f9f9] hover:bg-[#e8e8e8] text-[#795900] flex items-center justify-center transition-colors cursor-pointer border border-[#e2e2e2]"
+              aria-label="Back"
+            >
+              <FaArrowLeft className="text-sm" />
+            </button>
             <div>
-              <h1 className="text-[var(--text-main)] font-bold text-lg tracking-tight m-0 leading-tight">
-                {t('generateReport') || "Generate Report"}
+              <h1 className="text-[#1a1c1c] text-base font-bold tracking-tight leading-tight">
+                {t('statementTitle') || "Account Statement"}
               </h1>
-              <p className="text-[var(--text-muted)] text-[9px] uppercase font-bold tracking-wider mt-0.5 m-0">
-                {t('downloadPdfDesc') || "Download PDF Statements"}
-              </p>
+              <span className="text-[#4f4633] text-[10px] uppercase font-semibold tracking-wider block">
+                PDF Generator & Reports
+              </span>
             </div>
+          </div>
+          <div className="w-9 h-9 rounded-xl bg-[#fbc02d] text-[#6c5000] flex items-center justify-center shadow-sm">
+            <FaFilePdf className="text-base text-[#6c5000]" />
           </div>
         </div>
+      </header>
 
-        {/* INPUT FORM SECTION */}
-        <div className="space-y-4">
-
-          {/* Quick Date Pills */}
-          <div className="flex gap-2">
-            <button
-              onClick={setThisMonth}
-              className="flex-1 py-2 bg-white border border-[var(--border-color)] hover:border-[var(--primary)] rounded-xl text-[var(--text-muted)] text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2"
-            >
-              <FaHistory className="text-[var(--primary)]" /> {t('thisMonth') || "This Month"}
-            </button>
-            <button
-              onClick={setLastMonth}
-              className="flex-1 py-2 bg-white border border-[var(--border-color)] hover:border-[var(--primary)] rounded-xl text-[var(--text-muted)] text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2"
-            >
-              <FaHistory className="text-[var(--text-muted)]" /> {t('lastMonth') || "Last Month"}
-            </button>
+      {/* ── MAIN CONTENT CANVAS ── */}
+      <main className="w-full max-w-2xl mx-auto px-4 pt-5 pb-24 space-y-5">
+        {/* Hero Section Banner */}
+        <section className="bg-gradient-to-br from-white via-[#fffbeb] to-[#fbc02d]/20 border border-[#fbc02d] rounded-2xl p-4 shadow-sm relative overflow-hidden flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#fbc02d] text-[#6c5000] flex items-center justify-center shadow-md flex-shrink-0">
+            <FaFilePdf className="text-xl text-[#6c5000]" />
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {/* From Date */}
-            <div>
-              <label className="block text-[var(--text-muted)] text-[10px] font-semibold mb-1 pl-1">
-                {t('fromDate') || "From Date"}
-              </label>
-              <div className="relative">
-                <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-xs" />
-                <input
-                  type="date"
-                  value={startDate}
-                  max={today}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full bg-white text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-2.5 pl-8 pr-2 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none text-xs transition-all [color-scheme:dark] shadow-inner"
-                />
-              </div>
-            </div>
-
-            {/* To Date */}
-            <div>
-              <label className="block text-[var(--text-muted)] text-[10px] font-semibold mb-1 pl-1">
-                {t('toDate') || "To Date"}
-              </label>
-              <div className="relative">
-                <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-xs" />
-                <input
-                  type="date"
-                  value={endDate}
-                  min={startDate}
-                  max={today}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full bg-white text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-2.5 pl-8 pr-2 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none text-xs transition-all [color-scheme:dark] shadow-inner"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Filter Type */}
           <div>
-            <label className="block text-[var(--text-muted)] text-[10px] font-semibold mb-1 pl-1">
-              {t('recordType') || "Record Type"}
-            </label>
-            <div className="relative">
-              <FaFilter className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--primary)] text-xs z-10" />
-              <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                className="w-full bg-white text-[var(--primary)] font-bold border border-[var(--border-color)] rounded-xl py-2.5 pl-9 pr-4 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none text-xs appearance-none transition-all cursor-pointer shadow-inner"
-              >
-                <option value="All" className="bg-[var(--bg-main)] text-[var(--text-main)]">{t('allBills') || "All Bills"}</option>
-                <option value="Paid" className="bg-[var(--bg-main)] text-[var(--text-main)]">{t('fullyPaidOnly') || "Fully Paid Only"}</option>
-                <option value="Pending" className="bg-[var(--bg-main)] text-[var(--text-main)]">{t('pendingDuesOnly') || "Pending Dues Only"}</option>
-              </select>
-              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-[10px] pointer-events-none">▼</div>
+            <h2 className="text-[#1a1c1c] text-sm font-bold">
+              {t('generateReport') || "Generate Official Statement"}
+            </h2>
+            <p className="text-[#4f4633] text-xs mt-0.5">
+              {t('downloadPdfDesc') || "Download PDF statements for your billing & financial records."}
+            </p>
+          </div>
+        </section>
+
+        {/* Quick Select Period */}
+        <section className="space-y-2.5">
+          <h3 className="text-[#4f4633] text-xs font-bold uppercase tracking-widest pl-1">
+            {t('quickSelect') || "Quick Select Period"}
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={setThisMonth}
+              className="flex items-center justify-center gap-2 bg-white hover:bg-[#fffdf0] border border-[#e2e2e2] hover:border-[#fbc02d] rounded-2xl p-3.5 transition-all shadow-sm active:scale-95 cursor-pointer text-xs font-bold text-[#1a1c1c]"
+            >
+              <FaHistory className="text-[#795900] text-sm" />
+              <span>{t('thisMonth') || "This Month"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={setLastMonth}
+              className="flex items-center justify-center gap-2 bg-white hover:bg-[#fffdf0] border border-[#e2e2e2] hover:border-[#fbc02d] rounded-2xl p-3.5 transition-all shadow-sm active:scale-95 cursor-pointer text-xs font-bold text-[#1a1c1c]"
+            >
+              <MdUpdate className="text-[#795900] text-base" />
+              <span>{t('lastMonth') || "Last Month"}</span>
+            </button>
+          </div>
+        </section>
+
+        {/* Custom Date Range (Curved Inputs) */}
+        <section className="space-y-2.5">
+          <h3 className="text-[#4f4633] text-xs font-bold uppercase tracking-widest pl-1">
+            {t('customRange') || "Custom Date Range"}
+          </h3>
+          <div className="bg-white border border-[#e2e2e2] rounded-2xl p-4 shadow-sm space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              {/* From Date */}
+              <div>
+                <label className="block text-[#4f4633] text-xs font-semibold mb-1.5" htmlFor="fromDate">
+                  {t('fromDate') || "From Date"}
+                </label>
+                <div className="relative">
+                  <MdCalendarMonth className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4f4633] text-base pointer-events-none" />
+                  <input
+                    id="fromDate"
+                    name="fromDate"
+                    type="date"
+                    value={startDate}
+                    max={today}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full bg-[#f9f9f9] text-[#1a1c1c] pl-10 pr-3 py-2.5 rounded-2xl text-xs font-medium border border-[#e2e2e2] focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all cursor-pointer shadow-inner"
+                  />
+                </div>
+              </div>
+
+              {/* To Date */}
+              <div>
+                <label className="block text-[#4f4633] text-xs font-semibold mb-1.5" htmlFor="toDate">
+                  {t('toDate') || "To Date"}
+                </label>
+                <div className="relative">
+                  <MdEvent className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4f4633] text-base pointer-events-none" />
+                  <input
+                    id="toDate"
+                    name="toDate"
+                    type="date"
+                    value={endDate}
+                    min={startDate}
+                    max={today}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full bg-[#f9f9f9] text-[#1a1c1c] pl-10 pr-3 py-2.5 rounded-2xl text-xs font-medium border border-[#e2e2e2] focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all cursor-pointer shadow-inner"
+                  />
+                </div>
+              </div>
             </div>
           </div>
+        </section>
 
-          {/* Download Button */}
+        {/* Record Type Filter Pills */}
+        <section className="space-y-2.5">
+          <h3 className="text-[#4f4633] text-xs font-bold uppercase tracking-widest pl-1">
+            {t('recordType') || "Bill Filter Type"}
+          </h3>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { val: "All", label: t('allBills') || "All Bills" },
+              { val: "Paid", label: t('fullyPaidOnly') || "Fully Paid" },
+              { val: "Pending", label: t('pendingDuesOnly') || "Pending Dues" },
+            ].map((f) => (
+              <button
+                key={f.val}
+                type="button"
+                onClick={() => setFilterType(f.val)}
+                className={`py-2.5 rounded-2xl text-xs font-semibold border transition-all cursor-pointer text-center ${
+                  filterType === f.val
+                    ? "bg-[#fbc02d] text-[#6c5000] border-[#795900] font-bold shadow-sm"
+                    : "bg-white text-[#4f4633] border-[#e2e2e2] hover:bg-[#f9f9f9]"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      {/* ── FIXED BOTTOM ACTION BUTTON ── */}
+      <div className="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-[#e2e2e2] p-4 shadow-[0px_-4px_16px_rgba(0,0,0,0.05)] z-40">
+        <div className="max-w-2xl mx-auto">
           <button
+            type="button"
             onClick={generatePDFStatement}
             disabled={isGenerating}
-            className={`w-full mt-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${isGenerating
-              ? "bg-gray-300 text-[var(--text-muted)] cursor-not-allowed"
-              : "bg-[var(--primary)] text-black hover:bg-yellow-500 shadow-md shadow-[var(--primary)]/20 active:scale-95"
-              }`}
+            className={`w-full bg-[#fbc02d] hover:bg-[#f8bd2a] text-[#6c5000] font-bold text-sm py-3.5 rounded-2xl transition-all duration-200 active:scale-95 shadow-md shadow-[#fbc02d]/20 flex items-center justify-center gap-2 cursor-pointer ${
+              isGenerating ? "opacity-75 cursor-not-allowed" : ""
+            }`}
           >
             {isGenerating ? (
-              <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-5 h-5 border-2 border-[#6c5000] border-t-transparent rounded-full animate-spin" />
             ) : (
-              <FaDownload size={14} />
+              <FaDownload className="text-base text-[#6c5000]" />
             )}
-            {isGenerating
-              ? (t('generatingPdf') || "Generating...")
-              : (t('downloadPdfBtn') || "Download PDF Statement")
-            }
+            <span>
+              {isGenerating
+                ? (t('generatingPdf') || "Generating Statement...")
+                : (t('downloadPdfBtn') || "Download PDF Statement")}
+            </span>
           </button>
-
         </div>
       </div>
     </motion.div>
