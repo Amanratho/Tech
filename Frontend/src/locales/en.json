@@ -318,11 +318,9 @@
     "doneAndSave": "DONE",
     "liveSession": "LIVE SESSION",
     "manualCount": "MANUAL COUNT",
-
     "navStatement": "Statement",
     "navReminders": "Reminders",
     "navSummary": "Summary",
-
     "eodDashboardTitle": "EOD Dashboard",
     "eodBusinessSummary": "Business Summary",
     "eodSelectPeriod": "Select Period",
@@ -354,7 +352,6 @@
     "eodInPeriod": "in period",
     "eodEmptyTitle": "Select a time period",
     "eodEmptySubtitle": "Tap one of the filters above to load your summary",
-
     "pendingReminders": "Payment Reminders",
     "reminderActiveDues": "Active Dues",
     "reminderLoading": "Loading active reminders...",
@@ -392,7 +389,6 @@
     "reminderModalDateLabel": "Reminder Date",
     "reminderSaveChanges": "Save Changes",
     "signingIn": "Signing in…",
-
     "rateLabel": "RATE",
     "qtyLabel": "QTY",
     "totalBillAmount": "Total Bill Amount",
@@ -416,7 +412,6 @@
     "trackerMin": "min",
     "trackerAutoFilled": "auto-filled from Tracker!",
     "trackerCountAutoFilled": "Count",
-
     "confirmModalDefaultTitle": "Are you sure?",
     "confirmModalDefaultMessage": "This action cannot be undone.",
     "confirmModalConfirm": "Confirm",

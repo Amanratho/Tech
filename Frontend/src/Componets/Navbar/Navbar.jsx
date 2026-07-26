@@ -167,9 +167,9 @@ function Navbar() {
   // Menu items config for mapping
   const navItems = [
     { name: t("home")             || "Home",       path: "/",                icon: FaHome },
-    { name: t("navStatement")     || "Statement",  path: "/statement",       icon: FaFileInvoice },
-    { name: t("navReminders")     || "Reminders",  path: "/pending-payments",icon: FaBell },
     { name: t("navSummary")       || "Summary",    path: "/eod-dashboard",   icon: FaChartBar },
+    { name: t("navReminders")     || "Reminders",  path: "/pending-payments",icon: FaBell },
+    { name: t("navStatement")     || "Statement",  path: "/statement",       icon: FaFileInvoice },
   ];
 
   return (

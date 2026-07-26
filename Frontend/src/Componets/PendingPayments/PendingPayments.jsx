@@ -76,7 +76,7 @@ const PendingPayments = () => {
       return { label: t("reminderStatusDueToday") || "Due Today", color: "text-[#d97706]", bg: "bg-[#fef3c7]", border: "border-amber-200" };
     }
     if (isPast(date)) {
-      return { label: t("reminderStatusOverdue")  || "Overdue",   color: "text-[#dc2626]", bg: "bg-[#fee2e2]", border: "border-red-200" };
+      return { label: t("reminderStatusOverdue") || "Overdue", color: "text-[#dc2626]", bg: "bg-[#fee2e2]", border: "border-red-200" };
     }
     return { label: t("reminderStatusUpcoming") || "Upcoming", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200" };
   };
@@ -163,7 +163,7 @@ const PendingPayments = () => {
   };
 
   if (isLoading) return <div className="p-5 text-[#1a1c1c] bg-[#f9f9f9] min-h-screen pt-20">{t("reminderLoading") || "Loading active reminders..."}</div>;
-  if (error)     return <div className="p-5 text-red-500 bg-[#f9f9f9] min-h-screen pt-20">{t("reminderLoadError") || "Error loading active reminders"}</div>;
+  if (error) return <div className="p-5 text-red-500 bg-[#f9f9f9] min-h-screen pt-20">{t("reminderLoadError") || "Error loading active reminders"}</div>;
 
   return (
     <div className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen pt-16 pb-28 font-body-md relative">
@@ -210,20 +210,19 @@ const PendingPayments = () => {
           {/* Quick Filter Pills */}
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
             {[
-              { label: t("reminderFilterAll")      || "All Reminders", val: "all" },
-              { label: t("reminderFilterOverdue")  || "Overdue",       val: "overdue" },
-              { label: t("reminderFilterToday")    || "Due Today",     val: "today" },
-              { label: t("reminderFilterUpcoming") || "Upcoming",      val: "upcoming" },
+              { label: t("reminderFilterAll") || "All Reminders", val: "all" },
+              { label: t("reminderFilterOverdue") || "Overdue", val: "overdue" },
+              { label: t("reminderFilterToday") || "Due Today", val: "today" },
+              { label: t("reminderFilterUpcoming") || "Upcoming", val: "upcoming" },
             ].map((f) => (
               <button
                 key={f.val}
                 type="button"
                 onClick={() => setFilterStatus(f.val)}
-                className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
-                  filterStatus === f.val
+                className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${filterStatus === f.val
                     ? "bg-[#fbc02d] text-[#6c5000] border-[#795900] font-bold shadow-sm"
                     : "bg-[#f9f9f9] text-[#4f4633] border-[#e2e2e2] hover:bg-[#e8e8e8]"
-                }`}
+                  }`}
               >
                 {f.label}
               </button>
@@ -251,13 +250,12 @@ const PendingPayments = () => {
               >
                 {/* Visual Accent Glow on the side based on status */}
                 <div
-                  className={`absolute left-0 top-0 bottom-0 w-1.5 ${
-                    dateStatus.label === (t("reminderStatusOverdue")  || "Overdue")
+                  className={`absolute left-0 top-0 bottom-0 w-1.5 ${dateStatus.label === (t("reminderStatusOverdue") || "Overdue")
                       ? "bg-[#dc2626]"
                       : dateStatus.label === (t("reminderStatusDueToday") || "Due Today")
-                      ? "bg-[#d97706]"
-                      : "bg-blue-500"
-                  }`}
+                        ? "bg-[#d97706]"
+                        : "bg-blue-500"
+                    }`}
                 />
 
                 {/* Header row: Customer & Date status pill */}
@@ -419,17 +417,17 @@ const PendingPayments = () => {
         title={
           confirmDialog.action === "COMPLETE"
             ? (t("reminderCompleteTitle") || "Mark as Completed?")
-            : (t("reminderDeleteTitle")   || "Delete Reminder?")
+            : (t("reminderDeleteTitle") || "Delete Reminder?")
         }
         message={
           confirmDialog.action === "COMPLETE"
             ? (t("reminderCompleteConfirmMsg") || "Are you sure you want to mark this reminder as completed?")
-            : (t("reminderDeleteConfirmMsg")   || "Are you sure you want to delete this reminder? This action cannot be undone.")
+            : (t("reminderDeleteConfirmMsg") || "Are you sure you want to delete this reminder? This action cannot be undone.")
         }
         confirmText={
           confirmDialog.action === "COMPLETE"
             ? (t("reminderMarkPaidBtn") || "Mark Paid")
-            : (t("reminderDeleteBtn")   || "Delete")
+            : (t("reminderDeleteBtn") || "Delete")
         }
         cancelText={t("reminderCancelBtn") || "Cancel"}
         confirmColor={confirmDialog.action === "COMPLETE" ? "green" : "red"}

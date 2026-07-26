@@ -320,11 +320,9 @@
   "doneAndSave": "पूरा हुआ",
   "liveSession": "चालू सेशन",
   "manualCount": "मैनुअल गिनती",
-
   "navStatement": "विवरण",
   "navReminders": "रिमाइंडर",
   "navSummary": "सारांश",
-
   "eodDashboardTitle": "दिन का सारांश (EOD)",
   "eodBusinessSummary": "व्यावसायिक सारांश",
   "eodSelectPeriod": "अवधि चुनें",
@@ -356,7 +354,6 @@
   "eodInPeriod": "इस अवधि में",
   "eodEmptyTitle": "कोई अवधि चुनें",
   "eodEmptySubtitle": "सारांश देखने के लिए ऊपर दिए फ़िल्टर पर टैप करें",
-
   "pendingReminders": "भुगतान रिमाइंडर",
   "reminderActiveDues": "सक्रिय बकाया",
   "reminderLoading": "सक्रिय रिमाइंडर लोड हो रहे हैं...",
@@ -394,7 +391,6 @@
   "reminderModalDateLabel": "रिमाइंडर तारीख",
   "reminderSaveChanges": "बदलाव सेव करें",
   "signingIn": "लॉगिन हो रहा है…",
-
   "rateLabel": "दर",
   "qtyLabel": "मात्रा",
   "totalBillAmount": "कुल बिल राशि",
@@ -417,7 +413,6 @@
   "trackerMin": "मिनट",
   "trackerAutoFilled": "ट्रैकर से स्वचालित भरा गया!",
   "trackerCountAutoFilled": "गिनती",
-
   "कंफर्म मोडल संबंधित": "",
   "confirmModalDefaultTitle": "क्या आप निश्चित हैं?",
   "confirmModalDefaultMessage": "यह कार्य वापस नहीं हो सकता।",
