@@ -527,5 +527,15 @@
   "reminderUpdateFailed": "रिमाइंडर विवरण अपडेट करने में विफल",
   "reminderMarkedCompleted": "भुगतान सफलतापूर्वक प्राप्त मार्क किया गया!",
   "reminderDeletedSuccess": "रिमाइंडर सफलतापूर्वक हटाया गया!",
-  "reminderActionFailed": "कार्रवाई करने में विफल"
+  "reminderActionFailed": "कार्रवाई करने में विफल",
+  "paymentQrTitle": "पेमेंट QR कोड",
+  "missingQrBadge": "बाकी है",
+  "tapToUpdateQr": "UPI QR कोड देखने या बदलने के लिए टैप करें",
+  "tapToUploadQr": "⚠️ बिल पर पेमेंट QR कोड जोड़ने के लिए टैप करें",
+  "noQrNoticeTitle": "कोई पेमेंट QR कोड नहीं जुड़ा है",
+  "noQrNoticeMsg": "अपना UPI QR कोड अपलोड करें ताकि ग्राहक बिल स्कैन करके भुगतान कर सकें।",
+  "uploadNow": "QR अपलोड करें",
+  "homeQrBannerTitle": "अपना पेमेंट QR कोड जोड़ें",
+  "homeQrBannerMsg": "ग्राहक बिलों पर तुरंत स्कैन भुगतान के लिए UPI QR जोड़ें",
+  "addQrNow": "QR जोड़ें"
 }

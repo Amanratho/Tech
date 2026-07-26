@@ -149,22 +149,38 @@ const Profile = () => {
               className="bg-white rounded-[2rem] p-3 shadow-xl mb-8 border border-[#e2e2e2]"
             >
               {/* Payment QR */}
-              <div className="flex items-center p-3 mb-2 bg-gray-50 rounded-2xl">
-                <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-[var(--primary)] mr-4">
+              <Link
+                to="/EditProfile"
+                className="flex items-center p-3 mb-2 bg-[#fffdf0] hover:bg-[#fff9d6] border border-[#fbc02d]/40 rounded-2xl transition-all no-underline cursor-pointer group"
+              >
+                <div className="w-12 h-12 bg-white border border-[#e2e2e2] rounded-xl flex items-center justify-center text-[#795900] mr-3.5 shadow-sm">
                   <FaQrcode size={22} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-[var(--text-main)] font-bold text-sm mb-0.5">Payment QR</h3>
-                  <p className="text-[10px] text-[var(--text-muted)]">Receive payments</p>
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-[#1a1c1c] font-bold text-sm">
+                      {t("paymentQrTitle") || "Payment QR Code"}
+                    </h3>
+                    {!user.qrCodeUrl && (
+                      <span className="text-[9px] font-extrabold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full animate-pulse">
+                        {t("missingQrBadge") || "Missing"}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-[#4f4633] font-medium mt-0.5">
+                    {user.qrCodeUrl
+                      ? (t("tapToUpdateQr") || "Tap to view or update UPI QR Code")
+                      : (t("tapToUploadQr") || "⚠️ Tap to upload your UPI QR Code for bills")}
+                  </p>
                 </div>
-                <div className="w-12 h-12 bg-white rounded-xl p-1 flex items-center justify-center border border-gray-200">
+                <div className="w-12 h-12 bg-white rounded-xl p-1 flex items-center justify-center border border-[#e2e2e2] shadow-sm flex-shrink-0">
                   {user.qrCodeUrl ? (
                     <img src={user.qrCodeUrl} alt="QR" className="w-full h-full object-cover rounded-lg" />
                   ) : (
-                    <span className="text-[8px] font-bold text-[var(--text-muted)]">NO QR</span>
+                    <span className="text-[9px] font-bold text-[#795900] text-center">ADD</span>
                   )}
                 </div>
-              </div>
+              </Link>
 
               {/* Menu Links */}
               <Link to="/EditProfile" className="flex items-center justify-between p-4 no-underline rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors">

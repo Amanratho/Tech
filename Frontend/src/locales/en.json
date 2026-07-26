@@ -525,5 +525,15 @@
     "reminderUpdateFailed": "Failed to update reminder details",
     "reminderMarkedCompleted": "Payment marked as received successfully!",
     "reminderDeletedSuccess": "Reminder deleted successfully!",
-    "reminderActionFailed": "Failed to perform action"
+    "reminderActionFailed": "Failed to perform action",
+    "paymentQrTitle": "Payment QR Code",
+    "missingQrBadge": "Missing",
+    "tapToUpdateQr": "Tap to view or update UPI QR Code",
+    "tapToUploadQr": "⚠️ Tap to upload your UPI QR Code for bills",
+    "noQrNoticeTitle": "No Payment QR Code Added",
+    "noQrNoticeMsg": "Tap to upload your UPI QR code so customers can scan & pay.",
+    "uploadNow": "Upload QR",
+    "homeQrBannerTitle": "Add Your Payment QR Code",
+    "homeQrBannerMsg": "Print your UPI QR code on bills for instant payments",
+    "addQrNow": "Add QR"
   }
