@@ -488,5 +488,8 @@
   "confirmMachineArchiveTitle": "मशीन आर्काइव करें?",
   "archiveConfirmation": "यह मशीन को बेचा गया/आर्काइव किया गया मार्क करेगा। आपके रिपोर्ट के लिए पुराना रिकॉर्ड सुरक्षित रहेगा।",
   "archiveButton": "आर्काइव करें",
-  "cancelButton": "रद्द करें"
+  "cancelButton": "रद्द करें",
+  "logoutTitle": "रेंटवेदा से लॉग आउट करें?",
+  "logoutConfirmation": "क्या आप वाकई अपने रेंटवेदा अकाउंट से लॉग आउट करना चाहते हैं?",
+  "logoutButton": "लॉग आउट"
 }

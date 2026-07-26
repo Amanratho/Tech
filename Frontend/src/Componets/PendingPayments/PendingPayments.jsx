@@ -338,9 +338,10 @@ const PendingPayments = () => {
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="text-[#4f4633] p-1 rounded-full cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-[#f9f9f9] hover:bg-[#e8e8e8] text-[#4f4633] hover:text-[#1a1c1c] flex items-center justify-center transition-all cursor-pointer border border-[#e2e2e2] active:scale-90"
+                  aria-label="Close"
                 >
-                  <FaTimes size={16} />
+                  <FaTimes size={12} />
                 </button>
               </div>
 

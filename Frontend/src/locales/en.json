@@ -486,5 +486,8 @@
     "confirmMachineArchiveTitle": "Archive Machine?",
     "archiveConfirmation": "This will mark the machine as sold/archived. All historical income & expense data will be preserved for your reports.",
     "archiveButton": "Archive",
-    "cancelButton": "Cancel"
+    "cancelButton": "Cancel",
+    "logoutTitle": "Log Out of RentVeda?",
+    "logoutConfirmation": "Are you sure you want to log out of your account?",
+    "logoutButton": "Log Out"
   }

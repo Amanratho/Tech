@@ -366,7 +366,14 @@ const PaymentTracking = () => {
                         >
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-[var(--text-main)] text-sm font-bold">{t('collectPaymentTitle')}</h3>
-                                <button onClick={() => setIsModalOpen(false)} className="text-[var(--text-muted)]"><FaTimes /></button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="w-8 h-8 rounded-full bg-[#f9f9f9] hover:bg-[#e8e8e8] text-[#4f4633] hover:text-[#1a1c1c] flex items-center justify-center transition-all cursor-pointer border border-[#e2e2e2] active:scale-90"
+                                    aria-label="Close"
+                                >
+                                    <FaTimes size={12} />
+                                </button>
                             </div>
 
                             <label className="text-[var(--text-muted)] text-[10px] block mb-1">{t('customerNameLabel')}</label>
