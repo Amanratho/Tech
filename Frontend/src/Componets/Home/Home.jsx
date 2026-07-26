@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useGetMachinesQuery } from "../../redux/functional/machineApiSlice";
-import { slides } from "../../assets/image/assest";
+import { useGetPaymentsQuery, useGetPendingRemindersQuery } from "../../redux/functional/paymentApiSlice";
 import Tracker from "../Tracker/Tracker";
-import Footer from "../Footer/Footer";
+import { format, isToday, isPast } from "date-fns";
 import {
   FaPlus,
   FaFileInvoice,
@@ -14,168 +14,235 @@ import {
   FaTractor,
   FaChevronRight,
   FaSearch,
+  FaMoneyBillWave,
+  FaWallet,
+  FaExclamationTriangle,
+  FaCalendarAlt,
+  FaArrowRight,
+  FaUser,
+  FaBoxes,
+  FaCalculator,
 } from "react-icons/fa";
 
-// ─── HERO BANNER (Carousel with content overlay) ────────────
-function HeroBanner() {
+// ─── 1. GREETING & METRICS SUMMARY HEADER ────────────────────────────
+function DashboardHeader() {
   const { t } = useTranslation();
-  const [current, setCurrent] = useState(0);
+  const uid = localStorage.getItem("uid");
 
-  const next = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % slides.length);
-  }, []);
+  // RTK Query Data
+  const { data: payments = [] } = useGetPaymentsQuery(uid, { skip: !uid });
+  const { data: reminders = [] } = useGetPendingRemindersQuery(uid, { skip: !uid });
+  const { data: machines = [] } = useGetMachinesQuery({ uid }, { skip: !uid });
 
-  useEffect(() => {
-    const id = setInterval(next, 4000);
-    return () => clearInterval(id);
-  }, [next]);
+  // Calculate Time-based Greeting
+  const hour = new Date().getHours();
+  let greetingKey = "greetingMorning";
+  if (hour >= 12 && hour < 17) greetingKey = "greetingAfternoon";
+  if (hour >= 17) greetingKey = "greetingEvening";
+
+  // Calculate Metrics
+  const metrics = useMemo(() => {
+    let todayIncomeSum = 0;
+    let todayEntriesCount = 0;
+    let totalPendingSum = 0;
+
+    payments.forEach((p) => {
+      const pDate = new Date(p.createdAt);
+      if (isToday(pDate)) {
+        todayIncomeSum += Number(p.paidAmount || 0);
+        todayEntriesCount += 1;
+      }
+      totalPendingSum += Number(p.pendingAmount || 0);
+    });
+
+    // Check overdue reminders
+    const overdueCount = reminders.filter((r) => {
+      if (!r.reminderDate) return false;
+      const date = new Date(r.reminderDate);
+      return isPast(date) && !isToday(date);
+    }).length;
+
+    return {
+      todayIncome: todayIncomeSum,
+      todayEntries: todayEntriesCount,
+      totalPending: totalPendingSum,
+      totalMachines: machines.length,
+      overdueCount,
+    };
+  }, [payments, reminders, machines]);
 
   return (
-    <div className="relative w-full h-[50px]  sm:h-[260px] lg:h-[360px] overflow-hidden select-none">
-      {/* Slides — blurred to hide baked-in text on images */}
-      <AnimatePresence initial={false}>
-        <motion.div
-          key={current}
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="absolute inset-0 bg-cover bg-center blur-[2px] scale-105"
-          style={{ backgroundImage: `url(${slides[current].image})` }}
-        />
-      </AnimatePresence>
-
-      {/* Dark overlays for text readability — kept dark since they overlay images */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/70 to-[#121212]/30" />
-      <div className="absolute inset-0 bg-[#121212]/50" />
-
-      {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 z-10">
-        <motion.div
-          key={`text-${current}`}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <p className="text-[10px] text-[var(--primary)] font-bold uppercase tracking-[0.2em] mb-1">
-            {t("tagline") ? "MACHINERY RENTAL" : "MACHINERY RENTAL"}
-          </p>
-          <h1 className="text-white text-xl sm:text-2xl font-black leading-tight tracking-tight">
-            {t("welcome") || "Welcome to RentVeda!"}
+    <div className="px-4 pt-3 pb-2 space-y-4">
+      {/* Personalized Greeting */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-[#1a1c1c] text-lg font-extrabold tracking-tight">
+            {t(greetingKey) || "Welcome 👋"}
           </h1>
-          <p className="text-gray-300 text-xs mt-1.5 max-w-[280px] leading-relaxed">
-            {t("tagline") ||
-              "Revolutionizing machinery rentals with simplicity and efficiency."}
+          <p className="text-[#4f4633] text-xs font-medium">
+            {t("greetingSubtitle") || "Here is your business overview today"}
           </p>
-        </motion.div>
+        </div>
+        <div className="flex items-center gap-1.5 bg-white border border-[#e2e2e2] px-3 py-1.5 rounded-full shadow-sm text-xs font-bold text-[#795900]">
+          <FaCalendarAlt className="text-[#795900] text-xs" />
+          <span>{format(new Date(), "dd MMM yyyy")}</span>
+        </div>
       </div>
 
-      {/* Slide indicators */}
-      <div className="absolute bottom-5 right-5 flex gap-1.5 z-10">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrent(i)}
-            className={`rounded-full transition-all duration-300 ${
-              i === current
-                ? "w-5 h-1.5 bg-[var(--primary)]"
-                : "w-1.5 h-1.5 bg-white/30"
-            }`}
-          />
-        ))}
+      {/* 2x2 Metric Cards */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Today's Income */}
+        <div className="bg-white border border-[#e2e2e2] rounded-2xl p-3.5 shadow-sm space-y-1">
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] font-bold text-[#4f4633] uppercase tracking-wider">
+              {t("todayIncome") || "Today's Income"}
+            </span>
+            <div className="w-7 h-7 rounded-xl bg-[#dcfce7] border border-[#bbf7d0] text-[#16a34a] flex items-center justify-center">
+              <FaWallet size={12} />
+            </div>
+          </div>
+          <p className="text-lg font-extrabold text-[#16a34a] tracking-tight">
+            ₹{metrics.todayIncome.toLocaleString("en-IN")}
+          </p>
+        </div>
+
+        {/* Total Pending */}
+        <div className="bg-white border border-[#e2e2e2] rounded-2xl p-3.5 shadow-sm space-y-1">
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] font-bold text-[#4f4633] uppercase tracking-wider">
+              {t("totalPendingDues") || "Total Pending"}
+            </span>
+            <div className="w-7 h-7 rounded-xl bg-[#fee2e2] border border-[#fecaca] text-[#dc2626] flex items-center justify-center">
+              <FaMoneyBillWave size={12} />
+            </div>
+          </div>
+          <p className="text-lg font-extrabold text-[#dc2626] tracking-tight">
+            ₹{metrics.totalPending.toLocaleString("en-IN")}
+          </p>
+        </div>
+
+        {/* Today's Entries */}
+        <div className="bg-white border border-[#e2e2e2] rounded-2xl p-3.5 shadow-sm space-y-1">
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] font-bold text-[#4f4633] uppercase tracking-wider">
+              {t("activeWorkEntries") || "Today Entries"}
+            </span>
+            <div className="w-7 h-7 rounded-xl bg-[#fffdf0] border border-[#fbc02d]/40 text-[#795900] flex items-center justify-center">
+              <FaFileInvoice size={12} />
+            </div>
+          </div>
+          <p className="text-lg font-extrabold text-[#1a1c1c] tracking-tight">
+            {metrics.todayEntries}
+          </p>
+        </div>
+
+        {/* Total Machines */}
+        <div className="bg-white border border-[#e2e2e2] rounded-2xl p-3.5 shadow-sm space-y-1">
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] font-bold text-[#4f4633] uppercase tracking-wider">
+              {t("totalMachinesCount") || "My Machines"}
+            </span>
+            <div className="w-7 h-7 rounded-xl bg-[#fffdf0] border border-[#fbc02d]/40 text-[#795900] flex items-center justify-center">
+              <FaBoxes size={12} />
+            </div>
+          </div>
+          <p className="text-lg font-extrabold text-[#1a1c1c] tracking-tight">
+            {metrics.totalMachines}
+          </p>
+        </div>
       </div>
+
+      {/* Overdue Payment Alert Banner (Conditional) */}
+      {metrics.overdueCount > 0 && (
+        <Link
+          to="/pending-payments"
+          className="flex items-center justify-between bg-red-50 border border-red-200 rounded-2xl p-3.5 shadow-sm active:scale-98 transition-transform cursor-pointer"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
+              <FaExclamationTriangle size={14} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-red-700">
+                {t("overdueAlertTitle") || "Pending Dues Follow-up Required"}
+              </p>
+              <p className="text-[10px] text-red-600 font-medium mt-0.5">
+                {metrics.overdueCount} {t("overdueAlertMsg") || "reminders require urgent follow-up today."}
+              </p>
+            </div>
+          </div>
+          <span className="text-[10px] font-bold text-red-700 bg-red-100 px-2.5 py-1 rounded-full whitespace-nowrap">
+            {t("viewDues") || "View Dues"}
+          </span>
+        </Link>
+      )}
     </div>
   );
 }
 
-// ─── QUICK ACTIONS (Feature shortcuts) ───────────────────────
+// ─── 2. QUICK ACTIONS SHORTCUTS ────────────────────────────────────
 function QuickActions() {
   const { t } = useTranslation();
 
   const actions = [
     {
-      title: t("addMachinery") || "Add Machine",
-      icon: <FaPlus />,
-      link: "/add-machinery",
-      color: "#D97706",
-      bg: "from-amber-500/10 to-amber-600/5",
-    },
-    {
       title: t("paymentTracking") || "Payments",
       icon: <FaFileInvoice />,
       link: "/payment-tracking",
-      color: "#059669",
-      bg: "from-green-500/10 to-green-600/5",
+      color: "#16a34a",
+      bg: "bg-green-50 border-green-200",
     },
     {
       title: t("billsHistory") || "Bills",
       icon: <FaHistory />,
       link: "/bill-history",
-      color: "#2563EB",
-      bg: "from-blue-500/10 to-blue-600/5",
+      color: "#2563eb",
+      bg: "bg-blue-50 border-blue-200",
     },
     {
-      title: t("machineStatus") || "Status",
+      title: t("machineStatus") || "Machine",
       icon: <FaTools />,
       link: "/machine-maintenance",
-      color: "#EA580C",
-      bg: "from-orange-500/10 to-orange-600/5",
+      color: "#ea580c",
+      bg: "bg-orange-50 border-orange-200",
+    },
+    {
+      title: t("calculator") || "Calculator",
+      icon: <FaCalculator />,
+      link: "/calculator",
+      color: "#d97706",
+      bg: "bg-amber-50 border-amber-200",
     },
   ];
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.06 } },
-  };
-  const item = {
-    hidden: { opacity: 0, y: 12 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: { type: "spring", stiffness: 300, damping: 24 },
-    },
-  };
-
   return (
-    <div className="px-4 -mt-10 relative z-20">
-      {/* Glass card container — Light mode */}
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        className="bg-white border border-[var(--border-color)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
-      >
+    <div className="px-4 mt-2">
+      <div className="bg-white border border-[#e2e2e2] rounded-2xl p-4 shadow-sm">
         <div className="grid grid-cols-4 gap-3">
           {actions.map((action, idx) => (
-            <motion.div key={idx} variants={item}>
-              <Link
-                to={action.link}
-                className="flex flex-col items-center gap-2 no-underline hover:no-underline focus:no-underline group"
+            <Link
+              key={idx}
+              to={action.link}
+              className="flex flex-col items-center gap-2 group cursor-pointer"
+            >
+              <div
+                className={`w-12 h-12 rounded-2xl ${action.bg} border flex items-center justify-center group-active:scale-95 transition-transform shadow-sm`}
+                style={{ color: action.color }}
               >
-                {/* Icon circle */}
-                <div
-                  className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${action.bg} border border-[var(--border-color)] flex items-center justify-center group-active:scale-90 transition-transform duration-200 shadow-sm`}
-                  style={{ color: action.color }}
-                >
-                  <span className="text-base">{action.icon}</span>
-                </div>
-                {/* Label */}
-                <span className="text-[9px] text-[var(--text-muted)] font-bold text-center leading-tight uppercase tracking-wider">
-                  {action.title.length > 10
-                    ? action.title.split(" ")[0]
-                    : action.title}
-                </span>
-              </Link>
-            </motion.div>
+                <span className="text-base">{action.icon}</span>
+              </div>
+              <span className="text-[10px] text-[#4f4633] font-bold text-center leading-tight uppercase tracking-wider">
+                {action.title.split(" ")[0]}
+              </span>
+            </Link>
           ))}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
 
-// ─── MACHINE LIST SECTION ────────────────────────────────────
+// ─── 3. MACHINE GALLERY SECTION ────────────────────────────────────
 function MachineSection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -187,10 +254,7 @@ function MachineSection() {
     data: machines = [],
     error,
     isLoading,
-  } = useGetMachinesQuery({ uid }, {
-    skip: !uid,
-    keepUnusedDataFor: 1000,
-  });
+  } = useGetMachinesQuery({ uid }, { skip: !uid });
 
   const filteredMachines = useMemo(() => {
     return machines.filter((m) =>
@@ -211,16 +275,10 @@ function MachineSection() {
   if (isLoading) {
     return (
       <div className="px-4 mt-6">
-        <div className="flex justify-between items-center mb-4">
-          <div className="h-3 w-28 bg-gray-200 rounded animate-pulse" />
-          <div className="h-3 w-16 bg-gray-200 rounded animate-pulse" />
-        </div>
+        <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-3" />
         <div className="flex gap-3 overflow-hidden">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="w-40 h-48 flex-shrink-0 bg-gray-200 rounded-2xl animate-pulse border border-[var(--border-color)]"
-            />
+          {[1, 2].map((i) => (
+            <div key={i} className="w-40 h-44 bg-gray-200 rounded-2xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -231,28 +289,29 @@ function MachineSection() {
 
   return (
     <div className="mt-6">
-      {/* Section Header */}
+      {/* Header */}
       <div className="px-4 flex justify-between items-center mb-3">
         <div>
-          <h2 className="text-[var(--text-main)] text-base font-bold tracking-tight">
-            {t("exploreMachines") || "Your Machines"}
+          <h2 className="text-[#1a1c1c] text-base font-bold tracking-tight">
+            {t("exploreMachines") || "Explore Our Machines"}
           </h2>
-          <p className="text-[var(--text-muted)] text-[10px] font-semibold mt-0.5">
-            {filteredMachines.length} {t("machinesCount") || "machines"}{" "}
-            available
+          <p className="text-[#4f4633] text-[10px] font-semibold mt-0.5">
+            {filteredMachines.length} {t("machinesCount") || "machines"} available
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => setShowSearch(!showSearch)}
-            className="w-8 h-8 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--primary)] active:scale-90 transition-all"
+            className="w-8 h-8 bg-white border border-[#e2e2e2] rounded-xl flex items-center justify-center text-[#4f4633] hover:text-[#795900] active:scale-90 transition-all shadow-sm cursor-pointer"
           >
             <FaSearch size={11} />
           </button>
           {machines.length > 0 && (
             <button
+              type="button"
               onClick={() => navigate("/add-machinery")}
-              className="w-8 h-8 bg-[var(--primary)]/10 border border-[var(--primary)]/20 rounded-xl flex items-center justify-center text-[var(--primary)] active:scale-90 transition-all"
+              className="w-8 h-8 bg-[#fbc02d] text-[#6c5000] rounded-xl flex items-center justify-center font-bold active:scale-90 transition-all shadow-sm cursor-pointer"
             >
               <FaPlus size={11} />
             </button>
@@ -267,17 +326,17 @@ function MachineSection() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="px-4 overflow-hidden"
+            className="px-4 overflow-hidden mb-3"
           >
-            <div className="relative mb-3">
-              <FaSearch className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-[var(--text-muted)] text-xs" />
+            <div className="relative">
+              <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4f4633] text-xs" />
               <input
                 type="text"
                 placeholder={t("searchMachine") || "Search machines..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
-                className="w-full bg-white text-[var(--text-main)] border border-[var(--border-color)] rounded-xl py-2.5 pl-10 pr-4 focus:border-[var(--primary)] outline-none transition-all text-sm placeholder-[var(--text-muted)]"
+                className="w-full bg-white text-[#1a1c1c] border border-[#e2e2e2] rounded-2xl py-2.5 pl-10 pr-4 focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all text-xs placeholder-[#4f4633] shadow-inner"
               />
             </div>
           </motion.div>
@@ -285,27 +344,25 @@ function MachineSection() {
       </AnimatePresence>
 
       {machines.length === 0 ? (
-        /* Empty state */
         <div className="px-4">
           <div
             onClick={() => navigate("/add-machinery")}
-            className="w-full py-10 border-2 border-dashed border-[var(--border-color)] hover:border-[var(--primary)] rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors active:scale-[0.98]"
+            className="w-full py-8 border-2 border-dashed border-[#e2e2e2] hover:border-[#fbc02d] rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors active:scale-98 bg-white"
           >
-            <div className="w-14 h-14 bg-[var(--primary)]/10 rounded-2xl flex items-center justify-center text-[var(--primary)] shadow-sm border border-[var(--border-color)]">
-              <FaPlus size={20} />
+            <div className="w-12 h-12 bg-[#fffdf0] border border-[#fbc02d]/40 rounded-2xl flex items-center justify-center text-[#795900] shadow-sm">
+              <FaPlus size={18} />
             </div>
             <div className="text-center">
-              <p className="text-[var(--text-main)] text-sm font-bold">
+              <p className="text-[#1a1c1c] text-xs font-bold">
                 {t("addYourMachine") || "Add Your First Machine"}
               </p>
-              <p className="text-[var(--text-muted)] text-[10px] mt-1">
-                Tap to get started
+              <p className="text-[#4f4633] text-[10px] mt-0.5 font-medium">
+                Tap to register a machine
               </p>
             </div>
           </div>
         </div>
       ) : (
-        /* Horizontal scrolling machine cards */
         <div className="overflow-x-auto no-scrollbar">
           <div className="flex gap-3 px-4 pb-2">
             {filteredMachines.map((item, index) => (
@@ -316,43 +373,32 @@ function MachineSection() {
                 transition={{ delay: index * 0.05 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => handleCardClick(item)}
-                className="relative flex-shrink-0 w-[155px] h-[195px] rounded-2xl overflow-hidden cursor-pointer group bg-white border border-[var(--border-color)] shadow-[var(--shadow-card)]"
+                className="relative flex-shrink-0 w-[155px] h-[190px] rounded-2xl overflow-hidden cursor-pointer group bg-white border border-[#e2e2e2] shadow-sm"
               >
-                {/* Background Image */}
                 {item.image ? (
                   <img
-                    className="absolute inset-0 w-full h-full object-cover opacity-90 group-active:scale-110 transition-transform duration-500"
+                    className="absolute inset-0 w-full h-full object-cover group-active:scale-105 transition-transform duration-300"
                     src={item.image}
                     alt={item.Machine_name}
                     loading="lazy"
                   />
                 ) : (
-                  <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center text-gray-300 opacity-40 bg-gray-100">
+                  <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center text-[#4f4633]/40 bg-gray-100">
                     <FaTractor size={36} />
                   </div>
                 )}
 
-                {/* Dark gradient overlay — stays dark for image readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-                {/* Live badge */}
-                <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full border border-white/10">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)]" />
-                  <span className="text-[7px] text-white/80 font-bold tracking-widest uppercase">
-                    Live
-                  </span>
-                </div>
-
-                {/* Content at bottom */}
                 <div className="absolute bottom-0 left-0 w-full p-3 flex flex-col">
-                  <h5 className="text-white text-sm font-extrabold truncate leading-tight mb-1.5 drop-shadow-md">
+                  <h5 className="text-white text-xs font-extrabold truncate mb-1">
                     {item.Machine_name}
                   </h5>
                   <div className="flex items-center justify-between">
-                    <span className="text-[8px] text-gray-300/80 font-bold uppercase tracking-wider bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-md border border-white/5">
+                    <span className="text-[9px] text-gray-200 font-bold uppercase tracking-wider bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-md">
                       {item.RentType || "Rate"}
                     </span>
-                    <div className="w-6 h-6 rounded-full bg-[var(--primary)] text-[var(--text-on-primary)] flex items-center justify-center shadow-md shadow-[var(--primary)]/30">
+                    <div className="w-6 h-6 rounded-full bg-[#fbc02d] text-[#6c5000] flex items-center justify-center shadow-sm">
                       <FaChevronRight size={8} />
                     </div>
                   </div>
@@ -360,20 +406,17 @@ function MachineSection() {
               </motion.div>
             ))}
 
-            {/* Add machine card at end */}
-            {filteredMachines.length > 0 && (
-              <div
-                onClick={() => navigate("/add-machinery")}
-                className="flex-shrink-0 w-[155px] h-[195px] rounded-2xl border-2 border-dashed border-[var(--border-color)] hover:border-[var(--primary)] flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors active:scale-95"
-              >
-                <div className="w-10 h-10 bg-[var(--primary)]/10 rounded-xl flex items-center justify-center text-[var(--primary)] border border-[var(--border-color)]">
-                  <FaPlus size={14} />
-                </div>
-                <span className="text-[var(--text-muted)] text-[9px] font-bold uppercase">
-                  {t("addMachine") || "Add New"}
-                </span>
+            <div
+              onClick={() => navigate("/add-machinery")}
+              className="flex-shrink-0 w-[155px] h-[190px] rounded-2xl border-2 border-dashed border-[#e2e2e2] hover:border-[#fbc02d] bg-white flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors active:scale-95"
+            >
+              <div className="w-9 h-9 bg-[#fffdf0] border border-[#fbc02d]/40 rounded-xl flex items-center justify-center text-[#795900]">
+                <FaPlus size={14} />
               </div>
-            )}
+              <span className="text-[#4f4633] text-[10px] font-bold uppercase tracking-wider">
+                {t("addMachine") || "Add New"}
+              </span>
+            </div>
           </div>
         </div>
       )}
@@ -381,23 +424,95 @@ function MachineSection() {
   );
 }
 
+// ─── 4. RECENT ACTIVITY FEED SECTION ────────────────────────────
+function RecentActivitySection() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const uid = localStorage.getItem("uid");
+
+  const { data: payments = [] } = useGetPaymentsQuery(uid, { skip: !uid });
+
+  const recentEntries = useMemo(() => {
+    return [...payments]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 3);
+  }, [payments]);
+
+  if (!uid || recentEntries.length === 0) return null;
+
+  return (
+    <div className="px-4 mt-6">
+      <div className="flex justify-between items-center mb-3">
+        <h2 className="text-[#1a1c1c] text-base font-bold tracking-tight">
+          {t("recentActivityTitle") || "Recent Activity"}
+        </h2>
+        <Link
+          to="/bill-history"
+          className="text-xs font-bold text-[#795900] flex items-center gap-1 hover:underline"
+        >
+          <span>{t("viewAllHistory") || "View All"}</span>
+          <FaArrowRight size={10} />
+        </Link>
+      </div>
+
+      <div className="space-y-2.5">
+        {recentEntries.map((entry) => (
+          <div
+            key={entry._id}
+            onClick={() => navigate("/bill-history")}
+            className="bg-white border border-[#e2e2e2] rounded-2xl p-3.5 shadow-sm flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#f9f9f9] border border-[#e2e2e2] flex items-center justify-center text-[#4f4633]">
+                <FaUser size={12} />
+              </div>
+              <div>
+                <h4 className="text-[#1a1c1c] text-xs font-bold">
+                  {entry.customerName || "Customer Entry"}
+                </h4>
+                <p className="text-[10px] text-[#4f4633] mt-0.5">
+                  {format(new Date(entry.createdAt), "dd MMM yyyy • hh:mm a")}
+                </p>
+              </div>
+            </div>
+
+            <div className="text-right">
+              <p className="text-xs font-extrabold text-[#1a1c1c]">
+                ₹{entry.totalAmount?.toLocaleString()}
+              </p>
+              <span
+                className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block mt-0.5 ${
+                  entry.pendingAmount > 0
+                    ? "bg-[#fee2e2] text-[#dc2626] border border-red-200"
+                    : "bg-[#dcfce7] text-[#16a34a] border border-green-200"
+                }`}
+              >
+                {entry.pendingAmount > 0
+                  ? `Due ₹${entry.pendingAmount}`
+                  : (t("statusPaid") || "Paid")}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── MAIN HOME COMPONENT ─────────────────────────────────────
 function Home() {
   return (
-    <div className="bg-[var(--bg-main)] min-h-screen pb-20 overflow-x-hidden font-sans">
-      {/* Spacer for fixed navbar */}
-      <div className="h-16" />
+    <div className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen pt-16 pb-24 font-body-md overflow-x-hidden">
+      {/* 1. Dashboard Header with Greeting & Metric Cards */}
+      <DashboardHeader />
 
-      {/* 1. Hero Banner with auto-sliding images */}
-      <HeroBanner />
-
-      {/* 2. Quick Action Shortcuts (overlapping hero) */}
+      {/* 2. Quick Action Shortcuts */}
       <QuickActions />
 
-      {/* 3. Tracker Widget */}
+      {/* 3. Work Tracker Widget */}
       <div className="mt-6">
-        <div className="px-4 mb-3">
-          <h2 className="text-[var(--text-main)] text-base font-bold tracking-tight">
+        <div className="px-4 mb-2">
+          <h2 className="text-[#1a1c1c] text-base font-bold tracking-tight">
             Work Tracker
           </h2>
         </div>
@@ -407,10 +522,8 @@ function Home() {
       {/* 4. Machine Gallery */}
       <MachineSection />
 
-      {/* 5. Footer */}
-      <div className="mt-8">
-        <Footer />
-      </div>
+      {/* 5. Recent Activity Feed */}
+      <RecentActivitySection />
     </div>
   );
 }

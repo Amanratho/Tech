@@ -456,5 +456,19 @@
   "statementTotalPaid": "कुल भुगतान प्राप्त",
   "statementTotalPending": "कुल शेष राशि",
   "statementFetchFailedTitle": "डेटा प्राप्त करने में विफलता",
-  "statementFetchFailedMsg": "स्टेटमेंट सारांश डेटा लोड करने में असमर्थ। कृपया पुनः प्रयास करें।"
+  "statementFetchFailedMsg": "स्टेटमेंट सारांश डेटा लोड करने में असमर्थ। कृपया पुनः प्रयास करें।",
+  "greetingMorning": "सुप्रभात 👋",
+  "greetingAfternoon": "नमस्कार 👋",
+  "greetingEvening": "शुभ संध्या 👋",
+  "greetingSubtitle": "आज का व्यापार सारांश यहाँ है",
+  "todayIncome": "आज की आय",
+  "totalPendingDues": "कुल बकाया उधारी",
+  "activeWorkEntries": "आज की प्रविष्टियां",
+  "totalMachinesCount": "मेरी मशीनें",
+  "overdueAlertTitle": "बकाया भुगतान फॉलो-अप आवश्यक",
+  "overdueAlertMsg": "रिमाइंडर्स का आज तत्काल फॉलो-अप आवश्यक है।",
+  "viewDues": "उधारी देखें",
+  "recentActivityTitle": "हाल की गतिविधि",
+  "viewAllHistory": "सभी इतिहास देखें",
+  "noRecentActivity": "आज कोई प्रविष्टि दर्ज नहीं की गई है।"
 }

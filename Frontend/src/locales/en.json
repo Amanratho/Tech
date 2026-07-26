@@ -454,5 +454,19 @@
     "statementTotalPaid": "Total Paid",
     "statementTotalPending": "Pending Dues",
     "statementFetchFailedTitle": "Data Fetch Failed",
-    "statementFetchFailedMsg": "Unable to load statement summary data. Please try again."
+    "statementFetchFailedMsg": "Unable to load statement summary data. Please try again.",
+    "greetingMorning": "Good Morning 👋",
+    "greetingAfternoon": "Good Afternoon 👋",
+    "greetingEvening": "Good Evening 👋",
+    "greetingSubtitle": "Here is your business overview today",
+    "todayIncome": "Today's Income",
+    "totalPendingDues": "Total Pending",
+    "activeWorkEntries": "Today Entries",
+    "totalMachinesCount": "My Machines",
+    "overdueAlertTitle": "Pending Dues Follow-up Required",
+    "overdueAlertMsg": "reminders require urgent follow-up today.",
+    "viewDues": "View Dues",
+    "recentActivityTitle": "Recent Activity",
+    "viewAllHistory": "View All History",
+    "noRecentActivity": "No rental entries recorded today yet."
   }
