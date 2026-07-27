@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-size: 17px;
+}
+
 body
 {
     margin: 0;
@@ -10,7 +14,13 @@ body
     -moz-osx-font-smoothing: grayscale;
     font-family: "Poppins", sans-serif;
     scroll-behavior: smooth;
+    font-size: 1rem;
 }
+
+/* Global readable text scaling for micro text sizes */
+.text-\[8px\] { font-size: 11px !important; }
+.text-\[9px\] { font-size: 11.5px !important; }
+.text-\[10px\] { font-size: 12px !important; }
 
 :root {
   /* ── Backgrounds (Light Mode) ── */

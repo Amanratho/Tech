@@ -89,7 +89,7 @@ const Tracker = () => {
           (error) => {
             // Error Code 1 is Permission Denied. Code 3 is Timeout (we ignore timeout loops now)
             if (error.code === 1) {
-               toast.error("Please give Location Permission!", { theme: "light", toastId: "gps_err" });
+               toast.error(t('locationPermissionRequired') || "Please give Location Permission!", { theme: "light", toastId: "gps_err" });
             }
           },
           // Optimized for driving tracking
@@ -127,7 +127,7 @@ const Tracker = () => {
     localStorage.setItem("rentveda_startTime", calculatedStartTime.toString());
 
     if (activeTab === "DISTANCE") {
-      toast.info("GPS Tracking Started 🛰️", { toastId: "gps_start" });
+      toast.info(t('gpsTrackingStarted') || "GPS Tracking Started 🛰️", { toastId: "gps_start" });
     }
   };
 
@@ -145,7 +145,7 @@ const Tracker = () => {
     localStorage.removeItem("rentveda_timer_status");
     localStorage.removeItem("rentveda_startTime");
     localStorage.removeItem("rentveda_pausedTime");
-    toast.success(t('timeSavedSuccess', 'Time saved! Will auto-fill in next bill.'));
+    toast.success(t('timeSavedSuccess') || "Time saved! Will auto-fill in next bill.");
   };
 
   const handleIncrement = () => setCount(prev => prev + 1);
@@ -155,7 +155,7 @@ const Tracker = () => {
     localStorage.setItem("rentveda_pending_count_entry", count.toString());
     setCount(0);
     localStorage.removeItem("rentveda_count");
-    toast.success(t('countSavedSuccess', 'Count saved! Will auto-fill in next bill.'));
+    toast.success(t('countSavedSuccess') || "Count saved! Will auto-fill in next bill.");
   };
 
   const handleDoneDistance = () => {
@@ -165,7 +165,7 @@ const Tracker = () => {
     setDistance(0);
     lastCoordsRef.current = null;
     localStorage.removeItem("rentveda_distance");
-    toast.success(`${finalKM} KM saved! Will auto-fill in next bill.`);
+    toast.success(t('kmSavedSuccess', { km: finalKM }) || `${finalKM} KM saved! Will auto-fill in next bill.`);
   };
 
   return (

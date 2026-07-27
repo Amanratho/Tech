@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import { useTranslation } from "react-i18next";
@@ -208,16 +208,47 @@ const Invoice = () => {
           </div>
         </motion.div>
 
+        {/* MISSING QR NOTICE BANNER */}
+        {!user?.qrCodeUrl && (
+          <Link
+            to="/EditProfile"
+            className="flex items-center justify-between bg-[#fffdf0] border border-[#fbc02d]/50 rounded-2xl p-3.5 shadow-sm hover:shadow-md transition-all cursor-pointer no-underline"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-[#fbc02d] text-[#6c5000] flex items-center justify-center flex-shrink-0 shadow-sm">
+                <FaQrcode size={16} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[#1a1c1c]">
+                  {t("noQrNoticeTitle") || "No Payment QR Code Added"}
+                </p>
+                <p className="text-[10px] text-[#4f4633] font-semibold mt-0.5">
+                  {t("noQrNoticeMsg") || "Tap to upload your UPI QR code so customers can scan & pay."}
+                </p>
+              </div>
+            </div>
+            <span className="text-[10px] font-bold text-[#6c5000] bg-[#fbc02d] px-2.5 py-1 rounded-full whitespace-nowrap">
+              {t("uploadNow") || "Upload QR"}
+            </span>
+          </Link>
+        )}
+
         {/* TOTAL AMOUNT & QR */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex gap-3">
-          <div className="w-1/3 bg-white rounded-xl border border-[var(--border-color)] flex flex-col items-center justify-center p-2">
+          <Link
+            to="/EditProfile"
+            className="w-1/3 bg-white rounded-xl border border-[var(--border-color)] flex flex-col items-center justify-center p-2 no-underline hover:border-[var(--primary)] transition-colors cursor-pointer"
+            title={user?.qrCodeUrl ? "Tap to update QR" : "Tap to upload QR"}
+          >
             {user?.qrCodeUrl ? (
               <img src={user.qrCodeUrl} alt="QR" className="w-full h-full object-contain rounded-lg bg-white p-1 mb-1" />
             ) : (
-              <FaQrcode size={24} className="mb-1 text-[var(--text-muted)]" />
+              <FaQrcode size={24} className="mb-1 text-[#795900]" />
             )}
-            <p className="text-[8px] text-[var(--text-muted)] uppercase font-bold text-center">Scan to Pay</p>
-          </div>
+            <p className="text-[8px] text-[var(--text-muted)] uppercase font-bold text-center">
+              {user?.qrCodeUrl ? "Scan to Pay" : "+ Add QR"}
+            </p>
+          </Link>
           <div className="w-2/3 bg-gradient-to-br from-white to-gray-50 rounded-xl border border-[var(--border-color)] p-4 flex flex-col justify-center relative overflow-hidden shadow-[var(--shadow-card)]">
             <div className="absolute right-0 top-0 w-16 h-16 bg-[var(--primary)]/10 rounded-full blur-xl -mr-8 -mt-8 pointer-events-none"></div>
             <p className="text-[10px] text-[var(--text-muted)] uppercase font-bold tracking-wider mb-1">Grand Total</p>
