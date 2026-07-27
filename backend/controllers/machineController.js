@@ -76,19 +76,10 @@ exports.addMachine = [
 
 // Get a machine by ID
 exports.getMachineById = async (req, res) => {
-  const { Machine_id } = req.params;
-  try {
-    const machine = await machineRegModel.findById(Machine_id);
-    if (!machine) {
-      return res.status(404).json({ success: false, message: "Machine not found" });
-    }
-    res.status(200).json({ success: true, data: machine });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Server Error", error });
-  }
+  const { id } = req.params;
+  const machine = await machineRegModel.findOne({ Machine_id: id });
+  res.json(machine);
 };
-
-
 
 // Update a machine by Machine_id (string)
 exports.updateMachine = async (req, res) => {
