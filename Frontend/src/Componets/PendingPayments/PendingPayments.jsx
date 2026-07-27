@@ -307,7 +307,19 @@ const PendingPayments = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleAction(rem._id, "COMPLETE")}
+                    onClick={() =>
+                      navigate("/payment-tracking", {
+                        state: {
+                          fromReminder: true,
+                          customerName: rem.customerName,
+                          mobileNumber: rem.customerMobile || rem.mobileNumber,
+                          pendingAmount: rem.pendingAmount,
+                          machineId: rem.machineId,
+                          reminderId: rem._id,
+                          paidAmount: rem.paidAmount || 0,
+                        },
+                      })
+                    }
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#16a34a] hover:bg-green-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
                   >
                     <FaCheckCircle size={11} />
