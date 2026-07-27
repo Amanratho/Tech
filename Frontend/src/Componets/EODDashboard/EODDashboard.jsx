@@ -146,7 +146,7 @@ const EODDashboard = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen flex flex-col font-body-md pt-16 pb-[112px]"
+      className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen flex flex-col font-sans pt-16 pb-[112px]"
     >
       {/* ── MAIN CONTENT CANVAS ── */}
       <main className="flex-1 w-full max-w-2xl mx-auto p-4 space-y-6">
@@ -160,7 +160,7 @@ const EODDashboard = () => {
                   key={f.id}
                   id={`filter-${f.id}`}
                   onClick={() => handleQuickFilter(f)}
-                  className={`flex-shrink-0 px-4 py-2.5 rounded-full border text-xs font-semibold font-label-md transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+                  className={`flex-shrink-0 px-4 py-2.5 rounded-full border text-xs font-semibold transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5 ${
                     isActive
                       ? "border-[#795900] bg-[#fbc02d] text-[#6c5000] shadow-sm font-bold"
                       : "border-[#d3c5ad] text-[#4f4633] bg-[#eeeeee] hover:bg-[#e8e8e8]"
@@ -197,7 +197,7 @@ const EODDashboard = () => {
                   <div className="grid grid-cols-2 gap-4">
                     {/* Start Date */}
                     <div>
-                      <label className="block text-[#4f4633] font-label-sm text-label-sm mb-1.5 text-xs font-medium">
+                      <label className="block text-[#4f4633] mb-1.5 text-xs font-medium">
                         {t("eodFrom") || "From Date"}
                       </label>
                       <input
@@ -208,13 +208,13 @@ const EODDashboard = () => {
                           setCustomStart(e.target.value);
                           if (customEnd && e.target.value > customEnd) setCustomEnd("");
                         }}
-                        className="w-full bg-white border border-[#d3c5ad] rounded-2xl p-3 text-[#1a1c1c] font-label-md text-label-md focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all cursor-pointer shadow-inner"
+                        className="w-full bg-white border border-[#d3c5ad] rounded-2xl p-3 text-[#1a1c1c] text-xs focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all cursor-pointer shadow-inner"
                       />
                     </div>
 
                     {/* End Date */}
                     <div>
-                      <label className="block text-[#4f4633] font-label-sm text-label-sm mb-1.5 text-xs font-medium">
+                      <label className="block text-[#4f4633] mb-1.5 text-xs font-medium">
                         {t("eodTo") || "To Date"}
                       </label>
                       <input
@@ -223,7 +223,7 @@ const EODDashboard = () => {
                         min={customStart || undefined}
                         max={todayISO}
                         onChange={(e) => setCustomEnd(e.target.value)}
-                        className={`w-full bg-white border border-[#d3c5ad] rounded-2xl p-3 text-[#1a1c1c] font-label-md text-label-md focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all cursor-pointer shadow-inner ${
+                        className={`w-full bg-white border border-[#d3c5ad] rounded-2xl p-3 text-[#1a1c1c] text-xs focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all cursor-pointer shadow-inner ${
                           !customStart ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                         disabled={!customStart}
@@ -234,7 +234,7 @@ const EODDashboard = () => {
                   <button
                     id="apply-custom-range-btn"
                     onClick={handleCustomSubmit}
-                    className="w-full py-3.5 bg-[#fbc02d] text-[#6c5000] rounded-2xl font-label-md text-label-md font-bold transition-all duration-200 active:scale-95 shadow-md hover:bg-[#f8bd2a] cursor-pointer"
+                    className="w-full py-3.5 bg-[#fbc02d] text-[#6c5000] rounded-2xl text-xs font-bold transition-all duration-200 active:scale-95 shadow-md hover:bg-[#f8bd2a] cursor-pointer"
                   >
                     {t("eodApplyRange") || "Apply Date Range"}
                   </button>
@@ -268,7 +268,7 @@ const EODDashboard = () => {
               <div className="bg-white rounded-2xl p-4 border border-[#e2e2e2] relative overflow-hidden flex flex-col justify-between min-h-[140px] shadow-[0_2px_12px_rgba(22,163,74,0.1)] hover:shadow-[0_4px_18px_rgba(22,163,74,0.15)] transition-shadow">
                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#dcfce7] rounded-full blur-2xl opacity-70"></div>
                 <div className="flex justify-between items-start z-10">
-                  <span className="text-[#4f4633] font-label-sm text-label-sm uppercase font-semibold">
+                  <span className="text-[#4f4633] text-[10px] uppercase font-semibold">
                     {t("eodTotalIncome") || "Total Income"}
                   </span>
                   <div className="bg-[#dcfce7] p-2 rounded-xl flex items-center justify-center">
@@ -276,10 +276,10 @@ const EODDashboard = () => {
                   </div>
                 </div>
                 <div className="z-10 mt-3">
-                  <div className="font-headline-lg-mobile text-headline-lg-mobile text-[#16a34a] text-2xl font-extrabold">
+                  <div className="text-[#16a34a] text-2xl font-extrabold tracking-tight">
                     <AnimatedNumber value={summary.totalIncome} />
                   </div>
-                  <div className="flex items-center gap-1 text-[#16a34a] font-label-sm text-label-sm mt-1 text-xs font-medium">
+                  <div className="flex items-center gap-1 text-[#16a34a] mt-1 text-xs font-medium">
                     <FaArrowUp className="text-[10px]" />
                     <span>{summary.entryCount} {summary.entryCount === 1 ? (t("eodEntry") || "entry") : (t("eodEntries") || "entries")}</span>
                   </div>
@@ -290,7 +290,7 @@ const EODDashboard = () => {
               <div className="bg-white rounded-2xl p-4 border border-[#e2e2e2] relative overflow-hidden flex flex-col justify-between min-h-[140px] shadow-[0_2px_12px_rgba(220,38,38,0.1)] hover:shadow-[0_4px_18px_rgba(220,38,38,0.15)] transition-shadow">
                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#fee2e2] rounded-full blur-2xl opacity-70"></div>
                 <div className="flex justify-between items-start z-10">
-                  <span className="text-[#4f4633] font-label-sm text-label-sm uppercase font-semibold">
+                  <span className="text-[#4f4633] text-[10px] uppercase font-semibold">
                     {t("eodExpenses") || "Total Expenses"}
                   </span>
                   <div className="bg-[#fee2e2] p-2 rounded-xl flex items-center justify-center">
@@ -298,10 +298,10 @@ const EODDashboard = () => {
                   </div>
                 </div>
                 <div className="z-10 mt-3">
-                  <div className="font-headline-lg-mobile text-headline-lg-mobile text-[#dc2626] text-2xl font-extrabold">
+                  <div className="text-[#dc2626] text-2xl font-extrabold tracking-tight">
                     <AnimatedNumber value={summary.totalExpenses} />
                   </div>
-                  <div className="flex items-center gap-1 text-[#4f4633] font-label-sm text-label-sm mt-1 text-xs font-medium">
+                  <div className="flex items-center gap-1 text-[#4f4633] mt-1 text-xs font-medium">
                     <MdInfo className="text-xs opacity-70" />
                     <span>{t("eodMaintExpenses") || "Maintenance & Costs"}</span>
                   </div>
@@ -312,7 +312,7 @@ const EODDashboard = () => {
               <div className="bg-white rounded-2xl p-4 border border-[#e2e2e2] relative overflow-hidden flex flex-col justify-between min-h-[140px] shadow-[0_2px_12px_rgba(217,119,6,0.1)] hover:shadow-[0_4px_18px_rgba(217,119,6,0.15)] transition-shadow">
                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#fef3c7] rounded-full blur-2xl opacity-70"></div>
                 <div className="flex justify-between items-start z-10">
-                  <span className="text-[#4f4633] font-label-sm text-label-sm uppercase font-semibold">
+                  <span className="text-[#4f4633] text-[10px] uppercase font-semibold">
                     {t("eodPendingDues") || "Pending Dues"}
                   </span>
                   <div className="bg-[#fef3c7] p-2 rounded-xl flex items-center justify-center">
@@ -320,10 +320,10 @@ const EODDashboard = () => {
                   </div>
                 </div>
                 <div className="z-10 mt-3">
-                  <div className="font-headline-lg-mobile text-headline-lg-mobile text-[#d97706] text-2xl font-extrabold">
+                  <div className="text-[#d97706] text-2xl font-extrabold tracking-tight">
                     <AnimatedNumber value={summary.totalPending} />
                   </div>
-                  <div className="flex items-center gap-1 text-[#d97706] font-label-sm text-label-sm mt-1 text-xs font-medium">
+                  <div className="flex items-center gap-1 text-[#d97706] mt-1 text-xs font-medium">
                     <MdWarning className="text-xs" />
                     <span>Requires follow-up</span>
                   </div>
@@ -334,7 +334,7 @@ const EODDashboard = () => {
               <div className="bg-gradient-to-br from-white via-[#fffbeb] to-[#fbc02d]/25 rounded-2xl p-4 border-2 border-[#fbc02d] relative overflow-hidden flex flex-col justify-between min-h-[140px] shadow-[0_4px_20px_rgba(251,192,45,0.25)] hover:shadow-[0_6px_25px_rgba(251,192,45,0.35)] transition-shadow">
                 <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-[#fbc02d] rounded-full blur-2xl opacity-50"></div>
                 <div className="flex justify-between items-start z-10">
-                  <span className="text-[#6c5000] font-label-sm text-label-sm uppercase font-bold tracking-widest">
+                  <span className="text-[#6c5000] text-[10px] uppercase font-bold tracking-widest">
                     {t("eodNetProfit") || "Net Profit"}
                   </span>
                   <div className="bg-[#fbc02d] text-[#6c5000] p-2 rounded-xl flex items-center justify-center shadow-sm">
@@ -342,10 +342,10 @@ const EODDashboard = () => {
                   </div>
                 </div>
                 <div className="z-10 mt-3">
-                  <div className="font-headline-lg-mobile text-headline-lg-mobile text-[#6c5000] text-2xl font-extrabold">
+                  <div className="text-[#6c5000] text-2xl font-extrabold tracking-tight">
                     <AnimatedNumber value={summary.netProfit} />
                   </div>
-                  <div className="flex items-center gap-1 text-[#6c5000] font-label-sm text-label-sm mt-1 font-semibold text-xs">
+                  <div className="flex items-center gap-1 text-[#6c5000] mt-1 font-semibold text-xs">
                     <span>{netIsPositive ? "Net Profit" : "Net Deficit"}</span>
                   </div>
                 </div>
@@ -355,7 +355,7 @@ const EODDashboard = () => {
             {/* ── BREAKDOWN TABLE ── */}
             <section className="bg-white rounded-2xl border border-[#e2e2e2] overflow-hidden shadow-sm mt-6">
               <div className="p-4 border-b border-[#e2e2e2] bg-[#f9f9f9] flex items-center justify-between">
-                <h2 className="font-headline-md text-headline-md text-[#1a1c1c] flex items-center gap-2 text-base font-bold">
+                <h2 className="text-[#1a1c1c] flex items-center gap-2 text-base font-bold">
                   <FaReceipt className="text-[#795900] text-[20px]" />
                   {t("eodBreakdown") || "Financial Breakdown"}
                 </h2>
@@ -365,45 +365,45 @@ const EODDashboard = () => {
               </div>
               <div className="divide-y divide-[#e2e2e2]">
                 <div className="flex justify-between items-center p-4 hover:bg-[#f9f9f9] transition-colors">
-                  <div className="text-[#1a1c1c] font-body-md text-body-md font-medium">
+                  <div className="text-[#1a1c1c] text-sm font-medium">
                     {t("eodTotalBilled") || "Total Billed"}
                   </div>
-                  <div className="text-[#1a1c1c] font-label-md text-label-md font-bold">
+                  <div className="text-[#1a1c1c] text-sm font-bold">
                     ₹{Number(summary.totalBilled || 0).toLocaleString("en-IN")}
                   </div>
                 </div>
                 <div className="flex justify-between items-center p-4 hover:bg-[#f9f9f9] transition-colors">
-                  <div className="text-[#1a1c1c] font-body-md text-body-md font-medium flex items-center gap-2">
+                  <div className="text-[#1a1c1c] text-sm font-medium flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-[#16a34a]"></div>
                     {t("eodCollected") || "Collected (Income)"}
                   </div>
-                  <div className="text-[#16a34a] font-label-md text-label-md font-bold">
+                  <div className="text-[#16a34a] text-sm font-bold">
                     + ₹{Number(summary.totalIncome || 0).toLocaleString("en-IN")}
                   </div>
                 </div>
                 <div className="flex justify-between items-center p-4 hover:bg-[#f9f9f9] transition-colors">
-                  <div className="text-[#1a1c1c] font-body-md text-body-md font-medium flex items-center gap-2">
+                  <div className="text-[#1a1c1c] text-sm font-medium flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-[#dc2626]"></div>
                     {t("eodMaintExpenses") || "Maintenance Expenses"}
                   </div>
-                  <div className="text-[#dc2626] font-label-md text-label-md font-bold">
+                  <div className="text-[#dc2626] text-sm font-bold">
                     - ₹{Number(summary.totalExpenses || 0).toLocaleString("en-IN")}
                   </div>
                 </div>
                 <div className="flex justify-between items-center p-4 hover:bg-[#f9f9f9] transition-colors">
-                  <div className="text-[#1a1c1c] font-body-md text-body-md font-medium flex items-center gap-2">
+                  <div className="text-[#1a1c1c] text-sm font-medium flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-[#d97706]"></div>
                     {t("eodStillPending") || "Still Pending"}
                   </div>
-                  <div className="text-[#d97706] font-label-md text-label-md font-bold">
+                  <div className="text-[#d97706] text-sm font-bold">
                     ₹{Number(summary.totalPending || 0).toLocaleString("en-IN")}
                   </div>
                 </div>
                 <div className="flex justify-between items-center p-4 bg-[#fbc02d]/15 border-t-2 border-[#fbc02d]">
-                  <div className="text-[#1a1c1c] font-headline-md text-headline-md font-bold">
+                  <div className="text-[#1a1c1c] text-base font-bold">
                     {t("eodNetProfitRow") || "Net Profit"}
                   </div>
-                  <div className="text-[#6c5000] font-headline-md text-headline-md font-extrabold text-lg">
+                  <div className="text-[#6c5000] text-lg font-extrabold">
                     ₹{Number(summary.netProfit || 0).toLocaleString("en-IN")}
                   </div>
                 </div>
@@ -418,10 +418,10 @@ const EODDashboard = () => {
             <div className="w-20 h-20 bg-[#eeeeee] rounded-full flex items-center justify-center mb-4 text-[#817661] border border-[#e2e2e2]">
               <MdQueryStats className="text-4xl text-[#817661]" />
             </div>
-            <h3 className="font-headline-md text-headline-md text-[#1a1c1c] mb-1 text-lg font-bold">
+            <h3 className="text-[#1a1c1c] mb-1 text-lg font-bold">
               {t("eodEmptyTitle") || "No data for selected period"}
             </h3>
-            <p className="font-body-md text-body-md text-[#4f4633] text-sm max-w-xs">
+            <p className="text-[#4f4633] text-sm max-w-xs">
               {t("eodEmptySubtitle") || "Select a time period from the filters above to view your end of day dashboard."}
             </p>
           </section>

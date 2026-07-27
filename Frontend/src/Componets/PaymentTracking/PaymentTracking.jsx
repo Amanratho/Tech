@@ -120,7 +120,7 @@ const PaymentTracking = () => {
 
         if (numericPaymentAmount > 0) {
             if (numericPaymentAmount > selectedEntry.pendingAmount) {
-                toast.warn("Payment amount cannot exceed the pending amount.");
+                toast.warn(t('exceedPendingAmount') || "Payment amount cannot exceed the pending amount.");
                 return;
             }
 
@@ -139,7 +139,7 @@ const PaymentTracking = () => {
                     reminderId: activeReminderId // Can be used by backend to trigger reminder status change
                 }).unwrap();
 
-                toast.success("Payment updated successfully!");
+                toast.success(t('paymentUpdatedSuccess') || "Payment updated successfully!");
                 setIsModalOpen(false);
                 refetch();
 
@@ -152,10 +152,10 @@ const PaymentTracking = () => {
 
             } catch (error) {
                 console.error("Error updating payment:", error);
-                toast.error("Error updating payment.");
+                toast.error(t('paymentUpdateFailed') || "Error updating payment.");
             }
         } else {
-            toast.error("Please enter a valid amount.");
+            toast.error(t('enterValidAmount') || "Please enter a valid amount.");
         }
     };
 

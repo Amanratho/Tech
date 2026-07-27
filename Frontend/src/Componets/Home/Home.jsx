@@ -27,6 +27,7 @@ import {
 // ─── 1. GREETING & METRICS SUMMARY HEADER ────────────────────────────
 function DashboardHeader() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const uid = localStorage.getItem("uid");
 
   // RTK Query Data
@@ -73,26 +74,33 @@ function DashboardHeader() {
 
   return (
     <div className="px-4 pt-3 pb-2 space-y-4">
-      {/* Personalized Greeting */}
-      <div className="flex justify-between items-center">
+      {/* Personalized Greeting Banner - Clickable to Summary Module */}
+      <div
+        onClick={() => navigate("/eod-dashboard")}
+        className="flex justify-between items-center cursor-pointer group hover:opacity-90 transition-opacity"
+      >
         <div>
-          <h1 className="text-[#1a1c1c] text-lg font-extrabold tracking-tight">
-            {t(greetingKey) || "Welcome 👋"}
+          <h1 className="text-[#1a1c1c] text-lg font-extrabold tracking-tight flex items-center gap-1.5">
+            <span>{t(greetingKey) || "Welcome 👋"}</span>
+            <FaChevronRight size={12} className="text-[#795900] opacity-0 group-hover:opacity-100 transition-opacity" />
           </h1>
           <p className="text-[#4f4633] text-xs font-medium">
             {t("greetingSubtitle") || "Here is your business overview today"}
           </p>
         </div>
-        <div className="flex items-center gap-1.5 bg-white border border-[#e2e2e2] px-3 py-1.5 rounded-full shadow-sm text-xs font-bold text-[#795900]">
+        <div className="flex items-center gap-1.5 bg-white border border-[#e2e2e2] group-hover:border-[#fbc02d] px-3 py-1.5 rounded-full shadow-sm text-xs font-bold text-[#795900] transition-colors">
           <FaCalendarAlt className="text-[#795900] text-xs" />
           <span>{format(new Date(), "dd MMM yyyy")}</span>
         </div>
       </div>
 
-      {/* 2x2 Metric Cards */}
+      {/* 2x2 Metric Cards - Clickable to Summary & Related Modules */}
       <div className="grid grid-cols-2 gap-3">
         {/* Today's Income */}
-        <div className="bg-white border border-[#e2e2e2] rounded-2xl p-3.5 shadow-sm space-y-1">
+        <div
+          onClick={() => navigate("/eod-dashboard")}
+          className="bg-white border border-[#e2e2e2] hover:border-[#fbc02d] rounded-2xl p-3.5 shadow-sm space-y-1 cursor-pointer hover:shadow-md active:scale-98 transition-all"
+        >
           <div className="flex justify-between items-center">
             <span className="text-[10px] font-bold text-[#4f4633] uppercase tracking-wider">
               {t("todayIncome") || "Today's Income"}
@@ -107,7 +115,10 @@ function DashboardHeader() {
         </div>
 
         {/* Total Pending */}
-        <div className="bg-white border border-[#e2e2e2] rounded-2xl p-3.5 shadow-sm space-y-1">
+        <div
+          onClick={() => navigate("/payment-tracking")}
+          className="bg-white border border-[#e2e2e2] hover:border-[#fbc02d] rounded-2xl p-3.5 shadow-sm space-y-1 cursor-pointer hover:shadow-md active:scale-98 transition-all"
+        >
           <div className="flex justify-between items-center">
             <span className="text-[10px] font-bold text-[#4f4633] uppercase tracking-wider">
               {t("totalPendingDues") || "Total Pending"}
@@ -122,7 +133,10 @@ function DashboardHeader() {
         </div>
 
         {/* Today's Entries */}
-        <div className="bg-white border border-[#e2e2e2] rounded-2xl p-3.5 shadow-sm space-y-1">
+        <div
+          onClick={() => navigate("/bill-history")}
+          className="bg-white border border-[#e2e2e2] hover:border-[#fbc02d] rounded-2xl p-3.5 shadow-sm space-y-1 cursor-pointer hover:shadow-md active:scale-98 transition-all"
+        >
           <div className="flex justify-between items-center">
             <span className="text-[10px] font-bold text-[#4f4633] uppercase tracking-wider">
               {t("activeWorkEntries") || "Today Entries"}
@@ -137,7 +151,10 @@ function DashboardHeader() {
         </div>
 
         {/* Total Machines */}
-        <div className="bg-white border border-[#e2e2e2] rounded-2xl p-3.5 shadow-sm space-y-1">
+        <div
+          onClick={() => navigate("/machine-maintenance")}
+          className="bg-white border border-[#e2e2e2] hover:border-[#fbc02d] rounded-2xl p-3.5 shadow-sm space-y-1 cursor-pointer hover:shadow-md active:scale-98 transition-all"
+        >
           <div className="flex justify-between items-center">
             <span className="text-[10px] font-bold text-[#4f4633] uppercase tracking-wider">
               {t("totalMachinesCount") || "My Machines"}

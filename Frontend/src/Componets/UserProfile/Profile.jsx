@@ -32,7 +32,7 @@ const Profile = () => {
     const fetchUserProfile = async () => {
       const uid = localStorage.getItem("uid");
       if (!uid) {
-        toast.error("User ID not found. Please log in again.");
+        toast.error(t('userIdNotFound') || "User ID not found. Please log in again.");
         navigate("/login");
         return;
       }
@@ -43,7 +43,7 @@ const Profile = () => {
         );
         setUser(response.data);
       } catch (error) {
-        toast.error("Failed to fetch user profile");
+        toast.error(t('fetchProfileFailed') || "Failed to fetch user profile");
       }
     };
 

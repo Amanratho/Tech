@@ -21,7 +21,7 @@ import FinancialTracker from "./FinancialTracker";
 const MachineCard = ({ machine, toggleShowDetails, showDetails }) => {
   const { t } = useTranslation();
   const uid = localStorage.getItem("uid");
-  const isArchived = machine.isActive === false;
+  const isArchived = Boolean(machine.isArchived === true || machine.status === "archived");
 
   // Aggregations from backend summary
   const totalPaidAmount = machine.totalPaidAmount || 0;
@@ -63,7 +63,7 @@ const MachineCard = ({ machine, toggleShowDetails, showDetails }) => {
               </h3>
               {isArchived && (
                 <span className="text-[9px] text-orange-600 font-bold uppercase tracking-wider bg-orange-100 px-2 py-0.5 rounded-full flex items-center gap-1 border border-orange-200">
-                  <FaArchive size={8} /> {t("soldLabel") || "SOLD"}
+                  <FaArchive size={8} /> {t("archivedBadge") || "Archived"}
                 </span>
               )}
             </div>
@@ -185,10 +185,13 @@ const MachineMaintenanceApp = () => {
     let mapped = [...machines]; // Copy immutable RTK Query array
 
     if (searchQuery) {
+      const q = searchQuery.toLowerCase().trim();
       mapped = mapped.filter(
         (m) =>
-          m.Machine_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          String(m.Machine_id).includes(searchQuery)
+          (m.Machine_name && m.Machine_name.toLowerCase().includes(q)) ||
+          (m.RentType && m.RentType.toLowerCase().includes(q)) ||
+          (m.rentType && m.rentType.toLowerCase().includes(q)) ||
+          String(m.Machine_id || "").toLowerCase().includes(q)
       );
     }
 
@@ -214,7 +217,7 @@ const MachineMaintenanceApp = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t("searchPlaceholder") || "Search machine name or ID..."}
+              placeholder={t("machineSearchPlaceholder") || "Search machine name or rent type..."}
               className="w-full bg-[#f9f9f9] text-[#1a1c1c] pl-9 pr-4 py-2.5 rounded-2xl text-xs outline-none border border-[#e2e2e2] focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] transition-all placeholder-[#4f4633] shadow-inner"
             />
           </div>

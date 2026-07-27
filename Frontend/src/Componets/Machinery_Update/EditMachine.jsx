@@ -96,13 +96,13 @@ const EditMachine = () => {
       });
 
       if (response.data.success) {
-        toast.success("Machine updated successfully!");
+        toast.success(t('machineUpdateSuccess') || "Machine updated successfully!");
         navigate("/Machinery-Update");
       }
     } catch (error) {
-      const errorMsg = error.response?.data?.message || error.message || "Failed to update the machine.";
+      const errorMsg = error.response?.data?.message || error.message || (t('machineUpdateFailed') || "Failed to update the machine.");
       setError(errorMsg);
-      toast.error("Failed to update the machine.");
+      toast.error(t('machineUpdateFailed') || "Failed to update the machine.");
     } finally {
       setIsSubmitting(false);
     }
