@@ -65,10 +65,10 @@ export const paymentApi = createApi({
     }),
 
     deleteOrCompleteReminder: builder.mutation({
-      query: ({ _id, action }) => ({
+      query: ({ _id, id, action }) => ({
         url: "/api/reminders/action",
         method: "PUT",
-        body: { _id, action },
+        body: { _id: _id || id, action },
       }),
       invalidatesTags: ["Payments"],
     }),

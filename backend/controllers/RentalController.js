@@ -78,11 +78,21 @@ exports.getRentalsByMachineId = async (req, res) => {
 
 exports.updatePayment = async (req, res) => {
   try {
-    const { _id, paidAmount, pendingAmount } = req.body;
+    const { _id, id, reminderId, paidAmount, pendingAmount } = req.body;
+    const targetId = _id || id || reminderId;
+
+    if (!targetId) {
+      return res.status(400).json({ message: "Rental ID is required" });
+    }
+
+    const updateFields = { paidAmount, pendingAmount };
+    if (Number(pendingAmount) <= 0) {
+      updateFields.reminderStatus = "PAID";
+    }
 
     const updatedRental = await Rental.findByIdAndUpdate(
-      _id,
-      { paidAmount, pendingAmount },
+      targetId,
+      updateFields,
       { new: true }
     );
 
@@ -269,21 +279,22 @@ exports.updateReminderDetails = async (req, res) => {
 // Delete a reminder (CANCEL) or mark it as PAID
 exports.deleteOrCompleteReminder = async (req, res) => {
   try {
-    const { _id, action } = req.body;
-    if (!_id) {
+    const { _id, id, action } = req.body;
+    const targetId = _id || id;
+    if (!targetId) {
       return res.status(400).json({ message: "Rental ID is required" });
     }
 
     let updatedRental;
-    if (action === "PAID") {
-      const rental = await Rental.findById(_id);
+    if (action === "PAID" || action === "COMPLETE") {
+      const rental = await Rental.findById(targetId);
       if (!rental) {
         return res.status(404).json({ message: "Rental entry not found" });
       }
 
       const paidAmt = Number(rental.paidAmount) + Number(rental.pendingAmount);
       updatedRental = await Rental.findByIdAndUpdate(
-        _id,
+        targetId,
         {
           reminderStatus: "PAID",
           paidAmount: paidAmt,
@@ -293,7 +304,7 @@ exports.deleteOrCompleteReminder = async (req, res) => {
       );
     } else if (action === "DELETE" || action === "CANCEL") {
       updatedRental = await Rental.findByIdAndUpdate(
-        _id,
+        targetId,
         {
           reminderStatus: "CANCELLED",
           reminderDate: null
