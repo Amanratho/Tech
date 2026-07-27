@@ -4,10 +4,17 @@ import { API_BASE_URL } from "../../config";
 export const maintenanceApi = createApi({
   reducerPath: "maintenanceApi",
   baseQuery: fetchBaseQuery({ baseUrl: API_BASE_URL }),
-  tagTypes: ["Maintenance"],
+  tagTypes: ["Maintenance", "Machine"],
   endpoints: (builder) => ({
     getMaintenanceByMachine: builder.query({
-      query: (machineId) => `/api/maintenance/${machineId}`,
+      query: (machineId) => ({
+        url: `/api/maintenance/${machineId}`,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }),
       providesTags: (result, error, machineId) => [
         { type: "Maintenance", id: machineId },
         { type: "Maintenance", id: "LIST" },
