@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
+import { machineApi } from "../../redux/functional/machineApiSlice";
 import {
   useGetMaintenanceByMachineQuery,
   useAddMaintenanceMutation,
@@ -26,6 +28,7 @@ const INCOME_CHIPS = ["chipScrapSale","chipRentalBonus","chipOvertime","chipLate
 
 const FinancialTracker = ({ machineId, uid }) => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   const { data: mData, isLoading } = useGetMaintenanceByMachineQuery(machineId, { skip: !machineId });
   const [addMaintenance, { isLoading: isAdding }] = useAddMaintenanceMutation();
   const [deleteMaintenance, { isLoading: isDeleting }] = useDeleteMaintenanceMutation();
@@ -61,6 +64,7 @@ const FinancialTracker = ({ machineId, uid }) => {
     if (!amount || Number(amount) <= 0) return;
     try {
       await addMaintenance({ type: modalType, amount: Number(amount), description, date, machineId, uid }).unwrap();
+      dispatch(machineApi.util.invalidateTags(["Machine"]));
       showToast(t("entryAddedSuccess") || "Entry added successfully!");
       setShowModal(false);
     } catch {
@@ -71,6 +75,7 @@ const FinancialTracker = ({ machineId, uid }) => {
   const handleDelete = async (id) => {
     try {
       await deleteMaintenance({ id, machineId }).unwrap();
+      dispatch(machineApi.util.invalidateTags(["Machine"]));
       showToast(t("entryDeletedSuccess") || "Entry deleted successfully!");
       setDeleteId(null);
     } catch {
