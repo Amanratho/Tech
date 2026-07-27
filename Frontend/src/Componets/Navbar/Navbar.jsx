@@ -278,13 +278,21 @@ function Navbar() {
             />
           ) : null}
 
-          {uid ? (
-            <FaUserCircle size={location.pathname === "/profile" ? 22 : 20} className={`mb-1 transition-all duration-300 ${location.pathname === "/profile" ? "text-[var(--primary)]" : "text-[var(--nav-inactive)]"}`} />
-          ) : (
-            <FaSignInAlt size={location.pathname === "/login" ? 22 : 20} className={`mb-1 transition-all duration-300 ${location.pathname === "/login" ? "text-[var(--primary)]" : "text-[var(--nav-inactive)]"}`} />
-          )}
-          <span className={`text-[9px] font-bold no-underline transition-all duration-300 ${location.pathname === "/profile" || location.pathname === "/login" ? "text-[var(--primary)]" : "text-[var(--nav-inactive)]"
-            }`}>
+          <FaUserCircle
+            size={location.pathname === "/profile" || location.pathname === "/login" ? 22 : 20}
+            className={`mb-1 transition-all duration-300 ${
+              location.pathname === "/profile" || location.pathname === "/login"
+                ? "text-[var(--primary)]"
+                : "text-[var(--nav-inactive)]"
+            }`}
+          />
+          <span
+            className={`text-[9px] font-bold no-underline transition-all duration-300 ${
+              location.pathname === "/profile" || location.pathname === "/login"
+                ? "text-[var(--primary)]"
+                : "text-[var(--nav-inactive)]"
+            }`}
+          >
             {uid ? (t("profile") || "Profile") : (t("login") || "Login")}
           </span>
         </NavLink>
