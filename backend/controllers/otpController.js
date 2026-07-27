@@ -4,12 +4,15 @@ const otpGenerator = require("otp-generator");
 // In-memory storage for OTPs
 const otpStore = {};
 
-// Configure Nodemailer transporter
+// Configure Nodemailer transporter using Environment Variables
+const EMAIL_USER = (process.env.EMAIL_USER || process.env.GMAIL_USER || "rentvedasupport@gmail.com").trim();
+const EMAIL_PASS = (process.env.EMAIL_PASS || process.env.GMAIL_PASS || "").replace(/\s+/g, "");
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "techdiary562@gmail.com", // Your email
-    pass: "hvhr lkzg yfts onaf", // App password here
+    user: EMAIL_USER,
+    pass: EMAIL_PASS,
   },
 });
 
@@ -35,7 +38,7 @@ exports.sendOtp = async (req, res) => {
   try {
     // Send OTP to the user's email
     await transporter.sendMail({
-      from: "techdiary562@gmail.com",
+      from: EMAIL_USER,
       to: email,
       subject: "Your OTP Code",
       text: ` Your OTP code is ${otp}. It will expire in 5 minutes.`,
@@ -83,7 +86,7 @@ exports.sendContactEmail = async (req, res) => {
     // Email options
     const mailOptions = {
       from: email,
-      to: "techdiary562@gmail.com", // Your email where you want to receive messages
+      to: EMAIL_USER,
       subject: ` New Contact Message from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
     };
