@@ -35,7 +35,7 @@ const PaymentTracking = () => {
     const [paymentAmount, setPaymentAmount] = useState(0);
 
     const [searchQuery, setSearchQuery] = useState("");
-    const [filterType, setFilterType] = useState("all");
+    const [filterType, setFilterType] = useState("pending");
 
     // Form states for pre-filling and editing
     const [editCustomerName, setEditCustomerName] = useState("");
@@ -49,21 +49,21 @@ const PaymentTracking = () => {
     React.useEffect(() => {
         if (location.state && location.state.fromReminder) {
             const { customerName, mobileNumber, pendingAmount, machineId, reminderId, paidAmount } = location.state;
-            
+
             setEditCustomerName(customerName || "");
             setEditMobileNumber(mobileNumber || "");
             setEditMachineId(machineId || "");
             setPaymentAmount(pendingAmount || 0);
             setActiveReminderId(reminderId);
-            
+
             setSelectedEntry({
                 _id: reminderId,
                 pendingAmount: pendingAmount || 0,
                 paidAmount: paidAmount || 0
             });
-            
+
             setIsModalOpen(true);
-            
+
             // Clear router state to prevent re-triggering on refresh
             window.history.replaceState({}, document.title);
         }
@@ -120,7 +120,7 @@ const PaymentTracking = () => {
 
         if (numericPaymentAmount > 0) {
             if (numericPaymentAmount > selectedEntry.pendingAmount) {
-                toast.warn("Payment amount cannot exceed the pending amount.");
+                toast.warn(t('exceedPendingAmount') || "Payment amount cannot exceed the pending amount.");
                 return;
             }
 
@@ -139,7 +139,7 @@ const PaymentTracking = () => {
                     reminderId: activeReminderId // Can be used by backend to trigger reminder status change
                 }).unwrap();
 
-                toast.success("Payment updated successfully!");
+                toast.success(t('paymentUpdatedSuccess') || "Payment updated successfully!");
                 setIsModalOpen(false);
                 refetch();
 
@@ -152,10 +152,10 @@ const PaymentTracking = () => {
 
             } catch (error) {
                 console.error("Error updating payment:", error);
-                toast.error("Error updating payment.");
+                toast.error(t('paymentUpdateFailed') || "Error updating payment.");
             }
         } else {
-            toast.error("Please enter a valid amount.");
+            toast.error(t('enterValidAmount') || "Please enter a valid amount.");
         }
     };
 
@@ -179,33 +179,33 @@ const PaymentTracking = () => {
     if (error) return <div className="p-5 text-red-500">Error loading data</div>;
 
     return (
-        <div className="bg-[var(--bg-main)] min-h-screen pb-20 relative overflow-hidden">
+        <div className="bg-[var(--bg-main)] min-h-screen pt-16 pb-36 relative">
 
             {/* 1. MAIN SCREEN */}
-            <div className="sticky top-0 mt-16 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] pb-2">
+            <div className="sticky top-16 z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] pb-3">
                 <div className="px-4 py-3 flex justify-between items-center">
                     <h2 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest">
                         {t('paymentTrackingTitle') || "PAYMENT TRACKING"}
                     </h2>
-                    <span className="text-[9px] bg-white text-[var(--primary)] px-2 py-0.5 rounded border border-[var(--border-color)]">
+                    <span className="text-[10px] font-bold text-[#6c5000] bg-[#fbc02d]/20 border border-[#fbc02d] px-2.5 py-0.5 rounded-full">
                         {filteredUsers.length} Clients
                     </span>
                 </div>
 
-                <div className="px-4 mb-3">
+                <div className="px-4 mb-2">
                     <div className="relative">
-                        <FaSearch className="absolute left-3 top-2.5 text-[var(--text-muted)] text-xs" />
+                        <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-xs" />
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder={t('searchPlaceholder') || "Search client..."}
-                            className="w-full bg-white text-[var(--text-main)] pl-9 pr-3 py-2 rounded-full text-xs outline-none border border-[var(--border-color)] focus:border-[var(--primary)] transition-colors placeholder-[var(--text-muted)]"
+                            placeholder={t('searchPlaceholder') || "Search by customer name or mobile..."}
+                            className="w-full bg-[var(--bg-main)] text-[var(--text-main)] pl-9 pr-3 py-2.5 rounded-2xl text-xs outline-none border border-[var(--border-color)] focus:border-[var(--primary)] transition-all placeholder-[var(--text-muted)] font-medium shadow-inner"
                         />
                     </div>
                 </div>
 
-                <div className="px-4 flex gap-2">
+                <div className="px-4 flex gap-2 overflow-x-auto no-scrollbar">
                     {[
                         { label: t("filterAll") || "All Clients", val: "all" },
                         { label: t("filterPending") || "Pending Due", val: "pending" },
@@ -213,9 +213,10 @@ const PaymentTracking = () => {
                     ].map((f) => (
                         <button
                             key={f.val}
+                            type="button"
                             onClick={() => setFilterType(f.val)}
-                            className={`px-3 py-1 rounded-full text-[10px] font-bold border transition-all ${filterType === f.val
-                                ? "bg-[var(--primary)] text-black border-[var(--primary)]"
+                            className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${filterType === f.val
+                                ? "bg-[#fbc02d] text-[#6c5000] border-[#795900] font-bold shadow-sm"
                                 : "bg-transparent text-[var(--text-muted)] border-[var(--border-color)]"
                                 }`}
                         >
@@ -225,7 +226,8 @@ const PaymentTracking = () => {
                 </div>
             </div>
 
-            <div className="px-3 mt-3 space-y-2">
+            {/* ── CLIENT LIST (WITH PB-36 SCROLL CLEARANCE) ── */}
+            <main className="px-4 mt-3 pb-36 space-y-3 max-w-2xl mx-auto">
                 {filteredUsers.length === 0 ? (
                     <div className="text-center text-[var(--text-muted)] mt-10 text-xs">No clients found</div>
                 ) : (
@@ -275,7 +277,7 @@ const PaymentTracking = () => {
                         </motion.div>
                     ))
                 )}
-            </div>
+            </main>
 
             {/* 2. SUMMARY VIEW */}
             <AnimatePresence>
@@ -364,7 +366,14 @@ const PaymentTracking = () => {
                         >
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-[var(--text-main)] text-sm font-bold">{t('collectPaymentTitle')}</h3>
-                                <button onClick={() => setIsModalOpen(false)} className="text-[var(--text-muted)]"><FaTimes /></button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="w-8 h-8 rounded-full bg-[#f9f9f9] hover:bg-[#e8e8e8] text-[#4f4633] hover:text-[#1a1c1c] flex items-center justify-center transition-all cursor-pointer border border-[#e2e2e2] active:scale-90"
+                                    aria-label="Close"
+                                >
+                                    <FaTimes size={12} />
+                                </button>
                             </div>
 
                             <label className="text-[var(--text-muted)] text-[10px] block mb-1">{t('customerNameLabel')}</label>

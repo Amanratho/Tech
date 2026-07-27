@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
+import { machineApi } from "../../redux/functional/machineApiSlice";
 import {
   useGetMaintenanceByMachineQuery,
   useAddMaintenanceMutation,
@@ -26,6 +28,7 @@ const INCOME_CHIPS = ["chipScrapSale","chipRentalBonus","chipOvertime","chipLate
 
 const FinancialTracker = ({ machineId, uid }) => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   const { data: mData, isLoading } = useGetMaintenanceByMachineQuery(machineId, { skip: !machineId });
   const [addMaintenance, { isLoading: isAdding }] = useAddMaintenanceMutation();
   const [deleteMaintenance, { isLoading: isDeleting }] = useDeleteMaintenanceMutation();
@@ -61,103 +64,145 @@ const FinancialTracker = ({ machineId, uid }) => {
     if (!amount || Number(amount) <= 0) return;
     try {
       await addMaintenance({ type: modalType, amount: Number(amount), description, date, machineId, uid }).unwrap();
-      showToast(t("entryAddedSuccess"));
+      dispatch(machineApi.util.invalidateTags(["Machine"]));
+      showToast(t("entryAddedSuccess") || "Entry added successfully!");
       setShowModal(false);
-    } catch { showToast(t("entryAddFailed"), "error"); }
+    } catch {
+      showToast(t("entryAddFailed") || "Failed to add entry.", "error");
+    }
   };
 
   const handleDelete = async (id) => {
     try {
       await deleteMaintenance({ id, machineId }).unwrap();
-      showToast(t("entryDeletedSuccess"));
+      dispatch(machineApi.util.invalidateTags(["Machine"]));
+      showToast(t("entryDeletedSuccess") || "Entry deleted successfully!");
       setDeleteId(null);
-    } catch { showToast(t("entryDeleteFailed"), "error"); }
+    } catch {
+      showToast(t("entryDeleteFailed") || "Failed to delete entry.", "error");
+    }
   };
 
   const chips = modalType === "expense" ? EXPENSE_CHIPS : INCOME_CHIPS;
   const filtered = ledgerFilter === "all" ? entries : entries.filter(e => e.type === ledgerFilter);
 
   return (
-    <div className="space-y-3">
-      {/* Financial Summary */}
+    <div className="space-y-4">
+      {/* Financial Summary (Maintenance vs Extra Income) */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-[var(--bg-main)] p-3 rounded-lg border border-[var(--border-color)]">
-          <p className="text-[10px] text-[var(--text-muted)] flex items-center gap-1 mb-1">
-            <FaReceipt className="text-red-500" /> {t("totalExpenseLabel")}
+        <div className="bg-[#f9f9f9] p-3 rounded-xl border border-[#e2e2e2] shadow-inner">
+          <p className="text-[10px] text-[#4f4633] font-semibold flex items-center gap-1.5 mb-1">
+            <FaReceipt className="text-[#dc2626]" /> {t("totalExpenseLabel") || "Maintenance Expense"}
           </p>
-          <p className="text-red-500 text-sm font-bold">₹{totalExpense.toLocaleString()}</p>
+          <p className="text-[#dc2626] text-base font-extrabold">₹{totalExpense.toLocaleString()}</p>
         </div>
-        <div className="bg-[var(--bg-main)] p-3 rounded-lg border border-[var(--border-color)]">
-          <p className="text-[10px] text-[var(--text-muted)] flex items-center gap-1 mb-1">
-            <FaWallet className="text-emerald-500" /> {t("extraIncomeLabel")}
+        <div className="bg-[#f9f9f9] p-3 rounded-xl border border-[#e2e2e2] shadow-inner">
+          <p className="text-[10px] text-[#4f4633] font-semibold flex items-center gap-1.5 mb-1">
+            <FaWallet className="text-[#16a34a]" /> {t("extraIncomeLabel") || "Extra Income"}
           </p>
-          <p className="text-emerald-500 text-sm font-bold">₹{totalIncome.toLocaleString()}</p>
+          <p className="text-[#16a34a] text-base font-extrabold">₹{totalIncome.toLocaleString()}</p>
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Primary Action Buttons */}
       <div className="flex gap-2">
-        <button onClick={() => openModal("expense")}
-          className="flex-1 py-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-red-500/10 text-red-400 border border-red-500/20 active:bg-red-500 active:text-[var(--text-main)] transition-colors">
-          <FaPlus size={9}/> {t("addExpenseButton")}
+        <button
+          type="button"
+          onClick={() => openModal("expense")}
+          className="flex-1 py-3 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-2 bg-[#fee2e2] text-[#dc2626] border border-[#fecaca] hover:bg-[#fca5a5]/30 active:scale-95 transition-all cursor-pointer shadow-sm"
+        >
+          <FaPlus size={10} /> {t("addExpenseButton") || "Add Expense"}
         </button>
-        <button onClick={() => openModal("income")}
-          className="flex-1 py-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 active:bg-emerald-500 active:text-[var(--text-main)] transition-colors">
-          <FaPlus size={9}/> {t("addIncomeButton")}
+        <button
+          type="button"
+          onClick={() => openModal("income")}
+          className="flex-1 py-3 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-2 bg-[#dcfce7] text-[#16a34a] border border-[#bbf7d0] hover:bg-[#86efac]/30 active:scale-95 transition-all cursor-pointer shadow-sm"
+        >
+          <FaPlus size={10} /> {t("addIncomeButton") || "Add Income"}
         </button>
       </div>
 
-      {/* View Details Toggle */}
-      <button onClick={() => setShowLedger(!showLedger)}
-        className="w-full py-2 rounded-xl text-[10px] font-bold tracking-wide flex items-center justify-center gap-1.5 bg-[var(--bg-main)] text-[var(--text-muted)] border border-[var(--border-color)] active:text-[var(--primary)] transition-colors">
-        {showLedger ? t("hideDetailsButton") : t("viewDetailsButton")}
-        {showLedger ? <FaChevronUp size={9}/> : <FaChevronDown size={9}/>}
+      {/* Ledger Details Toggle */}
+      <button
+        type="button"
+        onClick={() => setShowLedger(!showLedger)}
+        className="w-full py-2.5 rounded-2xl text-xs font-bold tracking-wide flex items-center justify-center gap-2 bg-[#f9f9f9] hover:bg-[#eeeeee] text-[#4f4633] border border-[#e2e2e2] transition-colors cursor-pointer"
+      >
+        <span>{showLedger ? (t("hideDetailsButton") || "Hide Ledger History") : (t("viewDetailsButton") || "View Ledger History")}</span>
+        {showLedger ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
       </button>
 
       {/* Transaction Ledger */}
       <AnimatePresence>
         {showLedger && (
-          <motion.div initial={{height:0,opacity:0}} animate={{height:"auto",opacity:1}} exit={{height:0,opacity:0}} className="overflow-hidden">
-            <div className="bg-[var(--bg-main)] rounded-xl border border-[var(--border-color)] p-3">
-              <h4 className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest mb-2">{t("transactionLedger")}</h4>
-              
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="bg-[#f9f9f9] rounded-2xl border border-[#e2e2e2] p-4 space-y-3">
+              <h4 className="text-[#4f4633] text-xs font-bold uppercase tracking-widest">
+                {t("transactionLedger") || "Transaction History"}
+              </h4>
+
               {/* Filter Tabs */}
-              <div className="flex gap-1.5 mb-3">
-                {["all","income","expense"].map(f => (
-                  <button key={f} onClick={() => setLedgerFilter(f)}
-                    className={`px-3 py-1 rounded-full text-[9px] font-bold border transition-all ${
-                      ledgerFilter === f ? "bg-[var(--primary)] text-black border-[var(--primary)]" : "bg-transparent text-[var(--text-muted)] border-[var(--border-color)]"
-                    }`}>
-                    {f === "all" ? t("filterAllLabel") : f === "income" ? t("incomeType") : t("expenseType")}
+              <div className="flex gap-2">
+                {["all", "income", "expense"].map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setLedgerFilter(f)}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                      ledgerFilter === f
+                        ? "bg-[#fbc02d] text-[#6c5000] border-[#795900] font-bold shadow-sm"
+                        : "bg-white text-[#4f4633] border-[#e2e2e2]"
+                    }`}
+                  >
+                    {f === "all" ? (t("filterAllLabel") || "All") : f === "income" ? (t("incomeType") || "Income") : (t("expenseType") || "Expense")}
                   </button>
                 ))}
               </div>
 
               {/* Entries List */}
               {filtered.length === 0 ? (
-                <p className="text-[var(--text-muted)] text-[10px] text-center py-4">{t("noTransactions")}</p>
+                <p className="text-[#4f4633] text-xs text-center py-6 font-medium">
+                  {t("noTransactions") || "No maintenance or income transactions recorded."}
+                </p>
               ) : (
-                <div className="space-y-1.5 max-h-64 overflow-y-auto">
-                  {filtered.map(entry => (
-                    <div key={entry._id} className="flex items-center justify-between bg-white p-2.5 rounded-lg border border-[var(--border-color)]">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          entry.type === "income" ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
-                        }`}>
-                          {entry.type === "income" ? <FaArrowUp size={9}/> : <FaArrowDown size={9}/>}
+                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                  {filtered.map((entry) => (
+                    <div
+                      key={entry._id}
+                      className="flex items-center justify-between bg-white p-3 rounded-xl border border-[#e2e2e2] shadow-sm"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div
+                          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            entry.type === "income" ? "bg-[#dcfce7] text-[#16a34a]" : "bg-[#fee2e2] text-[#dc2626]"
+                          }`}
+                        >
+                          {entry.type === "income" ? <FaArrowUp size={10} /> : <FaArrowDown size={10} />}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[var(--text-main)] text-[11px] font-medium truncate">{entry.description || (entry.type === "income" ? t("incomeType") : t("expenseType"))}</p>
-                          <p className="text-[var(--text-muted)] text-[9px]">{new Date(entry.date).toLocaleDateString()}</p>
+                          <p className="text-[#1a1c1c] text-xs font-bold truncate">
+                            {entry.description || (entry.type === "income" ? (t("incomeType") || "Income") : (t("expenseType") || "Expense"))}
+                          </p>
+                          <p className="text-[#4f4633] text-[10px]">
+                            {new Date(entry.date).toLocaleDateString()}
+                          </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`text-xs font-bold ${entry.type === "income" ? "text-emerald-400" : "text-red-400"}`}>
-                          {entry.type === "income" ? "+" : "-"}₹{entry.amount.toLocaleString()}
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <span className={`text-xs font-extrabold ${entry.type === "income" ? "text-[#16a34a]" : "text-[#dc2626]"}`}>
+                          {entry.type === "income" ? "+" : "-"}₹{Number(entry.amount || 0).toLocaleString()}
                         </span>
-                        <button onClick={() => setDeleteId(entry._id)}
-                          className="w-5 h-5 rounded-full flex items-center justify-center text-[var(--text-muted)] active:text-red-400">
-                          <FaTrashAlt size={8}/>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteId(entry._id)}
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-[#4f4633] hover:text-[#dc2626] hover:bg-red-50 transition-colors cursor-pointer"
+                        >
+                          <FaTrashAlt size={10} />
                         </button>
                       </div>
                     </div>
@@ -169,99 +214,171 @@ const FinancialTracker = ({ machineId, uid }) => {
         )}
       </AnimatePresence>
 
-      {/* Add Entry Modal */}
+      {/* ── ADD ENTRY MODAL ── */}
       <AnimatePresence>
         {showModal && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <motion.div initial={{y:"100%",opacity:0}} animate={{y:0,opacity:1}} exit={{y:"100%",opacity:0}}
-              transition={{type:"spring",damping:25,stiffness:200}}
-              className="bg-white w-full max-w-sm rounded-3xl p-5 border border-[var(--border-color)] mb-4 sm:mb-0 max-h-[85vh] overflow-y-auto">
-              
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-[var(--text-main)] font-bold text-sm flex items-center gap-2">
-                  {modalType === "expense" ? <FaReceipt className="text-red-400"/> : <FaWallet className="text-emerald-400"/>}
-                  {t("addEntryTitle")}
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <motion.div
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="bg-white w-full max-w-sm rounded-3xl p-6 border border-[#e2e2e2] mb-4 sm:mb-0 max-h-[85vh] overflow-y-auto shadow-2xl space-y-4"
+            >
+              <div className="flex justify-between items-center pb-2 border-b border-[#e2e2e2]">
+                <h3 className="text-[#1a1c1c] font-bold text-base flex items-center gap-2">
+                  {modalType === "expense" ? <FaReceipt className="text-[#dc2626]" /> : <FaWallet className="text-[#16a34a]" />}
+                  {t("addEntryTitle") || (modalType === "expense" ? "Add Maintenance Expense" : "Add Extra Income")}
                 </h3>
-                <button onClick={() => setShowModal(false)} className="text-[var(--text-muted)] p-1"><FaTimes/></button>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="text-[#4f4633] hover:text-black p-1 rounded-full cursor-pointer"
+                >
+                  <FaTimes size={16} />
+                </button>
               </div>
 
-              {/* Type Selector */}
-              <div className="flex gap-2 mb-4">
-                {["expense","income"].map(tp => (
-                  <button key={tp} onClick={() => setModalType(tp)}
-                    className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all ${
+              {/* Type Switcher */}
+              <div className="flex gap-2">
+                {["expense", "income"].map((tp) => (
+                  <button
+                    key={tp}
+                    type="button"
+                    onClick={() => setModalType(tp)}
+                    className={`flex-1 py-2.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer ${
                       modalType === tp
-                        ? tp === "expense" ? "bg-red-500 text-[var(--text-main)] border-red-500" : "bg-emerald-500 text-[var(--text-main)] border-emerald-500"
-                        : "bg-transparent text-[var(--text-muted)] border-[var(--border-color)]"
-                    }`}>
-                    {tp === "expense" ? t("expenseType") : t("incomeType")}
+                        ? tp === "expense"
+                          ? "bg-[#fee2e2] text-[#dc2626] border-[#fecaca] shadow-sm"
+                          : "bg-[#dcfce7] text-[#16a34a] border-[#bbf7d0] shadow-sm"
+                        : "bg-[#f9f9f9] text-[#4f4633] border-[#e2e2e2]"
+                    }`}
+                  >
+                    {tp === "expense" ? (t("expenseType") || "Expense") : (t("incomeType") || "Income")}
                   </button>
                 ))}
               </div>
 
-              {/* Amount */}
-              <div className="mb-3">
-                <label className="text-[var(--text-muted)] text-[10px] block mb-1">{t("amountLabel")} (₹)</label>
-                <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder={t("enterAmount")}
-                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-sm border border-[var(--border-color)] focus:border-[var(--primary)] outline-none transition-colors"/>
+              {/* Curved Amount Input */}
+              <div>
+                <label className="text-[#4f4633] text-xs font-semibold block mb-1">
+                  {t("amountLabel") || "Amount"} (₹)
+                </label>
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder={t("enterAmount") || "Enter amount in ₹..."}
+                  className="w-full bg-[#f9f9f9] text-[#1a1c1c] px-4 py-3 rounded-2xl text-sm font-bold border border-[#e2e2e2] focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all shadow-inner"
+                />
               </div>
 
-              {/* Description */}
-              <div className="mb-2">
-                <label className="text-[var(--text-muted)] text-[10px] block mb-1">{t("descriptionLabel")}</label>
-                <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder={t("enterDescription")}
-                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-xs border border-[var(--border-color)] focus:border-[var(--primary)] outline-none transition-colors"/>
+              {/* Curved Description Input */}
+              <div>
+                <label className="text-[#4f4633] text-xs font-semibold block mb-1">
+                  {t("descriptionLabel") || "Description / Category"}
+                </label>
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={t("enterDescription") || "e.g. Engine Oil, Fuel, Overtime..."}
+                  className="w-full bg-[#f9f9f9] text-[#1a1c1c] px-4 py-3 rounded-2xl text-xs font-medium border border-[#e2e2e2] focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all shadow-inner"
+                />
               </div>
 
               {/* Quick Chips */}
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {chips.map(c => (
-                  <button key={c} onClick={() => setDescription(t(c))}
-                    className={`px-2.5 py-1 rounded-full text-[9px] font-bold border transition-all ${
-                      description === t(c)
-                        ? "bg-[var(--primary)] text-black border-[var(--primary)]"
-                        : "bg-[var(--bg-main)] text-[var(--text-muted)] border-[var(--border-color)]"
-                    }`}>
-                    {t(c)}
-                  </button>
-                ))}
+              <div>
+                <p className="text-[10px] text-[#4f4633] font-bold uppercase tracking-wider mb-2">
+                  Quick Select Categories
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {chips.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setDescription(t(c) || c)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                        description === (t(c) || c)
+                          ? "bg-[#fbc02d] text-[#6c5000] border-[#795900] font-bold shadow-sm"
+                          : "bg-[#f9f9f9] text-[#4f4633] border-[#e2e2e2] hover:bg-[#e8e8e8]"
+                      }`}
+                    >
+                      {t(c) || c}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {/* Date */}
-              <div className="mb-5">
-                <label className="text-[var(--text-muted)] text-[10px] block mb-1">{t("dateLabel")}</label>
-                <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] px-3 py-2.5 rounded-xl text-xs border border-[var(--border-color)] focus:border-[var(--primary)] outline-none transition-colors"/>
+              {/* Curved Date Input */}
+              <div>
+                <label className="text-[#4f4633] text-xs font-semibold block mb-1">
+                  {t("dateLabel") || "Date"}
+                </label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full bg-[#f9f9f9] text-[#1a1c1c] px-4 py-3 rounded-2xl text-xs font-medium border border-[#e2e2e2] focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all cursor-pointer shadow-inner"
+                />
               </div>
 
-              {/* Save */}
-              <button onClick={handleSave} disabled={isAdding || !amount}
-                className={`w-full py-3.5 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2 ${
-                  modalType === "expense" ? "bg-red-500 text-[var(--text-main)] shadow-red-500/20" : "bg-emerald-500 text-[var(--text-main)] shadow-emerald-500/20"
-                }`}>
-                {isAdding ? <><FaSpinner className="animate-spin" size={14}/> {t("savingButton")}</> : <><FaCheck size={12}/> {t("saveButton")}</>}
+              {/* Save Button */}
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={isAdding || !amount}
+                className={`w-full py-4 rounded-2xl font-bold text-sm shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 ${
+                  modalType === "expense"
+                    ? "bg-[#dc2626] text-white hover:bg-red-700 shadow-red-500/20"
+                    : "bg-[#16a34a] text-white hover:bg-green-700 shadow-green-500/20"
+                }`}
+              >
+                {isAdding ? (
+                  <>
+                    <FaSpinner className="animate-spin" size={14} /> {t("savingButton") || "Saving..."}
+                  </>
+                ) : (
+                  <>
+                    <FaCheck size={14} /> {t("saveButton") || "Save Transaction"}
+                  </>
+                )}
               </button>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* Delete Confirmation */}
+      {/* Delete Confirmation Modal */}
       <AnimatePresence>
         {deleteId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <motion.div initial={{scale:0.9,opacity:0}} animate={{scale:1,opacity:1}} exit={{scale:0.9,opacity:0}}
-              className="bg-white w-full max-w-xs rounded-2xl p-5 border border-[var(--border-color)] text-center">
-              <FaExclamationTriangle size={24} className="text-red-500 mx-auto mb-3"/>
-              <p className="text-[var(--text-main)] text-sm font-bold mb-1">{t("deleteEntryConfirm")}</p>
-              <div className="flex gap-3 mt-4">
-                <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 bg-[var(--bg-main)] border border-[var(--border-color)] text-[var(--text-main)] rounded-xl text-xs font-bold active:scale-95 transition-all">
-                  {t("cancelButton")}
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white w-full max-w-xs rounded-3xl p-6 border border-[#e2e2e2] text-center shadow-2xl space-y-3"
+            >
+              <FaExclamationTriangle size={28} className="text-[#dc2626] mx-auto" />
+              <p className="text-[#1a1c1c] text-sm font-bold">
+                {t("deleteEntryConfirm") || "Are you sure you want to delete this transaction?"}
+              </p>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setDeleteId(null)}
+                  className="flex-1 py-3 bg-[#f9f9f9] border border-[#e2e2e2] text-[#1a1c1c] rounded-2xl text-xs font-bold active:scale-95 transition-all cursor-pointer"
+                >
+                  {t("cancelButton") || "Cancel"}
                 </button>
-                <button onClick={() => handleDelete(deleteId)} disabled={isDeleting}
-                  className="flex-1 py-2.5 bg-red-500 text-[var(--text-main)] rounded-xl text-xs font-bold active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-1">
-                  {isDeleting ? <FaSpinner className="animate-spin" size={12}/> : <FaTrashAlt size={10}/>}
-                  {t("deleteButton")}
+                <button
+                  type="button"
+                  onClick={() => handleDelete(deleteId)}
+                  disabled={isDeleting}
+                  className="flex-1 py-3 bg-[#dc2626] text-white rounded-2xl text-xs font-bold active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-red-500/20"
+                >
+                  {isDeleting ? <FaSpinner className="animate-spin" size={12} /> : <FaTrashAlt size={12} />}
+                  {t("deleteButton") || "Delete"}
                 </button>
               </div>
             </motion.div>
@@ -269,15 +386,21 @@ const FinancialTracker = ({ machineId, uid }) => {
         )}
       </AnimatePresence>
 
-      {/* Toast */}
+      {/* Toast Notification */}
       <AnimatePresence>
         {toast.show && (
-          <motion.div initial={{y:80,opacity:0}} animate={{y:0,opacity:1}} exit={{y:80,opacity:0}}
-            className={`fixed bottom-20 left-4 right-4 z-[60] flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold shadow-xl border ${
-              toast.type === "success" ? "bg-green-900/90 text-green-300 border-green-700" : "bg-red-900/90 text-red-300 border-red-700"
-            }`}>
-            {toast.type === "success" ? <FaCheck size={14}/> : <FaExclamationTriangle size={14}/>}
-            {toast.msg}
+          <motion.div
+            initial={{ y: 60, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 60, opacity: 0 }}
+            className={`fixed bottom-20 left-4 right-4 z-[60] flex items-center gap-2 px-4 py-3.5 rounded-2xl text-xs font-bold shadow-2xl border ${
+              toast.type === "success"
+                ? "bg-[#16a34a] text-white border-green-600"
+                : "bg-[#dc2626] text-white border-red-600"
+            }`}
+          >
+            {toast.type === "success" ? <FaCheck size={14} /> : <FaExclamationTriangle size={14} />}
+            <span>{toast.msg}</span>
           </motion.div>
         )}
       </AnimatePresence>

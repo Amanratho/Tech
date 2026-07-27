@@ -164,16 +164,38 @@ exports.getMachineSummaryByUid = async (req, res) => {
       {
         $lookup: {
           from: "rentals",
-          localField: "Machine_id",
-          foreignField: "machineId",
+          let: { mUuid: "$Machine_id", mObjId: { $toString: "$_id" } },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $eq: ["$machineId", "$$mUuid"] },
+                    { $eq: ["$machineId", "$$mObjId"] }
+                  ]
+                }
+              }
+            }
+          ],
           as: "rentalsData"
         }
       },
       {
         $lookup: {
           from: "maintenances",
-          localField: "Machine_id",
-          foreignField: "machineId",
+          let: { mUuid: "$Machine_id", mObjId: { $toString: "$_id" } },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $eq: ["$machineId", "$$mUuid"] },
+                    { $eq: ["$machineId", "$$mObjId"] }
+                  ]
+                }
+              }
+            }
+          ],
           as: "maintenanceData"
         }
       },

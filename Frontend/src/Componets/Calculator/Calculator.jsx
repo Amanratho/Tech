@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { FaChevronLeft, FaBackspace, FaHistory } from "react-icons/fa";
+import { FaBackspace } from "react-icons/fa";
 
 const Calculator = () => {
-  const navigate = useNavigate();
-
   // States for Calculator Logic
   const [display, setDisplay] = useState("0");
   const [equation, setEquation] = useState("");
@@ -40,7 +37,9 @@ const Calculator = () => {
 
       const result = new Function(`'use strict'; return (${mathEquation})`)();
 
-      const formattedResult = Number.isInteger(result) ? result.toString() : result.toFixed(4).replace(/\.?0+$/, "");
+      const formattedResult = Number.isInteger(result)
+        ? result.toString()
+        : result.toFixed(4).replace(/\.?0+$/, "");
 
       setDisplay(formattedResult);
       setEquation("");
@@ -72,53 +71,48 @@ const Calculator = () => {
 
   const handlePercentage = () => {
     const value = parseFloat(display);
+    if (isNaN(value)) return;
     setDisplay((value / 100).toString());
     setIsResult(true);
   };
 
-  // Button UI Components
+  // Sleek, Compact Round Button UI Components
   const CalcBtn = ({ label, onClick, type = "number", className = "" }) => {
-    let baseStyle = "flex items-center justify-center text-3xl font-medium rounded-full active:scale-90 transition-transform select-none ";
+    let baseStyle =
+      "flex items-center justify-center text-lg font-bold rounded-full active:scale-95 transition-all select-none cursor-pointer py-3.5 ";
 
-    if (type === "number") baseStyle += "bg-white text-[var(--text-main)] hover:bg-[var(--bg-input)]";
-    if (type === "operator") baseStyle += "bg-[var(--primary)] text-black font-bold hover:bg-yellow-500 shadow-lg shadow-[var(--primary)]/20";
-    if (type === "function") baseStyle += "bg-gray-200 text-[var(--text-main)] hover:bg-gray-300";
-    if (type === "zero") baseStyle += "bg-white text-[var(--text-main)] hover:bg-[var(--bg-input)] col-span-2 rounded-[2rem] justify-start pl-10";
+    if (type === "number")
+      baseStyle += "bg-white text-[#1a1c1c] border border-[#e2e2e2] hover:bg-[#f9f9f9] shadow-sm";
+    if (type === "operator")
+      baseStyle += "bg-[#fbc02d] text-[#6c5000] border border-[#795900] font-extrabold hover:bg-[#f8bd2a] shadow-sm shadow-[#fbc02d]/20 text-xl";
+    if (type === "function")
+      baseStyle += "bg-[#eeeeee] text-[#4f4633] border border-[#e2e2e2] hover:bg-[#e8e8e8]";
+    if (type === "zero")
+      baseStyle += "bg-white text-[#1a1c1c] border border-[#e2e2e2] hover:bg-[#f9f9f9] col-span-2 rounded-full justify-start pl-8 shadow-sm";
 
     return (
-      <button onClick={() => onClick(label)} className={`${baseStyle} ${className}`}>
+      <button type="button" onClick={() => onClick(label)} className={`${baseStyle} ${className}`}>
         {label}
       </button>
     );
   };
 
   return (
-    <div className="bg-[var(--bg-main)] h-[100dvh] w-full flex flex-col font-sans overflow-hidden fixed top-0 left-0 z-50">
-
-      {/* 1. APP HEADER */}
-      <div className="px-4 py-4 flex items-center justify-between border-b border-[var(--border-color)]">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-3 -ml-3 rounded-full active:bg-[var(--bg-input)] text-[var(--text-main)] transition-colors"
-        >
-          <FaChevronLeft size={20} />
-        </button>
-        <h1 className="text-[var(--text-muted)] text-sm font-bold tracking-widest uppercase">
-          Calculator
-        </h1>
-        <button className="p-3 -mr-3 rounded-full active:bg-[var(--bg-input)] text-[var(--text-muted)] transition-colors">
-          <FaHistory size={18} />
-        </button>
-      </div>
-
-      {/* 2. DISPLAY AREA */}
-      <div className="flex-1 flex flex-col justify-end p-6 items-end relative w-full">
-        <div className="text-[var(--text-muted)] text-2xl h-8 mb-2 font-mono tracking-wider w-full text-right overflow-hidden text-ellipsis whitespace-nowrap">
+    <div className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen pt-16 pb-[64px] flex flex-col justify-end w-full max-w-sm mx-auto font-sans">
+      {/* ── COMPACT BORDERLESS OPEN DISPLAY AREA ── */}
+      <div className="flex-1 flex flex-col justify-end p-5 items-end relative w-full min-h-[120px]">
+        <div className="text-[#4f4633] text-sm h-5 mb-1 font-mono tracking-wider w-full text-right overflow-hidden text-ellipsis whitespace-nowrap font-medium">
           {equation}
         </div>
         <div className="w-full overflow-x-auto no-scrollbar text-right">
           <span
-            className={`text-[var(--text-main)] font-light tracking-tighter ${display.length > 10 ? 'text-5xl' : 'text-7xl'}`}
+            className={`text-[#1a1c1c] font-extrabold tracking-tight ${
+              display.length > 12
+                ? "text-2xl"
+                : display.length > 8
+                ? "text-3xl"
+                : "text-4xl"
+            }`}
             style={{ WebkitUserSelect: "none" }}
           >
             {display}
@@ -126,22 +120,26 @@ const Calculator = () => {
         </div>
       </div>
 
-      {/* 3. KEYPAD AREA */}
-      <div className="w-full p-4 pb-8 bg-white rounded-t-[2.5rem] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-        <div className="grid grid-cols-4 gap-4 max-w-md mx-auto aspect-[4/5]">
-
+      {/* ── COMPACT SLEEK KEYPAD CONTAINER (FLUSH TO BOTTOM NAVBAR) ── */}
+      <div className="w-full p-4 pb-3 bg-white rounded-t-[2rem] shadow-[0_-6px_25px_rgba(0,0,0,0.08)] border-t border-[#e2e2e2]">
+        <div className="grid grid-cols-4 gap-3 max-w-xs mx-auto">
           <CalcBtn label="AC" onClick={handleClear} type="function" />
 
-          {/* 🔥 BACKSPACE BUTTON (X) 🔥 */}
+          {/* Backspace Button */}
           <button
+            type="button"
             onClick={handleDelete}
-            className="flex items-center justify-center bg-gray-200 text-[var(--text-main)] hover:bg-gray-300 rounded-full active:scale-90 transition-transform select-none"
+            className="flex items-center justify-center bg-[#eeeeee] text-[#4f4633] border border-[#e2e2e2] hover:bg-[#e8e8e8] rounded-full active:scale-95 transition-all select-none cursor-pointer py-3.5"
           >
-            <FaBackspace size={24} />
+            <FaBackspace size={18} />
           </button>
 
           <CalcBtn label="%" onClick={handlePercentage} type="function" />
-          <button onClick={handleOperator.bind(null, '÷')} className="flex items-center justify-center text-4xl bg-[var(--primary)] text-black font-bold rounded-full active:scale-90 transition-transform shadow-lg shadow-[var(--primary)]/20 pb-1">
+          <button
+            type="button"
+            onClick={() => handleOperator("÷")}
+            className="flex items-center justify-center text-xl bg-[#fbc02d] text-[#6c5000] border border-[#795900] font-extrabold rounded-full active:scale-95 transition-all shadow-sm shadow-[#fbc02d]/20 py-3.5 cursor-pointer"
+          >
             ÷
           </button>
 
@@ -149,7 +147,11 @@ const Calculator = () => {
           <CalcBtn label="7" onClick={handleNumber} />
           <CalcBtn label="8" onClick={handleNumber} />
           <CalcBtn label="9" onClick={handleNumber} />
-          <button onClick={handleOperator.bind(null, '×')} className="flex items-center justify-center text-3xl bg-[var(--primary)] text-black font-bold rounded-full active:scale-90 transition-transform shadow-lg shadow-[var(--primary)]/20 pb-1">
+          <button
+            type="button"
+            onClick={() => handleOperator("×")}
+            className="flex items-center justify-center text-xl bg-[#fbc02d] text-[#6c5000] border border-[#795900] font-extrabold rounded-full active:scale-95 transition-all shadow-sm shadow-[#fbc02d]/20 py-3.5 cursor-pointer"
+          >
             ×
           </button>
 
@@ -157,24 +159,26 @@ const Calculator = () => {
           <CalcBtn label="4" onClick={handleNumber} />
           <CalcBtn label="5" onClick={handleNumber} />
           <CalcBtn label="6" onClick={handleNumber} />
-          <CalcBtn label="-" onClick={handleOperator} type="operator" className="text-4xl pb-1" />
+          <CalcBtn label="-" onClick={handleOperator} type="operator" />
 
           {/* Row 4 */}
           <CalcBtn label="1" onClick={handleNumber} />
           <CalcBtn label="2" onClick={handleNumber} />
           <CalcBtn label="3" onClick={handleNumber} />
-          <CalcBtn label="+" onClick={handleOperator} type="operator" className="text-4xl pb-1" />
+          <CalcBtn label="+" onClick={handleOperator} type="operator" />
 
           {/* Row 5 */}
           <CalcBtn label="0" onClick={handleNumber} type="zero" />
-          <CalcBtn label="." onClick={handleNumber} className="text-4xl pb-3" />
-          <button onClick={calculate} className="flex items-center justify-center text-3xl bg-green-500 text-[var(--text-main)] font-bold rounded-full active:scale-90 transition-transform shadow-lg shadow-green-500/20">
+          <CalcBtn label="." onClick={handleNumber} />
+          <button
+            type="button"
+            onClick={calculate}
+            className="flex items-center justify-center text-xl bg-[#16a34a] hover:bg-green-700 text-white font-extrabold rounded-full active:scale-95 transition-all shadow-sm shadow-green-500/20 py-3.5 cursor-pointer"
+          >
             =
           </button>
-
         </div>
       </div>
-
     </div>
   );
 };

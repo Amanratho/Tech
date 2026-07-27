@@ -150,57 +150,29 @@ const StartEntry = () => {
     setPaidAmount((total || 0) - validPendingAmount);
   };
 
-  // --- LOGIC: FETCH CUSTOMER (scoped to logged-in user) ---
-  // const fetchCustomerByMobile = async (mobile) => {
-  //   const uid = localStorage.getItem("uid");
-  //   if (!uid) return;
-  //   try {
-  //     const response = await axios.get(
-  //       `${API_BASE_URL}/api/rentals/customer/${mobile}`,
-  //       { params: { uid } }   // <-- scoped: only THIS user's records
-  //     );
-  //     if (response.data) {
-  //       setCustomerName(response.data.customerName);
-  //       setAddress(response.data.address);
-  //       setIsCustomerFound(true);
-  //       toast.success("Existing Customer Found!", { theme: "light" });
-  //     }
-  //   } catch {
-  //     // 404 just means new customer — silently clear
-  //     setCustomerName("");
-  //     setAddress("");
-  //   }
-  // };
-
-  // --- LOGIC: FETCH CUSTOMER (scoped to logged-in user) ---
   const fetchCustomerByMobile = async (mobile, isFromContactPicker = false) => {
     const uid = localStorage.getItem("uid");
     if (!uid) return;
     try {
       const response = await axios.get(
         `${API_BASE_URL}/api/rentals/customer/${mobile}`,
-        { params: { uid } }   // <-- scoped: only THIS user's records
+        { params: { uid } }
       );
-      if (response.data) {
-        // Agar database me purana record mil gaya, toh usko use karenge
+      if (response.data) { 
         setCustomerName(response.data.customerName);
         setAddress(response.data.address);
         setIsCustomerFound(true);
         toast.success(t('existingCustomerFound') || "Existing Customer Found!", { theme: "light" });
       }
-    } catch {
-      // 🚨 YAHAN FIX HAI: 
-      // Agar contact picker se naam aaya hai, toh use erase mat karo. 
-      // Sirf tab erase karo jab user manually type kar raha ho.
+    } catch { 
       if (!isFromContactPicker) {
         setCustomerName("");
       }
-      setAddress(""); // Address hamesha naya hoga naye number ke liye
+      setAddress("");  
     }
   };
 
-  const handleMobileNumberChange = async (e) => {
-    // Strip anything except digits for mobile number specifically
+  const handleMobileNumberChange = async (e) => { 
     const mobile = e.target.value.replace(/\D/g, "");
     setMobileNumber(mobile);
     setIsCustomerFound(false);
@@ -212,16 +184,8 @@ const StartEntry = () => {
     }
   };
 
-  // --- LOGIC: NATIVE CONTACT PICKER ---
-  // ⚡ KEY FIX: The @capacitor-community/contacts v8 plugin's pickContact()
-  //    method INTERNALLY handles requestPermissions(). Calling requestPermissions()
-  //    separately BEFORE pickContact() creates a double-prompt race condition
-  //    that causes "Could not open contact picker" on some Android devices.
-  //    Solution: Let pickContact() manage permissions on its own, and only
-  //    pre-check with checkPermissions() to show a user-friendly denial message.
 
-  const handleContactPicker = async () => {
-    // Derive current language for bilingual alerts
+  const handleContactPicker = async () => { 
     const currentLang = i18n.language?.startsWith("hi") ? "hi" : "en";
 
     // ─── WEB FALLBACK: if running in a normal browser (not Capacitor) ───
@@ -452,10 +416,10 @@ const StartEntry = () => {
   };
 
   return (
-    <div className="bg-[var(--bg-main)] min-h-screen flex flex-col pb-20 relative">
+    <div className="bg-[var(--bg-main)] min-h-screen flex flex-col pt-16 pb-28 relative">
 
       {/* 1. APP HEADER */}
-      <div className="sticky top-0 z-30 bg-[var(--bg-main)] border-b border-[var(--border-color)] px-4 py-3 flex items-center gap-3">
+      <div className="sticky top-16 z-30 bg-[var(--bg-main)] border-b border-[var(--border-color)] px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 rounded-full active:bg-[var(--bg-input)] text-[var(--text-main)]"

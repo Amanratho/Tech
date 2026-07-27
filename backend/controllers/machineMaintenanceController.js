@@ -1,4 +1,6 @@
 const Maintenance = require("../models/machineMaintenanceModel");
+const machineRegModel = require("../models/machineRegModel");
+const mongoose = require("mongoose");
 
 // Add a new maintenance entry
 exports.addMaintenance = async (req, res) => {
@@ -12,11 +14,24 @@ exports.addMaintenance = async (req, res) => {
       });
     }
 
+    // Ensure machineId uses canonical Machine_id if found
+    let canonicalMachineId = machineId;
+    const isValidObjectId = mongoose.Types.ObjectId.isValid(machineId);
+    const machine = await machineRegModel.findOne({
+      $or: [
+        { Machine_id: machineId },
+        ...(isValidObjectId ? [{ _id: machineId }] : [])
+      ]
+    });
+    if (machine && machine.Machine_id) {
+      canonicalMachineId = machine.Machine_id;
+    }
+
     const newMaintenance = await Maintenance.create({
       type,
       amount,
       description: description || "",
-      machineId,
+      machineId: canonicalMachineId,
       uid,
       date: date ? new Date(date) : new Date(),
     });
@@ -38,7 +53,21 @@ exports.getMaintenanceByMachine = async (req, res) => {
   const { type } = req.query;
 
   try {
-    const query = { machineId };
+    const isValidObjectId = mongoose.Types.ObjectId.isValid(machineId);
+    const machine = await machineRegModel.findOne({
+      $or: [
+        { Machine_id: machineId },
+        ...(isValidObjectId ? [{ _id: machineId }] : [])
+      ]
+    });
+
+    const machineIdList = [machineId];
+    if (machine) {
+      if (machine.Machine_id) machineIdList.push(String(machine.Machine_id));
+      if (machine._id) machineIdList.push(String(machine._id));
+    }
+
+    const query = { machineId: { $in: machineIdList } };
 
     if (type) query.type = type; // Filter by type (income/expense) if provided
 

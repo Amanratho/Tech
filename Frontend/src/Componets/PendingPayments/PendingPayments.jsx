@@ -23,6 +23,7 @@ import {
   FaTrashAlt,
   FaCheckCircle,
   FaTimes,
+  FaBell,
 } from "react-icons/fa";
 
 const PendingPayments = () => {
@@ -69,15 +70,15 @@ const PendingPayments = () => {
 
   // Helper: Get status label and color styling for dates
   const getDateStatus = (dateString) => {
-    if (!dateString) return { label: t("reminderStatusNoDate") || "No Date",  color: "text-[var(--text-muted)]",  bg: "bg-gray-500/10",  border: "border-gray-500/20" };
+    if (!dateString) return { label: t("reminderStatusNoDate") || "No Date", color: "text-[#4f4633]", bg: "bg-gray-100", border: "border-gray-200" };
     const date = new Date(dateString);
     if (isToday(date)) {
-      return { label: t("reminderStatusDueToday") || "Due Today", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" };
+      return { label: t("reminderStatusDueToday") || "Due Today", color: "text-[#d97706]", bg: "bg-[#fef3c7]", border: "border-amber-200" };
     }
     if (isPast(date)) {
-      return { label: t("reminderStatusOverdue")  || "Overdue",   color: "text-red-400",   bg: "bg-red-500/10",   border: "border-red-500/20" };
+      return { label: t("reminderStatusOverdue") || "Overdue", color: "text-[#dc2626]", bg: "bg-[#fee2e2]", border: "border-red-200" };
     }
-    return { label: t("reminderStatusUpcoming") || "Upcoming", color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" };
+    return { label: t("reminderStatusUpcoming") || "Upcoming", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200" };
   };
 
   // Filter Logic
@@ -102,21 +103,17 @@ const PendingPayments = () => {
     return true;
   });
 
-  // Open Edit Modal
+  // Action: Open Edit Modal
   const handleOpenEdit = (reminder) => {
     setSelectedReminder(reminder);
-    // Format date to YYYY-MM-DD for the HTML5 input
-    const dateFormatted = reminder.reminderDate
-      ? new Date(reminder.reminderDate).toISOString().split("T")[0]
-      : "";
-    setEditDate(dateFormatted);
+    setEditDate(reminder.reminderDate ? reminder.reminderDate.split("T")[0] : "");
     setIsEditModalOpen(true);
   };
 
-  // Submit edits
+  // Action: Save Edits
   const handleSaveEdit = async () => {
     if (!editDate) {
-      toast.error(t("reminderPickDateError") || "Please pick a reminder date");
+      toast.warn(t("reminderSelectValidDate") || "Please select a valid date.");
       return;
     }
     if (editDate < today) {
@@ -144,88 +141,75 @@ const PendingPayments = () => {
     setConfirmDialog({ open: true, reminderId, action });
   };
 
-  // Called when user confirms inside the modal
-  const handleConfirmedAction = async () => {
+  // Confirm Modal Handler
+  const handleConfirmAction = async () => {
     const { reminderId, action } = confirmDialog;
-    setConfirmDialog({ open: false, reminderId: null, action: null });
+    if (!reminderId || !action) return;
+
     try {
-      await performAction({ _id: reminderId, action }).unwrap();
-      toast.success(
-        action === "PAID"
-          ? (t("reminderMarkedPaidSuccess")    || "Payment completed successfully!")
-          : (t("reminderClearedSuccess")       || "Reminder cleared!")
-      );
+      await performAction({ id: reminderId, action }).unwrap();
+      if (action === "COMPLETE") {
+        toast.success(t("reminderMarkedCompleted") || "Reminder marked as completed!");
+      } else {
+        toast.success(t("reminderDeletedSuccess") || "Reminder deleted!");
+      }
       refetch();
     } catch (err) {
-      console.error("Action failed:", err);
-      toast.error(err.data?.message || (t("reminderActionFailed") || "Action failed"));
+      console.error(`Error performing ${action}:`, err);
+      toast.error(err.data?.message || (t("reminderActionFailed") || "Failed to perform action"));
+    } finally {
+      setConfirmDialog({ open: false, reminderId: null, action: null });
     }
   };
 
-  if (isLoading) return <div className="p-5 text-[var(--text-main)] bg-[var(--bg-main)] min-h-screen">{t("reminderLoading") || "Loading active reminders..."}</div>;
-  if (error)     return <div className="p-5 text-red-500 bg-[var(--bg-main)] min-h-screen">{t("reminderLoadError") || "Error loading active reminders"}</div>;
+  if (isLoading) return <div className="p-5 text-[#1a1c1c] bg-[#f9f9f9] min-h-screen pt-20">{t("reminderLoading") || "Loading active reminders..."}</div>;
+  if (error) return <div className="p-5 text-red-500 bg-[#f9f9f9] min-h-screen pt-20">{t("reminderLoadError") || "Error loading active reminders"}</div>;
 
   return (
-    <div className="bg-[var(--bg-main)] min-h-screen pb-20 relative overflow-hidden">
-      {/* 1. APP HEADER */}
-      <div className="sticky top-0 mt-16 z-30 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] px-4 py-3 flex items-center gap-3">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 -ml-2 rounded-full active:bg-[var(--bg-input)] text-[var(--text-main)]"
-        >
-          <FaChevronLeft />
-        </button>
-        <div>
-          <h1 className="text-[var(--text-main)] text-lg font-bold tracking-wide">
-            {t("pendingReminders") || "Payment Reminders"}
-          </h1>
-          <p className="text-[10px] text-[var(--primary)] font-medium uppercase tracking-wider">
-            {reminders.length} {t("reminderActiveDues") || "Active Dues"}
-          </p>
-        </div>
-      </div>
-
-      {/* 2. SEARCH & QUICK FILTER PILLS */}
-      <div className="sticky top-[116px] z-20 bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] pb-3">
-        <div className="px-4 mt-3">
+    <div className="bg-[#f9f9f9] text-[#1a1c1c] min-h-screen pt-16 pb-28 font-body-md relative">
+      {/* ── UNIFIED STICKY APP HEADER & SEARCH BAR ── */}
+      <header className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-[#e2e2e2] shadow-sm">
+        <div className="max-w-2xl mx-auto px-4 py-3 space-y-3">
+          {/* Search Input */}
           <div className="relative">
-            <FaSearch className="absolute left-3 top-2.5 text-[var(--text-muted)] text-xs" />
+            <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4f4633] text-xs" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t("reminderSearchPlaceholder") || "Search by customer name or mobile..."}
-              className="w-full bg-white text-[var(--text-main)] pl-9 pr-3 py-2 rounded-full text-xs outline-none border border-[var(--border-color)] focus:border-[var(--primary)] transition-colors placeholder-[var(--text-muted)] font-medium"
+              className="w-full bg-[#f9f9f9] text-[#1a1c1c] pl-9 pr-4 py-2.5 rounded-2xl text-xs outline-none border border-[#e2e2e2] focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] transition-all placeholder-[#4f4633] shadow-inner font-medium"
             />
           </div>
-        </div>
 
-        <div className="px-4 mt-3 flex gap-2 overflow-x-auto no-scrollbar">
-          {[
-            { label: t("reminderFilterAll")      || "All Reminders", val: "all" },
-            { label: t("reminderFilterOverdue")  || "Overdue",       val: "overdue" },
-            { label: t("reminderFilterToday")    || "Due Today",     val: "today" },
-            { label: t("reminderFilterUpcoming") || "Upcoming",      val: "upcoming" },
-          ].map((f) => (
-            <button
-              key={f.val}
-              onClick={() => setFilterStatus(f.val)}
-              className={`px-3 py-1 rounded-full text-[10px] font-bold border transition-all whitespace-nowrap ${
-                filterStatus === f.val
-                  ? "bg-[var(--primary)] text-black border-[var(--primary)]"
-                  : "bg-transparent text-[var(--text-muted)] border-[var(--border-color)]"
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
+          {/* Quick Filter Pills */}
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+            {[
+              { label: t("reminderFilterAll") || "All Reminders", val: "all" },
+              { label: t("reminderFilterOverdue") || "Overdue", val: "overdue" },
+              { label: t("reminderFilterToday") || "Due Today", val: "today" },
+              { label: t("reminderFilterUpcoming") || "Upcoming", val: "upcoming" },
+            ].map((f) => (
+              <button
+                key={f.val}
+                type="button"
+                onClick={() => setFilterStatus(f.val)}
+                className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${filterStatus === f.val
+                    ? "bg-[#fbc02d] text-[#6c5000] border-[#795900] font-bold shadow-sm"
+                    : "bg-[#f9f9f9] text-[#4f4633] border-[#e2e2e2] hover:bg-[#e8e8e8]"
+                  }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      </header>
 
-      {/* 3. REMINDER TILES LIST */}
-      <div className="px-4 mt-4 space-y-3">
+      {/* ── REMINDER TILES LIST ── */}
+      <main className="max-w-2xl mx-auto px-4 mt-4 space-y-3">
         {filteredReminders.length === 0 ? (
-          <div className="text-center text-[var(--text-muted)] py-20 text-xs font-semibold">
+          <div className="bg-white border border-[#e2e2e2] rounded-2xl p-12 text-center text-[#4f4633] text-xs font-semibold">
             {t("reminderNoResults") || "No pending reminders match the filter"}
           </div>
         ) : (
@@ -237,17 +221,16 @@ const PendingPayments = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.04 }}
-                className="bg-white p-4 rounded-xl border border-[var(--border-color)] flex flex-col gap-3 shadow-lg hover:border-[var(--border-color)] transition-all relative overflow-hidden"
+                className="bg-white p-4 rounded-2xl border border-[#e2e2e2] flex flex-col gap-3 shadow-sm hover:shadow-md transition-all relative overflow-hidden"
               >
                 {/* Visual Accent Glow on the side based on status */}
                 <div
-                  className={`absolute left-0 top-0 bottom-0 w-1 ${
-                    dateStatus.label === (t("reminderStatusOverdue")  || "Overdue")
-                      ? "bg-red-500"
+                  className={`absolute left-0 top-0 bottom-0 w-1.5 ${dateStatus.label === (t("reminderStatusOverdue") || "Overdue")
+                      ? "bg-[#dc2626]"
                       : dateStatus.label === (t("reminderStatusDueToday") || "Due Today")
-                      ? "bg-amber-500"
-                      : "bg-blue-500"
-                  }`}
+                        ? "bg-[#d97706]"
+                        : "bg-blue-500"
+                    }`}
                 />
 
                 {/* Header row: Customer & Date status pill */}
@@ -255,161 +238,148 @@ const PendingPayments = () => {
                   <div className="flex items-center gap-3">
                     {/* Call Button */}
                     <button
+                      type="button"
                       onClick={(e) => { e.stopPropagation(); openPhoneDialer(rem.customerMobile || rem.mobileNumber); }}
-                      className="w-8 h-8 rounded-full bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0 text-green-500 active:bg-green-600 active:text-[var(--text-main)] transition-colors"
+                      className="w-9 h-9 rounded-xl bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0 text-green-600 hover:bg-green-100 transition-colors cursor-pointer"
+                      title="Call Customer"
                     >
                       <FaPhoneAlt size={12} />
                     </button>
 
                     <div>
-                      <h3 className="text-[var(--text-main)] text-sm font-extrabold flex items-center gap-1.5">
-                        <FaUser size={9} className="text-[var(--text-muted)]" />
+                      <h3 className="text-[#1a1c1c] text-sm font-bold flex items-center gap-1.5">
+                        <FaUser size={9} className="text-[#4f4633]" />
                         {rem.customerName}
                       </h3>
-                      <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                      <p className="text-[10px] text-[#4f4633] mt-0.5 font-medium">
                         {rem.customerMobile || rem.mobileNumber}
                       </p>
                     </div>
                   </div>
                   <span
-                    className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${dateStatus.color} ${dateStatus.bg} ${dateStatus.border}`}
+                    className={`text-[9px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${dateStatus.color} ${dateStatus.bg} ${dateStatus.border}`}
                   >
                     {dateStatus.label}
                   </span>
                 </div>
 
                 {/* Middle row: Follow-up Date & Pending Amount */}
-                <div className="flex justify-between items-center text-xs pl-1 mt-1 bg-[var(--bg-main)]/50 p-2.5 rounded-lg border border-[var(--border-color)]">
+                <div className="flex justify-between items-center text-xs pl-1 mt-1 bg-[#f9f9f9] p-3 rounded-xl border border-[#e2e2e2]">
                   <div>
-                    <p className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest font-bold">
-                      {t("reminderFollowUp") || "Follow Up"}
+                    <p className="text-[9px] text-[#4f4633] uppercase tracking-widest font-semibold">
+                      {t("reminderFollowUp") || "Follow Up Date"}
                     </p>
-                    <p className="text-[var(--text-muted)] font-bold text-[11px] mt-0.5 flex items-center gap-1">
-                      <FaCalendarAlt size={9} className="text-[var(--primary)]" />
+                    <p className="text-[#1a1c1c] font-bold text-xs mt-0.5 flex items-center gap-1">
+                      <FaCalendarAlt size={10} className="text-[#795900]" />
                       {rem.reminderDate
                         ? format(new Date(rem.reminderDate), "dd MMM yyyy")
                         : "N/A"}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest font-bold">
-                      {t("reminderPendingDues") || "Pending Dues"}
+                    <p className="text-[9px] text-[#4f4633] uppercase tracking-widest font-semibold">
+                      {t("reminderPendingDues") || "Pending Amount"}
                     </p>
-                    <p className="text-emerald-400 text-base font-extrabold tracking-tight mt-0.5 flex items-center gap-1 justify-end">
-                      <FaMoneyBillWave size={11} className="text-emerald-500/60" />
+                    <p className="text-[#16a34a] text-base font-extrabold tracking-tight mt-0.5 flex items-center gap-1 justify-end">
+                      <FaMoneyBillWave size={12} className="text-[#16a34a]" />
                       ₹{rem.pendingAmount?.toLocaleString()}
                     </p>
                   </div>
                 </div>
 
                 {/* Actions Row */}
-                <div className="flex justify-end items-center pl-1 pt-2 gap-2">
+                <div className="flex justify-end items-center pl-1 pt-1 gap-2">
                   <button
+                    type="button"
                     onClick={() => handleOpenEdit(rem)}
-                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-[var(--text-muted)] flex items-center justify-center border border-[var(--border-color)] active:scale-90 transition-transform"
+                    className="w-9 h-9 rounded-xl bg-[#f9f9f9] hover:bg-[#e8e8e8] text-[#4f4633] flex items-center justify-center border border-[#e2e2e2] transition-colors cursor-pointer"
                     title={t("reminderEditTitle") || "Edit Reminder"}
                   >
-                    <FaEdit size={10} />
+                    <FaEdit size={12} />
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleAction(rem._id, "DELETE")}
-                    className="w-8 h-8 rounded-full bg-red-950/40 hover:bg-red-900/60 text-red-400 flex items-center justify-center border border-red-900/30 active:scale-90 transition-transform"
+                    className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 text-[#dc2626] flex items-center justify-center border border-red-200 transition-colors cursor-pointer"
                     title={t("reminderDeleteTitle") || "Delete Reminder"}
                   >
-                    <FaTrashAlt size={10} />
+                    <FaTrashAlt size={12} />
                   </button>
                   <button
-                    onClick={() => {
-                      navigate("/payment-tracking", {
-                        state: {
-                          fromReminder: true,
-                          customerName: rem.customerName,
-                          mobileNumber: rem.customerMobile || rem.mobileNumber,
-                          pendingAmount: rem.pendingAmount,
-                          machineId: rem.machineId || rem.rentType,
-                          reminderId: rem._id,
-                          paidAmount: rem.paidAmount || 0
-                        }
-                      });
-                    }}
-                    className="px-3 h-8 bg-green-500 text-[var(--text-main)] rounded-lg text-[10px] font-black flex items-center gap-1 active:scale-95 transition-transform shadow-md shadow-green-500/10"
+                    type="button"
+                    onClick={() => handleAction(rem._id, "COMPLETE")}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#16a34a] hover:bg-green-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
                   >
-                    <FaCheckCircle size={10} /> {t("reminderCompleteBtn") || "Complete"}
+                    <FaCheckCircle size={11} />
+                    <span>{t("reminderMarkPaid") || "Mark Paid"}</span>
                   </button>
                 </div>
               </motion.div>
             );
           })
         )}
-      </div>
+      </main>
 
-      {/* 4. EDIT REMINDER DETAILS MODAL */}
+      {/* ── EDIT REMINDER MODAL ── */}
       <AnimatePresence>
-        {isEditModalOpen && selectedReminder && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        {isEditModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-sm rounded-2xl p-5 border border-[var(--border-color)] shadow-2xl relative"
+              className="bg-white w-full max-w-sm rounded-3xl p-6 border border-[#e2e2e2] shadow-2xl space-y-4"
             >
-              <div className="flex justify-between items-center mb-4 border-b border-[var(--border-color)] pb-2">
-                <h3 className="text-[var(--text-main)] text-sm font-black uppercase tracking-wider">
-                  {t("reminderEditModalTitle") || "Edit Reminder"}
+              <div className="flex justify-between items-center pb-2 border-b border-[#e2e2e2]">
+                <h3 className="text-[#1a1c1c] font-bold text-sm flex items-center gap-2">
+                  <FaClock className="text-[#795900]" />
+                  {t("reminderEditModalTitle") || "Edit Reminder Date"}
                 </h3>
                 <button
+                  type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="text-[var(--text-muted)] hover:text-[var(--text-main)] p-1"
+                  className="w-8 h-8 rounded-full bg-[#f9f9f9] hover:bg-[#e8e8e8] text-[#4f4633] hover:text-[#1a1c1c] flex items-center justify-center transition-all cursor-pointer border border-[#e2e2e2] active:scale-90"
+                  aria-label="Close"
                 >
-                  <FaTimes />
+                  <FaTimes size={12} />
                 </button>
               </div>
 
-              <div className="space-y-4">
-                {/* Client Reference */}
-                <div className="bg-[var(--bg-main)] p-3 rounded-xl border border-[var(--border-color)]">
-                  <p className="text-[var(--text-muted)] text-[9px] font-bold uppercase tracking-wider">
-                    {t("reminderModalCustomer") || "Customer"}
-                  </p>
-                  <p className="text-[var(--text-main)] text-xs font-bold mt-0.5">
-                    {selectedReminder.customerName}
-                  </p>
-                  <p className="text-[10px] text-[var(--text-muted)] font-medium">
-                    {selectedReminder.customerMobile || selectedReminder.mobileNumber}
-                  </p>
+              {selectedReminder && (
+                <div className="bg-[#f9f9f9] p-3 rounded-2xl border border-[#e2e2e2] space-y-1">
+                  <p className="text-xs font-bold text-[#1a1c1c]">{selectedReminder.customerName}</p>
+                  <p className="text-[10px] text-[#4f4633]">{selectedReminder.customerMobile || selectedReminder.mobileNumber}</p>
+                  <p className="text-xs font-extrabold text-[#16a34a] pt-1">Due: ₹{selectedReminder.pendingAmount?.toLocaleString()}</p>
                 </div>
+              )}
 
-                {/* Removed Edit Pending Amount block */}
-
-                {/* Edit Reminder Date */}
-                <div>
-                  <label className="text-[var(--text-muted)] text-[10px] font-bold mb-1.5 block uppercase tracking-wider">
-                    {t("reminderModalDateLabel") || "Reminder Date"}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      value={editDate}
-                      min={today}
-                      onChange={handleEditDateChange}
-                      className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-color)] rounded-lg py-2 px-3 focus:border-[var(--primary)] outline-none text-xs font-semibold"
-                    />
-                  </div>
-                </div>
+              <div>
+                <label className="text-[#4f4633] text-xs font-semibold block mb-1.5">
+                  {t("reminderNewFollowUpDate") || "New Follow-up Date"}
+                </label>
+                <input
+                  type="date"
+                  value={editDate}
+                  min={today}
+                  onChange={handleEditDateChange}
+                  className="w-full bg-[#f9f9f9] text-[#1a1c1c] px-4 py-3 rounded-2xl text-xs font-medium border border-[#e2e2e2] focus:border-[#fbc02d] focus:ring-2 focus:ring-[#fbc02d] outline-none transition-all cursor-pointer shadow-inner"
+                />
               </div>
 
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-3 pt-2">
                 <button
+                  type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="flex-1 py-2.5 bg-transparent hover:bg-gray-50 text-[var(--text-muted)] rounded-xl font-bold text-xs border border-[var(--border-color)] active:scale-95 transition-all"
+                  className="flex-1 py-3 bg-[#f9f9f9] border border-[#e2e2e2] text-[#1a1c1c] rounded-2xl text-xs font-bold active:scale-95 transition-all cursor-pointer"
                 >
-                  {t("cancelButton") || "Cancel"}
+                  {t("reminderCancel") || "Cancel"}
                 </button>
                 <button
+                  type="button"
                   onClick={handleSaveEdit}
-                  className="flex-1 py-2.5 bg-[var(--primary)] text-black rounded-xl font-black text-xs active:scale-95 transition-all shadow-md shadow-[var(--primary)]/10"
+                  className="flex-1 py-3 bg-[#fbc02d] hover:bg-[#f8bd2a] text-[#6c5000] rounded-2xl text-xs font-bold active:scale-95 transition-all cursor-pointer shadow-md shadow-[#fbc02d]/20"
                 >
-                  {t("reminderSaveChanges") || "Save Changes"}
+                  {t("reminderSaveDate") || "Save Date"}
                 </button>
               </div>
             </motion.div>
@@ -417,28 +387,28 @@ const PendingPayments = () => {
         )}
       </AnimatePresence>
 
-      {/* ─── GLOBAL CONFIRM MODAL ─────────────────────────────────── */}
+      {/* ── CONFIRM ACTION DIALOG ── */}
       <ConfirmModal
         isOpen={confirmDialog.open}
-        onCancel={() => setConfirmDialog({ open: false, reminderId: null, action: null })}
-        onConfirm={handleConfirmedAction}
-        variant={confirmDialog.action === "PAID" ? "success" : "danger"}
         title={
-          confirmDialog.action === "PAID"
-            ? (t("confirmPaidTitle")   || "Mark as Paid?")
-            : (t("confirmDeleteTitle") || "Delete Reminder?")
+          confirmDialog.action === "COMPLETE"
+            ? (t("reminderCompleteTitle") || "Mark as Completed?")
+            : (t("reminderDeleteTitle") || "Delete Reminder?")
         }
         message={
-          confirmDialog.action === "PAID"
-            ? (t("confirmPaidMessage")   || "This will mark the payment as completed and remove it from your pending list.")
-            : (t("confirmDeleteMessage") || "This reminder will be permanently deleted. This action cannot be undone.")
+          confirmDialog.action === "COMPLETE"
+            ? (t("reminderCompleteConfirmMsg") || "Are you sure you want to mark this reminder as completed?")
+            : (t("reminderDeleteConfirmMsg") || "Are you sure you want to delete this reminder? This action cannot be undone.")
         }
         confirmText={
-          confirmDialog.action === "PAID"
-            ? (t("reminderCompleteBtn") || "Mark Paid")
-            : (t("deleteButton")        || "Delete")
+          confirmDialog.action === "COMPLETE"
+            ? (t("reminderMarkPaidBtn") || "Mark Paid")
+            : (t("reminderDeleteBtn") || "Delete")
         }
-        cancelText={t("cancelButton") || "Cancel"}
+        cancelText={t("reminderCancelBtn") || "Cancel"}
+        confirmColor={confirmDialog.action === "COMPLETE" ? "green" : "red"}
+        onConfirm={handleConfirmAction}
+        onCancel={() => setConfirmDialog({ open: false, reminderId: null, action: null })}
       />
     </div>
   );
