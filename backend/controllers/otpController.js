@@ -47,7 +47,13 @@ exports.sendOtp = async (req, res) => {
     res.status(200).json({ success: true, message: "OTP sent successfully" });
   } catch (error) {
     console.error("Error sending OTP:", error);
-    res.status(500).json({ error: "Failed to send OTP" });
+    // Send the detailed error back to the client to debug the Render issue
+    res.status(500).json({ 
+      error: "Failed to send OTP", 
+      details: error.message,
+      emailUser: EMAIL_USER ? "Provided" : "Missing",
+      emailPass: EMAIL_PASS ? "Provided" : "Missing"
+    });
   }
 };
 
