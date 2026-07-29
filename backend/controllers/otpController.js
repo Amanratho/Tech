@@ -47,7 +47,7 @@ exports.sendOtp = async (req, res) => {
   try {
     // HTML Template for OTP Email
     const emailHtml = `
-      <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #e2e2e2;">
+      <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid #e2e2e2;">
         <div style="text-align: center; margin-bottom: 20px;">
           <h1 style="color: #fbc02d; margin: 0; font-size: 28px; font-weight: 700;">RentVeda</h1>
           <p style="color: #5f5e5e; font-size: 14px; margin-top: 5px;">Your Trusted Rental Partner</p>
