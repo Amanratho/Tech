@@ -47,6 +47,11 @@ const Welcome = () => {
   const handleCreateAccount = async (e) => {
     e.preventDefault();
 
+    if (password.length < 6) {
+      toast.error(t("passwordTooShort") || "Password must be at least 6 characters long.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       toast.error(t("passwordMismatch") || "Passwords do not match!");
       return;
@@ -118,8 +123,8 @@ const Welcome = () => {
     } catch (error) {
       if (error.code === "ECONNABORTED") {
         toast.error(t("server_timeout"));
-      } else if (error?.response?.data?.message) {
-        toast.error(error.response.data.message);
+      } else if (error?.response?.data?.error || error?.response?.data?.message) {
+        toast.error(error.response.data.error || error.response.data.message);
       } else {
         toast.error(t("general_error"));
       }

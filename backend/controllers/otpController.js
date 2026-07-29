@@ -31,8 +31,8 @@ exports.sendOtp = async (req, res) => {
     return res.status(400).json({ error: "Email is required" });
   }
 
-  // Generate a 6-digit OTP
-  const otp = otpGenerator.generate(6, {
+  // Generate a 4-digit OTP
+  const otp = otpGenerator.generate(4, {
     upperCaseAlphabets: false,
     specialChars: false,
     digits: true,
@@ -43,11 +43,38 @@ exports.sendOtp = async (req, res) => {
   otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 }; // 5 minutes expiration
 
   try {
-    // Send OTP to the user's email via GAS HTTP API (bypasses Render SMTP block)
+    // HTML Template for OTP Email
+    const emailHtml = `
+      <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #e2e2e2;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h1 style="color: #fbc02d; margin: 0; font-size: 28px; font-weight: 700;">RentVeda</h1>
+          <p style="color: #5f5e5e; font-size: 14px; margin-top: 5px;">Your Trusted Rental Partner</p>
+        </div>
+        <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          <h2 style="color: #1a1c1c; font-size: 20px; margin-top: 0;">Verify Your Email Address</h2>
+          <p style="color: #474746; font-size: 15px; line-height: 1.5;">Hello,</p>
+          <p style="color: #474746; font-size: 15px; line-height: 1.5;">Please use the following OTP to complete your verification process. This OTP is valid for <strong>5 minutes</strong>.</p>
+          
+          <div style="margin: 30px 0; text-align: center;">
+            <div style="display: inline-block; background-color: #fff9e6; border: 2px dashed #fbc02d; padding: 15px 30px; border-radius: 8px;">
+              <span style="font-size: 32px; font-weight: bold; color: #795900; letter-spacing: 5px;">${otp}</span>
+              <span style="font-size: 24px; margin-left: 10px; cursor: pointer;" title="Copy OTP">📋</span>
+            </div>
+            <p style="color: #636262; font-size: 12px; margin-top: 10px;">(Long press or double click the number to copy)</p>
+          </div>
+          
+          <p style="color: #474746; font-size: 15px; line-height: 1.5;">If you didn't request this code, you can safely ignore this email.</p>
+          <hr style="border: none; border-top: 1px solid #eeeeee; margin: 20px 0;" />
+          <p style="color: #636262; font-size: 12px; text-align: center; margin: 0;">&copy; ${new Date().getFullYear()} RentVeda. All rights reserved.</p>
+        </div>
+      </div>
+    `;
+
+    // Send OTP to the user's email via GAS HTTP API
     await sendEmailViaGAS(
       email,
-      "Your OTP Code",
-      ` Your OTP code is ${otp}. It will expire in 5 minutes.`
+      "Your RentVeda Verification Code",
+      emailHtml
     );
 
     res.status(200).json({ success: true, message: "OTP sent successfully" });
