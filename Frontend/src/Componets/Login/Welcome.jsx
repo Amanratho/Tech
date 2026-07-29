@@ -117,8 +117,12 @@ const Welcome = () => {
       if (response.data?.success) {
         toast.success(t("account_created_success"));
         setView("login");
+        setOtpSent(false);
+        setOtpVerified(false);
       } else {
         toast.error(t("failed_to_create_account"));
+        setOtpSent(false);
+        setOtpVerified(false);
       }
     } catch (error) {
       if (error.code === "ECONNABORTED") {
@@ -128,6 +132,8 @@ const Welcome = () => {
       } else {
         toast.error(t("general_error"));
       }
+      setOtpSent(false);
+      setOtpVerified(false);
     }
   };
 
