@@ -60,9 +60,7 @@ exports.sendOtp = async (req, res) => {
           <div style="margin: 30px 0; text-align: center;">
             <div style="display: inline-block; background-color: #fff9e6; border: 2px dashed #fbc02d; padding: 15px 30px; border-radius: 8px;">
               <span style="font-size: 32px; font-weight: bold; color: #795900; letter-spacing: 5px;">${otp}</span>
-              <span style="font-size: 24px; margin-left: 10px; cursor: pointer;" title="Copy OTP">📋</span>
             </div>
-            <p style="color: #636262; font-size: 12px; margin-top: 10px;">(Long press or double click the number to copy)</p>
           </div>
           
           <p style="color: #474746; font-size: 15px; line-height: 1.5;">If you didn't request this code, you can safely ignore this email.</p>
