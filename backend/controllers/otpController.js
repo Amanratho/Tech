@@ -1,26 +1,27 @@
-const nodemailer = require("nodemailer");
 const otpGenerator = require("otp-generator");
 
 // In-memory storage for OTPs
 const otpStore = {};
 
-// Configure Nodemailer transporter using Environment Variables
-const EMAIL_USER = (process.env.EMAIL_USER || process.env.GMAIL_USER || "rentvedasupport@gmail.com").trim();
-const EMAIL_PASS = (process.env.EMAIL_PASS || process.env.GMAIL_PASS || "").replace(/\s+/g, "");
+// Google Apps Script Web App URL for sending emails via HTTP
+const GAS_MAIL_URL = "https://script.google.com/macros/s/AKfycbyr1zQJPjVQ_01WLGXGOXelFheNOF-Yv5uaQ-dfWSZ8KLspTwvqF5ynjv-wKPthMky_2w/exec";
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: EMAIL_USER,
-    pass: EMAIL_PASS,
-  },
-  // Add this to prevent connection timeouts on cloud servers (like Render)
-  tls: {
-    rejectUnauthorized: false
+// Helper function to send email via GAS
+async function sendEmailViaGAS(to, subject, text) {
+  const response = await fetch(GAS_MAIL_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ to, subject, text }),
+  });
+  
+  const result = await response.json();
+  if (!result.success) {
+    throw new Error(result.error || "Failed to send email via Apps Script");
   }
-});
+  return result;
+}
 
 // Controller to send OTP
 exports.sendOtp = async (req, res) => {
@@ -42,23 +43,19 @@ exports.sendOtp = async (req, res) => {
   otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 }; // 5 minutes expiration
 
   try {
-    // Send OTP to the user's email
-    await transporter.sendMail({
-      from: EMAIL_USER,
-      to: email,
-      subject: "Your OTP Code",
-      text: ` Your OTP code is ${otp}. It will expire in 5 minutes.`,
-    });
+    // Send OTP to the user's email via GAS HTTP API (bypasses Render SMTP block)
+    await sendEmailViaGAS(
+      email,
+      "Your OTP Code",
+      ` Your OTP code is ${otp}. It will expire in 5 minutes.`
+    );
 
     res.status(200).json({ success: true, message: "OTP sent successfully" });
   } catch (error) {
     console.error("Error sending OTP:", error);
-    // Send the detailed error back to the client to debug the Render issue
     res.status(500).json({ 
       error: "Failed to send OTP", 
-      details: error.message,
-      emailUser: EMAIL_USER ? "Provided" : "Missing",
-      emailPass: EMAIL_PASS ? "Provided" : "Missing"
+      details: error.message 
     });
   }
 };
@@ -95,16 +92,16 @@ exports.sendContactEmail = async (req, res) => {
   }
 
   try {
-    // Email options
-    const mailOptions = {
-      from: email,
-      to: EMAIL_USER,
-      subject: ` New Contact Message from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
-    };
-
-    // Send email
-    await transporter.sendMail(mailOptions);
+    // Determine where to send the contact email
+    const supportEmail = process.env.EMAIL_USER || process.env.GMAIL_USER || "rentvedasupport@gmail.com";
+    
+    // Send email via GAS HTTP API
+    await sendEmailViaGAS(
+      supportEmail,
+      `New Contact Message from ${name}`,
+      `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+    );
+    
     res.status(200).json({ success: "Message sent successfully!" });
   } catch (error) {
     console.error("Error sending email:", error);
