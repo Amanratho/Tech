@@ -194,6 +194,22 @@ const Welcome = () => {
     setIsEmailSent(false);
   };
 
+  const handleOpenEmailApp = (e) => {
+    e.preventDefault();
+    if (!email) return;
+    const domain = email.split('@')[1]?.toLowerCase();
+    
+    if (domain === 'gmail.com') {
+      window.open(`https://mail.google.com/mail/u/?authuser=${email}`, '_blank');
+    } else if (domain === 'yahoo.com' || domain === 'ymail.com') {
+      window.open('https://mail.yahoo.com/', '_blank');
+    } else if (domain === 'outlook.com' || domain === 'hotmail.com' || domain === 'live.com') {
+      window.open('https://outlook.live.com/mail/0/inbox', '_blank');
+    } else {
+      window.location.href = `mailto:`;
+    }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0, scale: 0.95, y: 20 },
     visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
@@ -305,7 +321,17 @@ const Welcome = () => {
                 <h1 className="text-xl font-bold text-[var(--text-main)] ml-2">{t("verify_otp") || "Verify OTP"}</h1>
               </div>
 
-              <p className="text-[var(--text-muted)] text-xs mb-6 text-center">We've sent an OTP to <span className="text-[var(--text-main)] font-bold">{email}</span></p>
+              <p className="text-[var(--text-muted)] text-xs mb-4 text-center">We've sent an OTP to <span className="text-[var(--text-main)] font-bold">{email}</span></p>
+
+              <div className="flex justify-center mb-6">
+                <button 
+                  onClick={handleOpenEmailApp}
+                  className="flex items-center gap-2 text-xs font-semibold px-4 py-2 bg-[var(--primary)]/10 text-[var(--primary)] rounded-full hover:bg-[var(--primary)]/20 transition-colors"
+                >
+                  <FaEnvelope size={12} />
+                  Open Email App
+                </button>
+              </div>
 
               <form onSubmit={handleOtpVerify} className="space-y-4">
                 <input
