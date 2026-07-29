@@ -6,21 +6,23 @@ const otpStore = {};
 // Google Apps Script Web App URL for sending emails via HTTP
 const GAS_MAIL_URL = "https://script.google.com/macros/s/AKfycbyr1zQJPjVQ_01WLGXGOXelFheNOF-Yv5uaQ-dfWSZ8KLspTwvqF5ynjv-wKPthMky_2w/exec";
 
-// Helper function to send email via GAS
 async function sendEmailViaGAS(to, subject, text) {
   const response = await fetch(GAS_MAIL_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({ to, subject, text }),
   });
   
-  const result = await response.json();
-  if (!result.success) {
-    throw new Error(result.error || "Failed to send email via Apps Script");
+  const responseText = await response.text();
+  try {
+    const result = JSON.parse(responseText);
+    if (!result.success) {
+      throw new Error(result.error || "Failed to send email via Apps Script");
+    }
+    return result;
+  } catch (err) {
+    console.error("GAS returned HTML instead of JSON:", responseText.substring(0, 200));
+    throw new Error("GAS API Error: " + responseText.substring(0, 100));
   }
-  return result;
 }
 
 // Controller to send OTP
