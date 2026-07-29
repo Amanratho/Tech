@@ -9,11 +9,17 @@ const EMAIL_USER = (process.env.EMAIL_USER || process.env.GMAIL_USER || "rentved
 const EMAIL_PASS = (process.env.EMAIL_PASS || process.env.GMAIL_PASS || "").replace(/\s+/g, "");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: EMAIL_USER,
     pass: EMAIL_PASS,
   },
+  // Add this to prevent connection timeouts on cloud servers (like Render)
+  tls: {
+    rejectUnauthorized: false
+  }
 });
 
 // Controller to send OTP
