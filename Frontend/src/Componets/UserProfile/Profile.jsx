@@ -55,6 +55,18 @@ const Profile = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("uid");
     localStorage.removeItem("user");
+    
+    // Clear Tracker Data
+    localStorage.removeItem("rentveda_timer_status");
+    localStorage.removeItem("rentveda_startTime");
+    localStorage.removeItem("rentveda_pausedTime");
+    localStorage.removeItem("rentveda_count");
+    localStorage.removeItem("rentveda_distance");
+    localStorage.removeItem("rentveda_activeTab");
+    localStorage.removeItem("rentveda_pending_time_entry");
+    localStorage.removeItem("rentveda_pending_count_entry");
+    localStorage.removeItem("rentveda_pending_km_entry");
+
     setIsLogoutModalOpen(false);
     toast.success(t("logoutSuccess") || "Logged out successfully!");
     navigate("/login");
