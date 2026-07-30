@@ -117,6 +117,10 @@ const Tracker = () => {
   };
  
   const handleStart = () => {
+    if (!localStorage.getItem("token")) {
+      toast.warn(t("please_login_first") || "Please login to start tracking!");
+      return;
+    }
     const now = Date.now();
     const calculatedStartTime = timerStatus === "PAUSED" ? now - (time * 1000) : now;
     
@@ -148,8 +152,21 @@ const Tracker = () => {
     toast.success(t('timeSavedSuccess') || "Time saved! Will auto-fill in next bill.");
   };
 
-  const handleIncrement = () => setCount(prev => prev + 1);
-  const handleDecrement = () => setCount(prev => (prev > 0 ? prev - 1 : 0));
+  const handleIncrement = () => {
+    if (!localStorage.getItem("token")) {
+      toast.warn(t("please_login_first") || "Please login to start tracking!");
+      return;
+    }
+    setCount(prev => prev + 1);
+  };
+  
+  const handleDecrement = () => {
+    if (!localStorage.getItem("token")) {
+      toast.warn(t("please_login_first") || "Please login to start tracking!");
+      return;
+    }
+    setCount(prev => (prev > 0 ? prev - 1 : 0));
+  };
   
   const handleDoneCount = () => {
     localStorage.setItem("rentveda_pending_count_entry", count.toString());

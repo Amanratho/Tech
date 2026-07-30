@@ -112,6 +112,18 @@ const EditProfile = () => {
       toast.success(t('accountDeletedSuccess') || "Your account has been deleted successfully.");
       localStorage.removeItem("uid");
       localStorage.removeItem("token");
+      
+      // Clear Tracker Data
+      localStorage.removeItem("rentveda_timer_status");
+      localStorage.removeItem("rentveda_startTime");
+      localStorage.removeItem("rentveda_pausedTime");
+      localStorage.removeItem("rentveda_count");
+      localStorage.removeItem("rentveda_distance");
+      localStorage.removeItem("rentveda_activeTab");
+      localStorage.removeItem("rentveda_pending_time_entry");
+      localStorage.removeItem("rentveda_pending_count_entry");
+      localStorage.removeItem("rentveda_pending_km_entry");
+
       setIsDeleteOpen(false);
       window.location.href = "/login";
     } catch (error) {

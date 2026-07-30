@@ -4,14 +4,14 @@ const otpGenerator = require("otp-generator");
 const otpStore = {};
 
 // Google Apps Script Web App URL for sending emails via HTTP
-const GAS_MAIL_URL = "https://script.google.com/macros/s/AKfycbyr1zQJPjVQ_01WLGXGOXelFheNOF-Yv5uaQ-dfWSZ8KLspTwvqF5ynjv-wKPthMky_2w/exec";
+const GAS_MAIL_URL = "https://script.google.com/macros/s/AKfycbxID6cEu2TWl8eDTFeZbsw_jY65ZIkvuhY5FjMseBzUh8gf44NJT3ublSwtONKb8o9jtw/exec";
 
 async function sendEmailViaGAS(to, subject, text) {
   const response = await fetch(GAS_MAIL_URL, {
     method: "POST",
     body: JSON.stringify({ to, subject, text }),
   });
-  
+
   const responseText = await response.text();
   try {
     const result = JSON.parse(responseText);
@@ -80,9 +80,9 @@ exports.sendOtp = async (req, res) => {
     res.status(200).json({ success: true, message: "OTP sent successfully" });
   } catch (error) {
     console.error("Error sending OTP:", error);
-    res.status(500).json({ 
-      error: "Failed to send OTP", 
-      details: error.message 
+    res.status(500).json({
+      error: "Failed to send OTP",
+      details: error.message
     });
   }
 };
@@ -121,14 +121,14 @@ exports.sendContactEmail = async (req, res) => {
   try {
     // Determine where to send the contact email
     const supportEmail = process.env.EMAIL_USER || process.env.GMAIL_USER || "rentvedasupport@gmail.com";
-    
+
     // Send email via GAS HTTP API
     await sendEmailViaGAS(
       supportEmail,
       `New Contact Message from ${name}`,
       `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
     );
-    
+
     res.status(200).json({ success: "Message sent successfully!" });
   } catch (error) {
     console.error("Error sending email:", error);
