@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RecentActivity extends StatelessWidget {
   final List<dynamic> payments;
@@ -28,11 +28,11 @@ class RecentActivity extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Recent Activity',
+              Text(tr('recentActivityTitle'),
                 style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C))),
               Row(
                 children: [
-                  Text('View All', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF795900))),
+                  Text(tr('viewAllHistory'), style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF795900))),
                   const SizedBox(width: 4),
                   const Icon(Icons.arrow_forward, size: 12, color: Color(0xFF795900)),
                 ],

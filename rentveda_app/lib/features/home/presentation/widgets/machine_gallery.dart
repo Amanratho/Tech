@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MachineGallery extends StatelessWidget {
   final List<dynamic> machines;
@@ -21,10 +22,10 @@ class MachineGallery extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Explore Our Machines',
+                  Text(tr('exploreMachines'),
                     style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C))),
                   const SizedBox(height: 2),
-                  Text('${machines.length} machines available',
+                  Text('${machines.length} ${tr('machinesCount')}',
                     style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFF4F4633))),
                 ],
               ),
@@ -68,10 +69,10 @@ class MachineGallery extends StatelessWidget {
                       child: const Icon(Icons.add, size: 20, color: Color(0xFF795900)),
                     ),
                     const SizedBox(height: 8),
-                    Text('Add Your First Machine',
+                    Text(tr('addYourMachine'),
                       style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C))),
                     const SizedBox(height: 2),
-                    Text('Tap to register a machine',
+                    Text(tr('addMachine'),
                       style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500, color: const Color(0xFF4F4633))),
                   ],
                 ),
@@ -112,7 +113,7 @@ class MachineGallery extends StatelessWidget {
                             child: const Icon(Icons.add, size: 16, color: Color(0xFF795900)),
                           ),
                           const SizedBox(height: 8),
-                          Text('ADD NEW', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: const Color(0xFF4F4633), letterSpacing: 0.5)),
+                          Text(tr('addMachineButton').toUpperCase(), style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: const Color(0xFF4F4633), letterSpacing: 0.5)),
                         ],
                       ),
                     ),

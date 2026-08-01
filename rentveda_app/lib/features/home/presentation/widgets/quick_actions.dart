@@ -9,10 +9,10 @@ class QuickActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final actions = [
-      _Action(title: tr('paymentTrackingButton') == 'paymentTrackingButton' ? 'Payments' : tr('paymentTrackingButton'), icon: Icons.receipt_long, color: const Color(0xFF16A34A), bgColor: const Color(0xFFF0FDF4), borderColor: const Color(0xFFBBF7D0), path: '/payment-tracking'),
-      _Action(title: tr('billsHistoryButton') == 'billsHistoryButton' ? 'Bills' : tr('billsHistoryButton'), icon: Icons.history, color: const Color(0xFF2563EB), bgColor: const Color(0xFFEFF6FF), borderColor: const Color(0xFFBFDBFE), path: '/summary'),
-      _Action(title: tr('machineStatusButton') == 'machineStatusButton' ? 'Machine' : tr('machineStatusButton'), icon: Icons.build_circle, color: const Color(0xFFEA580C), bgColor: const Color(0xFFFFF7ED), borderColor: const Color(0xFFFED7AA), path: '/summary'),
-      _Action(title: tr('calculator') == 'calculator' ? 'Calculator' : tr('calculator'), icon: Icons.calculate, color: const Color(0xFFD97706), bgColor: const Color(0xFFFFFBEB), borderColor: const Color(0xFFFDE68A), path: '/summary'),
+      _Action(title: tr('paymentTracking'), icon: Icons.receipt_long, color: const Color(0xFF16A34A), bgColor: const Color(0xFFF0FDF4), borderColor: const Color(0xFFBBF7D0), path: '/payment-tracking'),
+      _Action(title: tr('billsHistory'), icon: Icons.history, color: const Color(0xFF2563EB), bgColor: const Color(0xFFEFF6FF), borderColor: const Color(0xFFBFDBFE), path: '/summary'),
+      _Action(title: tr('machineStatus'), icon: Icons.build_circle, color: const Color(0xFFEA580C), bgColor: const Color(0xFFFFF7ED), borderColor: const Color(0xFFFED7AA), path: '/summary'),
+      _Action(title: tr('rentalCalculator'), icon: Icons.calculate, color: const Color(0xFFD97706), bgColor: const Color(0xFFFFFBEB), borderColor: const Color(0xFFFDE68A), path: '/summary'),
     ];
 
     return Padding(

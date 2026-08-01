@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class DashboardHeader extends StatelessWidget {
   final List<dynamic> payments;
@@ -26,13 +26,13 @@ class DashboardHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     // Calculate greeting
     final hour = DateTime.now().hour;
-    String greeting;
+    String greetingKey;
     if (hour < 12) {
-      greeting = 'Good Morning 👋';
+      greetingKey = 'greetingMorning';
     } else if (hour < 17) {
-      greeting = 'Good Afternoon 👋';
+      greetingKey = 'greetingAfternoon';
     } else {
-      greeting = 'Good Evening 👋';
+      greetingKey = 'greetingEvening';
     }
 
     // Calculate metrics
@@ -77,12 +77,12 @@ class DashboardHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      greeting,
+                      tr(greetingKey),
                       style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800, color: const Color(0xFF1A1C1C)),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Here is your business overview today',
+                      tr('greetingSubtitle'),
                       style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF4F4633), fontWeight: FontWeight.w500),
                     ),
                   ],
@@ -117,7 +117,7 @@ class DashboardHeader extends StatelessWidget {
             children: [
               Expanded(
                 child: _MetricCard(
-                  title: "TODAY'S INCOME",
+                  title: tr('todayIncome').toUpperCase(),
                   value: '₹${NumberFormat('#,##,###').format(todayIncome.toInt())}',
                   valueColor: const Color(0xFF16A34A),
                   icon: Icons.account_balance_wallet,
@@ -130,7 +130,7 @@ class DashboardHeader extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: _MetricCard(
-                  title: "TOTAL PENDING",
+                  title: tr('totalPendingDues').toUpperCase(),
                   value: '₹${NumberFormat('#,##,###').format(totalPending.toInt())}',
                   valueColor: const Color(0xFFDC2626),
                   icon: Icons.money_off,
@@ -147,7 +147,7 @@ class DashboardHeader extends StatelessWidget {
             children: [
               Expanded(
                 child: _MetricCard(
-                  title: "TODAY ENTRIES",
+                  title: tr('activeWorkEntries').toUpperCase(),
                   value: '$todayEntries',
                   valueColor: const Color(0xFF1A1C1C),
                   icon: Icons.receipt_long,
@@ -160,7 +160,7 @@ class DashboardHeader extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: _MetricCard(
-                  title: "MY MACHINES",
+                  title: tr('totalMachinesCount').toUpperCase(),
                   value: '${machines.length}',
                   valueColor: const Color(0xFF1A1C1C),
                   icon: Icons.inventory_2,
@@ -190,30 +190,32 @@ class DashboardHeader extends StatelessWidget {
                     height: 32,
                     decoration: BoxDecoration(
                       color: const Color(0xFFFEE2E2),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.warning_amber_rounded, size: 16, color: Color(0xFFDC2626)),
+                    child: const Icon(Icons.warning_amber_rounded, size: 18, color: Color(0xFFDC2626)),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Pending Dues Follow-up Required',
-                          style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFFB91C1C))),
-                        Text('$overdueCount reminders require urgent follow-up today.',
-                          style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFFDC2626), fontWeight: FontWeight.w500)),
+                        Text(
+                          tr('overdueAlertTitle'),
+                          style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF991B1B)),
+                        ),
+                        Text(
+                          tr('overdueAlertMsg'),
+                          style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFFB91C1C)),
+                        ),
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFEE2E2),
-                      borderRadius: BorderRadius.circular(12),
+                  TextButton(
+                    onPressed: onPaymentsTap,
+                    child: Text(
+                      tr('viewDues'),
+                      style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFFDC2626)),
                     ),
-                    child: Text('View Dues',
-                      style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w800, color: const Color(0xFFB91C1C))),
                   ),
                 ],
               ),

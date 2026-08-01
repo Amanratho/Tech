@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -13,11 +14,11 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      _NavItem(icon: Icons.home_rounded, label: 'Home', path: '/home'),
-      _NavItem(icon: Icons.bar_chart_rounded, label: 'Summary', path: '/summary'),
-      _NavItem(icon: Icons.notifications_rounded, label: 'Reminders', path: '/payment-tracking'),
-      _NavItem(icon: Icons.receipt_long_rounded, label: 'Statement', path: '/statement'),
-      _NavItem(icon: Icons.person_rounded, label: 'Profile', path: '/profile'),
+      _NavItem(icon: Icons.home_rounded, label: tr('home'), path: '/home'),
+      _NavItem(icon: Icons.bar_chart_rounded, label: tr('navSummary'), path: '/summary'),
+      _NavItem(icon: Icons.notifications_rounded, label: tr('navReminders'), path: '/payment-tracking'),
+      _NavItem(icon: Icons.receipt_long_rounded, label: tr('navStatement'), path: '/statement'),
+      _NavItem(icon: Icons.person_rounded, label: tr('profile'), path: '/profile'),
     ];
 
     return Container(

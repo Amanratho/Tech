@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
   const RentVedaAppBar({super.key});
@@ -11,6 +12,8 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isEn = context.locale.languageCode == 'en';
+
     return Container(
       height: 56 + MediaQuery.of(context).padding.top,
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
@@ -68,23 +71,32 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
             Row(
               children: [
                 // Language toggle pill
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8F9FA),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.language, size: 14, color: primaryColor),
-                      const SizedBox(width: 4),
-                      Text(
-                        'हिन्दी',
-                        style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C)),
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: () {
+                    if (isEn) {
+                      context.setLocale(const Locale('hi'));
+                    } else {
+                      context.setLocale(const Locale('en'));
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8F9FA),
+                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.language, size: 14, color: primaryColor),
+                        const SizedBox(width: 4),
+                        Text(
+                          isEn ? 'हिन्दी' : 'ENG',
+                          style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C)),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
