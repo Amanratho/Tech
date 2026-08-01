@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/network/api_client.dart';
 
 // State definition for Auth
@@ -41,22 +43,38 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   // ─── LOGIN (matching React's handleLogin) ───
-  // React sends Firebase idToken, but since we don't have Firebase in Flutter yet,
-  // we send email+password directly to the backend.
+  // Step 1: Firebase signInWithEmailAndPassword → get idToken
+  // Step 2: Send idToken to backend /api/auth/login
   Future<bool> login(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
+      // Step 1: Authenticate with Firebase
+      debugPrint('🔑 [LOGIN] Step 1: Firebase signIn for $email');
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      debugPrint('🔑 [LOGIN] Firebase signIn SUCCESS. UID: ${userCredential.user?.uid}');
+
+      final idToken = await userCredential.user?.getIdToken();
+      debugPrint('🔑 [LOGIN] idToken received: ${idToken != null ? "YES (${idToken.length} chars)" : "NULL"}');
+
+      if (idToken == null) {
+        state = state.copyWith(isLoading: false, error: 'Failed to get auth token');
+        return false;
+      }
+
+      // Step 2: Send idToken to backend
+      debugPrint('🔑 [LOGIN] Step 2: Sending idToken to backend...');
       final response = await apiClient.dio.post('/auth/login', data: {
-        'identifier': email,
-        'password': password,
+        'idToken': idToken,
       });
+      debugPrint('🔑 [LOGIN] Backend response status: ${response.statusCode}');
+      debugPrint('🔑 [LOGIN] Backend response data: ${response.data}');
 
       if (response.statusCode == 200 && response.data != null) {
         final token = response.data['token'];
         if (token != null) {
           await apiClient.secureStorage.write(key: 'token', value: token);
         }
-        // Store user data
         final userData = response.data['user'];
         if (userData != null && userData['uid'] != null) {
           await apiClient.secureStorage.write(key: 'uid', value: userData['uid']);
@@ -66,14 +84,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
       state = state.copyWith(isLoading: false, error: 'Login failed');
       return false;
+    } on FirebaseAuthException catch (e) {
+      debugPrint('❌ [LOGIN] FirebaseAuthException: code=${e.code}, message=${e.message}');
+      String errorMsg;
+      if (e.code == 'user-not-found') {
+        errorMsg = 'No user found with this email';
+      } else if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        errorMsg = 'Invalid email or password';
+      } else {
+        errorMsg = e.message ?? 'Authentication failed';
+      }
+      state = state.copyWith(isLoading: false, error: errorMsg);
+      return false;
     } on DioException catch (e) {
+      debugPrint('❌ [LOGIN] DioException: status=${e.response?.statusCode}, data=${e.response?.data}');
       final errorMsg = e.response?.data is Map
           ? (e.response?.data['error'] ?? e.response?.data['message'] ?? 'Server error')
           : 'Server error';
       state = state.copyWith(isLoading: false, error: errorMsg);
       return false;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: 'Connection error');
+      debugPrint('❌ [LOGIN] Unknown error: ${e.runtimeType} → $e');
+      state = state.copyWith(isLoading: false, error: e.toString());
       return false;
     }
   }
