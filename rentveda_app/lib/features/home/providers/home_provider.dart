@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
 import '../../auth/providers/auth_provider.dart';
 
@@ -89,7 +88,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
 
   Future<List<dynamic>> _fetchPayments(String uid) async {
     try {
-      final response = await apiClient.dio.get('/payments/$uid');
+      final response = await apiClient.dio.post('/rentals', data: {'uid': uid});
       return response.data is List ? response.data : [];
     } catch (e) {
       debugPrint('❌ [HOME] Payments fetch error: $e');
@@ -99,7 +98,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
 
   Future<List<dynamic>> _fetchReminders(String uid) async {
     try {
-      final response = await apiClient.dio.get('/payments/pending-reminders/$uid');
+      final response = await apiClient.dio.post('/reminders/pending', data: {'uid': uid});
       return response.data is List ? response.data : [];
     } catch (e) {
       debugPrint('❌ [HOME] Reminders fetch error: $e');

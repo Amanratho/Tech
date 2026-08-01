@@ -85,7 +85,7 @@ class MachineGallery extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: machines.length + 1, // +1 for "Add New" card
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (context, index) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
                 if (index == machines.length) {
                   // "Add New" card at end
@@ -144,7 +144,7 @@ class MachineGallery extends StatelessWidget {
                           Image.network(
                             image,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _machinePlaceholder(),
+                            errorBuilder: (context, error, stackTrace) => _machinePlaceholder(),
                           )
                         else
                           _machinePlaceholder(),

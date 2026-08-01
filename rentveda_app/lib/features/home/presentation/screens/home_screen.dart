@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../providers/home_provider.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/quick_actions.dart';
@@ -51,6 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             payments: homeState.payments,
                             reminders: homeState.reminders,
                             machines: homeState.machines,
+                            onPaymentsTap: () => context.push('/payment-tracking'),
                           ),
 
                           // 2. Quick Action Shortcuts

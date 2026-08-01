@@ -6,6 +6,7 @@ import '../../features/summary/presentation/screens/summary_screen.dart';
 import '../../features/reminders/presentation/screens/reminders_screen.dart';
 import '../../features/statement/presentation/screens/statement_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/payments/presentation/screens/payment_tracking_screen.dart';
 import '../widgets/bottom_nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -35,6 +36,11 @@ class AppRouter {
         path: '/welcome',
         name: 'welcome',
         builder: (context, state) => const WelcomeScreen(),
+      ),
+      GoRoute(
+        path: '/payment-tracking',
+        name: 'payment-tracking',
+        builder: (context, state) => const PaymentTrackingScreen(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

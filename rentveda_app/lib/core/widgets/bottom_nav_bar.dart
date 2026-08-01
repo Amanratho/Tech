@@ -15,7 +15,7 @@ class BottomNavBar extends StatelessWidget {
     final items = [
       _NavItem(icon: Icons.home_rounded, label: 'Home', path: '/home'),
       _NavItem(icon: Icons.bar_chart_rounded, label: 'Summary', path: '/summary'),
-      _NavItem(icon: Icons.notifications_rounded, label: 'Reminders', path: '/reminders'),
+      _NavItem(icon: Icons.notifications_rounded, label: 'Reminders', path: '/payment-tracking'),
       _NavItem(icon: Icons.receipt_long_rounded, label: 'Statement', path: '/statement'),
       _NavItem(icon: Icons.person_rounded, label: 'Profile', path: '/profile'),
     ];
