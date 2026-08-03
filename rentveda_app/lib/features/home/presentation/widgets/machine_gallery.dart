@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
@@ -136,7 +137,11 @@ class MachineGallery extends StatelessWidget {
 
                 return GestureDetector(
                   onTap: () {
-                    // Navigate to start-entry with machine data
+                    context.push('/start-entry', extra: {
+                      'machineId': machine['_id'] ?? machine['Machine_id'] ?? '',
+                      'machineName': name,
+                      'rentType': rentType,
+                    });
                   },
                   child: Container(
                     width: 155,

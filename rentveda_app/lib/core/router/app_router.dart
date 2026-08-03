@@ -7,6 +7,8 @@ import '../../features/reminders/presentation/screens/reminders_screen.dart';
 import '../../features/statement/presentation/screens/statement_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/payments/presentation/screens/payment_tracking_screen.dart';
+import '../../features/start_entry/presentation/screens/start_entry_screen.dart';
+import '../../features/invoice/presentation/screens/invoice_screen.dart';
 import '../widgets/bottom_nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -41,6 +43,22 @@ class AppRouter {
         path: '/payment-tracking',
         name: 'payment-tracking',
         builder: (context, state) => const PaymentTrackingScreen(),
+      ),
+      GoRoute(
+        path: '/start-entry',
+        name: 'start-entry',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return StartEntryScreen(extra: extra);
+        },
+      ),
+      GoRoute(
+        path: '/invoice',
+        name: 'invoice',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return InvoiceScreen(extra: extra);
+        },
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
