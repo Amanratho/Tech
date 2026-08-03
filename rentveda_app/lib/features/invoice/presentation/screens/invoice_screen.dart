@@ -1,8 +1,12 @@
+import 'dart:ui' as ui;
+import 'dart:io';
+import 'package:flutter/rendering.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/providers/auth_provider.dart';
@@ -21,6 +25,8 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
   late String _machineName;
   
   Map<String, dynamic>? _user;
+  final GlobalKey _invoiceKey = GlobalKey();
+  bool _isGenerating = false;
   
   @override
   void initState() {
@@ -49,33 +55,49 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
   }
 
   Future<void> _shareOnWhatsApp(Map<String, dynamic>? user) async {
-    final customerName = _entryData['customerName'] ?? 'Customer';
-    final pendingAmount = _entryData['pendingAmount'] ?? 0;
-    final companyName = user?['companyName'] ?? 'Our Company';
-    final mobileNumber = _entryData['mobileNumber'] ?? '';
+    if (_isGenerating) return;
+    setState(() => _isGenerating = true);
     
-    // We mock the PDF link here and provide a text summary for WhatsApp,
-    // which is more reliable than headless html2canvas in Flutter.
-    final greeting = context.locale.languageCode == 'hi' ? 'नमस्ते' : 'Hello';
-    final bodyText = context.locale.languageCode == 'hi'
-        ? 'यहाँ $companyName से आपका बिल सारांश है:\n\nमशीन: $_machineName\nकार्य: ${_entryData['jobWork'] ?? 'N/A'}\nकुल बकाया राशि: ₹$pendingAmount\n\nधन्यवाद!'
-        : 'Here is your bill summary from $companyName:\n\nMachine: $_machineName\nWork: ${_entryData['jobWork'] ?? 'N/A'}\nTotal Due: ₹$pendingAmount\n\nThank you!';
-
-    final message = '$greeting $customerName,\n\n$bodyText';
-    final encodedMessage = Uri.encodeComponent(message);
-    
-    final Uri launchUri = Uri.parse('whatsapp://send?phone=91$mobileNumber&text=$encodedMessage');
+    // Store localized strings before async gaps
+    final langCode = context.locale.languageCode;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     
     try {
-      if (await canLaunchUrl(launchUri)) {
-        await launchUrl(launchUri, mode: LaunchMode.externalApplication);
-      } else {
-        // Fallback to wa.me web link if native app fails
-        final Uri webUri = Uri.parse('https://wa.me/91$mobileNumber?text=$encodedMessage');
-        await launchUrl(webUri, mode: LaunchMode.externalApplication);
-      }
+      // 1. Capture the Widget as an Image
+      RenderRepaintBoundary boundary = _invoiceKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 2.0); // High quality
+      
+      // 2. Convert to ByteData (PNG)
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final pngBytes = byteData!.buffer.asUint8List();
+      
+      // 3. Save to Temporary Directory
+      final directory = await getTemporaryDirectory();
+      final imagePath = '${directory.path}/Invoice_${_entryData['customerName']}_${DateTime.now().millisecondsSinceEpoch}.png';
+      final file = File(imagePath);
+      await file.writeAsBytes(pngBytes);
+      
+      // 4. Create the WhatsApp Message Text
+      final customerName = _entryData['customerName'] ?? 'Customer';
+      final pendingAmount = _entryData['pendingAmount'] ?? 0;
+      final companyName = user?['companyName'] ?? 'Our Company';
+      
+      final greeting = langCode == 'hi' ? 'नमस्ते' : 'Hello';
+      final bodyText = langCode == 'hi'
+          ? 'यहाँ $companyName से आपका बिल संलग्न है:\n\nमशीन: $_machineName\nकार्य: ${_entryData['jobWork'] ?? 'N/A'}\nकुल बकाया राशि: ₹$pendingAmount\n\nधन्यवाद!'
+          : 'Here is your bill attached from $companyName:\n\nMachine: $_machineName\nWork: ${_entryData['jobWork'] ?? 'N/A'}\nTotal Due: ₹$pendingAmount\n\nThank you!';
+
+      final message = '$greeting $customerName,\n\n$bodyText';
+      
+      // 5. Share via Native Share Sheet (Works perfectly for WhatsApp with images)
+      // ignore: deprecated_member_use
+      await Share.shareXFiles([XFile(imagePath)], text: message);
+
     } catch (e) {
-      debugPrint('WhatsApp launch failed: $e');
+      debugPrint('Failed to generate or share invoice image: $e');
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text('Failed to share invoice: $e')));
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
     }
   }
 
@@ -123,8 +145,12 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+        child: RepaintBoundary(
+          key: _invoiceKey,
+          child: Container(
+            color: AppColors.bgMain,
+            padding: const EdgeInsets.all(16),
+            child: Column(
           children: [
             // Cards: From and Bill To
             Row(
@@ -349,14 +375,16 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 elevation: 2,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.chat, size: 18),
-                  const SizedBox(width: 8),
-                  Text('Share on WhatsApp', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w800, color: Colors.white)),
-                ],
-              ),
+              child: _isGenerating
+                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.chat, size: 18),
+                        const SizedBox(width: 8),
+                        Text('Share on WhatsApp', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w800, color: Colors.white)),
+                      ],
+                    ),
             ),
             const SizedBox(height: 12),
             OutlinedButton(
@@ -375,7 +403,7 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
             ),
           ],
         ),
-      ),
+      ))),
     );
   }
 }
