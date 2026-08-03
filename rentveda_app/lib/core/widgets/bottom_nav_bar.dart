@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_typography.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
 
   const BottomNavBar({super.key, required this.currentIndex});
-
-  static const Color primaryColor = Color(0xFFFFCC00);
-  static const Color inactiveColor = Color(0xFF9CA3AF);
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +20,10 @@ class BottomNavBar extends StatelessWidget {
     ];
 
     return Container(
-      height: 72,
+      height: 74,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.95),
-        border: const Border(top: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
+        color: AppColors.bgSurface.withValues(alpha: 0.95),
+        border: const Border(top: BorderSide(color: AppColors.border, width: 1)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
@@ -48,7 +46,7 @@ class BottomNavBar extends StatelessWidget {
             },
             behavior: HitTestBehavior.opaque,
             child: SizedBox(
-              width: 64,
+              width: 68,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -56,28 +54,28 @@ class BottomNavBar extends StatelessWidget {
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     height: 3,
-                    width: isActive ? 32 : 0,
+                    width: isActive ? 34 : 0,
                     margin: const EdgeInsets.only(bottom: 6),
                     decoration: BoxDecoration(
-                      color: primaryColor,
+                      color: AppColors.primary,
                       borderRadius: BorderRadius.circular(2),
                       boxShadow: isActive
-                          ? [BoxShadow(color: primaryColor.withValues(alpha: 0.5), blurRadius: 8)]
+                          ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.5), blurRadius: 8)]
                           : [],
                     ),
                   ),
                   Icon(
                     item.icon,
-                    size: isActive ? 22 : 20,
-                    color: isActive ? primaryColor : inactiveColor,
+                    size: isActive ? 24 : 22,
+                    color: isActive ? AppColors.primaryGold : AppColors.textSubtle,
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Text(
                     item.label,
-                    style: GoogleFonts.inter(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      color: isActive ? primaryColor : inactiveColor,
+                    style: AppTypography.caption.copyWith(
+                      fontSize: 12,
+                      fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                      color: isActive ? AppColors.primaryGold : AppColors.textSubtle,
                     ),
                   ),
                 ],

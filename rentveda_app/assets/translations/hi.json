@@ -567,5 +567,6 @@
   "eodSelectBothDates": "कृपया शुरू और अंतिम दोनों तारीखें चुनें।",
   "eodEndDateError": "अंतिम तारीख शुरू तारीख से पहले की नहीं हो सकती।",
   "machineSearchPlaceholder": "मशीन का नाम या किराया प्रकार खोजें...",
-  "archivedBadge": "आर्काइव्ड"
+  "archivedBadge": "आर्काइव्ड",
+  "calculator": "कैलकुलेटर"
 }

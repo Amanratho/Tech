@@ -1,63 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'app_colors.dart';
+import 'app_typography.dart';
 
 class AppTheme {
-  // Brand Colors matching React frontend
-  static const Color primaryColor = Color(0xFFFFCC00); // Yellow
-  static const Color primaryDark = Color(0xFFE6B800);
-  static const Color backgroundColor = Color(0xFFFFFFFF);
-  static const Color surfaceColor = Color(0xFFF8F9FA);
-  static const Color textPrimary = Color(0xFF1E1E1E);
-  static const Color textSecondary = Color(0xFF757575);
-  static const Color errorColor = Color(0xFFDC3545);
+  static Color get primaryColor => AppColors.primary;
+  static Color get primaryDark => AppColors.primaryDark;
+  static Color get backgroundColor => AppColors.bgMain;
+  static Color get surfaceColor => AppColors.bgSurface;
+  static Color get textPrimary => AppColors.textMain;
+  static Color get textSecondary => AppColors.textMuted;
+  static Color get errorColor => AppColors.danger;
 
   static ThemeData get lightTheme {
     return ThemeData(
-      primaryColor: primaryColor,
-      scaffoldBackgroundColor: backgroundColor,
-      colorScheme: const ColorScheme.light(
-        primary: primaryColor,
-        secondary: primaryDark,
-        surface: surfaceColor,
-        error: errorColor,
-        onPrimary: textPrimary,
+      primaryColor: AppColors.primary,
+      scaffoldBackgroundColor: AppColors.bgMain,
+      colorScheme: ColorScheme.light(
+        primary: AppColors.primary,
+        secondary: AppColors.primaryDark,
+        surface: AppColors.bgSurface,
+        error: AppColors.danger,
+        onPrimary: AppColors.textMain,
       ),
       textTheme: GoogleFonts.interTextTheme().copyWith(
-        displayLarge: GoogleFonts.inter(color: textPrimary, fontWeight: FontWeight.bold),
-        bodyLarge: GoogleFonts.inter(color: textPrimary),
-        bodyMedium: GoogleFonts.inter(color: textSecondary),
+        displayLarge: AppTypography.screenHeader,
+        titleLarge: AppTypography.sectionHeader,
+        titleMedium: AppTypography.cardHeader,
+        bodyLarge: AppTypography.bodyMain,
+        bodyMedium: AppTypography.bodySecondary,
+        bodySmall: AppTypography.caption,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
-          foregroundColor: textPrimary,
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.textMain,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(vertical: 16),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: AppTypography.buttonText,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surfaceColor,
+        fillColor: AppColors.bgMain,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: primaryColor, width: 2),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.borderFocus, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }

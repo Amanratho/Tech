@@ -565,5 +565,6 @@
     "eodSelectBothDates": "Please select both start and end dates.",
     "eodEndDateError": "End date cannot be before start date.",
     "machineSearchPlaceholder": "Search machine name or rent type...",
-    "archivedBadge": "Archived"
+    "archivedBadge": "Archived",
+    "calculator": "Calculator"
   }

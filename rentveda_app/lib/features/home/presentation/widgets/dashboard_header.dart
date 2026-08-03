@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 
 class DashboardHeader extends StatelessWidget {
   final List<dynamic> payments;
@@ -78,31 +79,35 @@ class DashboardHeader extends StatelessWidget {
                   children: [
                     Text(
                       tr(greetingKey),
-                      style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800, color: const Color(0xFF1A1C1C)),
+                      style: AppTypography.screenHeader,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       tr('greetingSubtitle'),
-                      style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF4F4633), fontWeight: FontWeight.w500),
+                      style: AppTypography.bodySecondary,
                     ),
                   ],
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: const Color(0xFFE2E2E2)),
+                    color: AppColors.bgSurface,
+                    border: Border.all(color: AppColors.border),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4)],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.calendar_today, size: 12, color: Color(0xFF795900)),
-                      const SizedBox(width: 4),
+                      const Icon(Icons.calendar_today, size: 13, color: AppColors.primaryGold),
+                      const SizedBox(width: 5),
                       Text(
                         DateFormat('dd MMM yyyy').format(today),
-                        style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF795900)),
+                        style: AppTypography.caption.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryGold,
+                        ),
                       ),
                     ],
                   ),
@@ -119,11 +124,11 @@ class DashboardHeader extends StatelessWidget {
                 child: _MetricCard(
                   title: tr('todayIncome').toUpperCase(),
                   value: '₹${NumberFormat('#,##,###').format(todayIncome.toInt())}',
-                  valueColor: const Color(0xFF16A34A),
+                  valueColor: AppColors.successDark,
                   icon: Icons.account_balance_wallet,
-                  iconBg: const Color(0xFFDCFCE7),
-                  iconBorder: const Color(0xFFBBF7D0),
-                  iconColor: const Color(0xFF16A34A),
+                  iconBg: AppColors.successBg,
+                  iconBorder: AppColors.successBorder,
+                  iconColor: AppColors.successDark,
                   onTap: onSummaryTap,
                 ),
               ),
@@ -132,11 +137,11 @@ class DashboardHeader extends StatelessWidget {
                 child: _MetricCard(
                   title: tr('totalPendingDues').toUpperCase(),
                   value: '₹${NumberFormat('#,##,###').format(totalPending.toInt())}',
-                  valueColor: const Color(0xFFDC2626),
+                  valueColor: AppColors.dangerDark,
                   icon: Icons.money_off,
-                  iconBg: const Color(0xFFFEE2E2),
-                  iconBorder: const Color(0xFFFECACA),
-                  iconColor: const Color(0xFFDC2626),
+                  iconBg: AppColors.dangerBg,
+                  iconBorder: AppColors.dangerBorder,
+                  iconColor: AppColors.dangerDark,
                   onTap: onPaymentsTap,
                 ),
               ),
@@ -149,11 +154,11 @@ class DashboardHeader extends StatelessWidget {
                 child: _MetricCard(
                   title: tr('activeWorkEntries').toUpperCase(),
                   value: '$todayEntries',
-                  valueColor: const Color(0xFF1A1C1C),
+                  valueColor: AppColors.textMain,
                   icon: Icons.receipt_long,
-                  iconBg: const Color(0xFFFFFDF0),
-                  iconBorder: const Color(0xFFFBC02D).withValues(alpha: 0.4),
-                  iconColor: const Color(0xFF795900),
+                  iconBg: AppColors.primaryGoldBg,
+                  iconBorder: AppColors.warning.withValues(alpha: 0.4),
+                  iconColor: AppColors.primaryGold,
                   onTap: onBillsTap,
                 ),
               ),
@@ -162,11 +167,11 @@ class DashboardHeader extends StatelessWidget {
                 child: _MetricCard(
                   title: tr('totalMachinesCount').toUpperCase(),
                   value: '${machines.length}',
-                  valueColor: const Color(0xFF1A1C1C),
+                  valueColor: AppColors.textMain,
                   icon: Icons.inventory_2,
-                  iconBg: const Color(0xFFFFFDF0),
-                  iconBorder: const Color(0xFFFBC02D).withValues(alpha: 0.4),
-                  iconColor: const Color(0xFF795900),
+                  iconBg: AppColors.primaryGoldBg,
+                  iconBorder: AppColors.warning.withValues(alpha: 0.4),
+                  iconColor: AppColors.primaryGold,
                   onTap: onMachinesTap,
                 ),
               ),
@@ -179,20 +184,20 @@ class DashboardHeader extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF2F2),
-                border: Border.all(color: const Color(0xFFFECACA)),
+                color: AppColors.dangerBg,
+                border: Border.all(color: AppColors.dangerBorder),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 32,
-                    height: 32,
+                    width: 34,
+                    height: 34,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFEE2E2),
-                      borderRadius: BorderRadius.circular(8),
+                      color: AppColors.dangerBg,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.warning_amber_rounded, size: 18, color: Color(0xFFDC2626)),
+                    child: const Icon(Icons.warning_amber_rounded, size: 20, color: AppColors.dangerDark),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -201,11 +206,17 @@ class DashboardHeader extends StatelessWidget {
                       children: [
                         Text(
                           tr('overdueAlertTitle'),
-                          style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF991B1B)),
+                          style: AppTypography.cardHeader.copyWith(
+                            fontSize: 13,
+                            color: AppColors.dangerDark,
+                          ),
                         ),
                         Text(
                           tr('overdueAlertMsg'),
-                          style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFFB91C1C)),
+                          style: AppTypography.caption.copyWith(
+                            fontSize: 12,
+                            color: AppColors.danger,
+                          ),
                         ),
                       ],
                     ),
@@ -214,7 +225,10 @@ class DashboardHeader extends StatelessWidget {
                     onPressed: onPaymentsTap,
                     child: Text(
                       tr('viewDues'),
-                      style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFFDC2626)),
+                      style: AppTypography.buttonText.copyWith(
+                        fontSize: 13,
+                        color: AppColors.dangerDark,
+                      ),
                     ),
                   ),
                 ],
@@ -255,8 +269,8 @@ class _MetricCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: const Color(0xFFE2E2E2)),
+          color: AppColors.bgSurface,
+          border: Border.all(color: AppColors.border),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4)],
         ),
@@ -267,25 +281,35 @@ class _MetricCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
-                  child: Text(title,
-                    style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: const Color(0xFF4F4633), letterSpacing: 0.5),
+                  child: Text(
+                    title,
+                    style: AppTypography.badgeText.copyWith(
+                      fontSize: 12,
+                      color: AppColors.textDarkBrown,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Container(
-                  width: 28,
-                  height: 28,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
                     color: iconBg,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: iconBorder),
                   ),
-                  child: Icon(icon, size: 14, color: iconColor),
+                  child: Icon(icon, size: 15, color: iconColor),
                 ),
               ],
             ),
-            const SizedBox(height: 4),
-            Text(value, style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800, color: valueColor)),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: AppTypography.screenHeader.copyWith(
+                fontSize: 20,
+                color: valueColor,
+              ),
+            ),
           ],
         ),
       ),

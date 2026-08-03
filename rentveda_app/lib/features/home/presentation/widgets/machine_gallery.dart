@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 
 class MachineGallery extends StatelessWidget {
   final List<dynamic> machines;
@@ -22,11 +23,15 @@ class MachineGallery extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(tr('exploreMachines'),
-                    style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C))),
+                  Text(
+                    tr('exploreMachines'),
+                    style: AppTypography.sectionHeader,
+                  ),
                   const SizedBox(height: 2),
-                  Text('${machines.length} ${tr('machinesCount')}',
-                    style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFF4F4633))),
+                  Text(
+                    '${machines.length} ${tr('machinesCount')}',
+                    style: AppTypography.bodySecondary,
+                  ),
                 ],
               ),
               Row(
@@ -52,8 +57,8 @@ class MachineGallery extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 32),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: const Color(0xFFE2E2E2), width: 2, strokeAlign: BorderSide.strokeAlignInside),
+                  color: AppColors.bgSurface,
+                  border: Border.all(color: AppColors.border, width: 2, strokeAlign: BorderSide.strokeAlignInside),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -62,18 +67,22 @@ class MachineGallery extends StatelessWidget {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFFDF0),
-                        border: Border.all(color: const Color(0xFFFBC02D).withValues(alpha: 0.4)),
+                        color: AppColors.primaryGoldBg,
+                        border: Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Icon(Icons.add, size: 20, color: Color(0xFF795900)),
+                      child: const Icon(Icons.add, size: 22, color: AppColors.primaryGold),
                     ),
-                    const SizedBox(height: 8),
-                    Text(tr('addYourMachine'),
-                      style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C))),
-                    const SizedBox(height: 2),
-                    Text(tr('addMachine'),
-                      style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500, color: const Color(0xFF4F4633))),
+                    const SizedBox(height: 10),
+                    Text(
+                      tr('addYourMachine'),
+                      style: AppTypography.cardHeader,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      tr('addMachine'),
+                      style: AppTypography.bodySecondary,
+                    ),
                   ],
                 ),
               ),
@@ -113,7 +122,7 @@ class MachineGallery extends StatelessWidget {
                             child: const Icon(Icons.add, size: 16, color: Color(0xFF795900)),
                           ),
                           const SizedBox(height: 8),
-                          Text(tr('addMachineButton').toUpperCase(), style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: const Color(0xFF4F4633), letterSpacing: 0.5)),
+                          Text(tr('addMachineButton').toUpperCase(), style: AppTypography.badgeText.copyWith(fontSize: 12, color: AppColors.textDarkBrown)),
                         ],
                       ),
                     ),
@@ -133,7 +142,7 @@ class MachineGallery extends StatelessWidget {
                     width: 155,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFE2E2E2)),
+                      border: Border.all(color: AppColors.border),
                       boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4)],
                     ),
                     clipBehavior: Clip.antiAlias,
@@ -176,7 +185,7 @@ class MachineGallery extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(name,
-                                  style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white),
+                                  style: AppTypography.cardHeader.copyWith(fontSize: 14, color: Colors.white),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -192,7 +201,7 @@ class MachineGallery extends StatelessWidget {
                                       ),
                                       child: Text(
                                         rentType,
-                                        style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.grey[200], letterSpacing: 0.5),
+                                        style: AppTypography.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
                                       ),
                                     ),
                                     Container(

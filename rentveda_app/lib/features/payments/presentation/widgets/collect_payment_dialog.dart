@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 
 class CollectPaymentDialog extends StatefulWidget {
   final Map<String, dynamic> entry;
@@ -45,7 +46,7 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.bgSurface,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -59,7 +60,7 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
               children: [
                 Text(
                   'Collect Payment',
-                  style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C)),
+                  style: AppTypography.sectionHeader,
                 ),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
@@ -67,11 +68,11 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF9F9F9),
-                      border: Border.all(color: const Color(0xFFE2E2E2)),
+                      color: AppColors.bgMain,
+                      border: Border.all(color: AppColors.border),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.close, size: 14, color: Color(0xFF4F4633)),
+                    child: const Icon(Icons.close, size: 16, color: AppColors.textDarkBrown),
                   ),
                 ),
               ],
@@ -79,41 +80,44 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
             const SizedBox(height: 20),
 
             // Input fields
-            Text(tr('customerName'), style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF9CA3AF))),
+            Text(tr('customerName'), style: AppTypography.bodySecondary),
             const SizedBox(height: 4),
             _buildTextField(_nameController),
             const SizedBox(height: 12),
 
-            Text(tr('mobileNumber'), style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF9CA3AF))),
+            Text(tr('mobileNumber'), style: AppTypography.bodySecondary),
             const SizedBox(height: 4),
             _buildTextField(_mobileController, keyboardType: TextInputType.phone),
             const SizedBox(height: 16),
 
             // Pending amount display
-            Text(tr('pendingAmount'), style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF9CA3AF))),
+            Text(tr('pendingAmount'), style: AppTypography.bodySecondary),
             const SizedBox(height: 4),
             Text(
               '₹${pendingAmount.toInt()}',
-              style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFFEF4444)),
+              style: AppTypography.screenHeader.copyWith(
+                fontSize: 20,
+                color: AppColors.danger,
+              ),
             ),
             const SizedBox(height: 16),
 
             // Payment Amount Input
-            Text(tr('pendingAmount') == 'pendingAmount' ? 'Enter Payment Amount' : tr('pendingAmount'), style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF9CA3AF))),
+            Text(tr('pendingAmount') == 'pendingAmount' ? 'Enter Payment Amount' : tr('pendingAmount'), style: AppTypography.bodySecondary),
             const SizedBox(height: 4),
             TextField(
               controller: _amountController,
               keyboardType: TextInputType.number,
-              style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF1A1C1C)),
+              style: AppTypography.bodyMain.copyWith(fontSize: 15, fontWeight: FontWeight.w700),
               decoration: InputDecoration(
                 prefixText: '₹ ',
-                prefixStyle: GoogleFonts.inter(color: const Color(0xFF9CA3AF)),
+                prefixStyle: AppTypography.bodyMain.copyWith(color: AppColors.textSubtle),
                 filled: true,
-                fillColor: const Color(0xFFF9F9F9),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE2E2E2))),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE2E2E2))),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFFFCC00))),
+                fillColor: AppColors.bgMain,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.borderFocus, width: 2)),
               ),
             ),
             const SizedBox(height: 24),
@@ -129,7 +133,7 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF22C55E),
+                  backgroundColor: AppColors.success,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -137,7 +141,7 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
                 ),
                 child: Text(
                   tr('submit'),
-                  style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700),
+                  style: AppTypography.buttonText.copyWith(color: Colors.white),
                 ),
               ),
             ),
@@ -151,14 +155,14 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF1A1C1C)),
+      style: AppTypography.bodyMain,
       decoration: InputDecoration(
         filled: true,
-        fillColor: const Color(0xFFF9F9F9),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE2E2E2))),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE2E2E2))),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFFFCC00))),
+        fillColor: AppColors.bgMain,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.borderFocus, width: 2)),
       ),
     );
   }

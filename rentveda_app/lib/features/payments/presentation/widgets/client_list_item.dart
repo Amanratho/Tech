@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 
 class ClientListItem extends StatelessWidget {
   final Map<String, dynamic> user;
@@ -22,11 +23,12 @@ class ClientListItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: const Color(0xFFE2E2E2)),
+          color: AppColors.bgSurface,
+          border: Border.all(color: AppColors.border),
           borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4)],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -34,14 +36,14 @@ class ClientListItem extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9F9F9),
-                    border: Border.all(color: const Color(0xFFE2E2E2)),
+                    color: AppColors.bgMain,
+                    border: Border.all(color: AppColors.border),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.person_outline, size: 18, color: Color(0xFF9CA3AF)),
+                  child: const Icon(Icons.person_outline, size: 20, color: AppColors.textSubtle),
                 ),
                 const SizedBox(width: 12),
                 Column(
@@ -49,23 +51,16 @@ class ClientListItem extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF1A1C1C),
-                      ),
+                      style: AppTypography.cardHeader,
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Row(
                       children: [
-                        const Icon(Icons.phone, size: 8, color: Color(0xFF9CA3AF)),
-                        const SizedBox(width: 4),
+                        const Icon(Icons.phone, size: 10, color: AppColors.textSubtle),
+                        const SizedBox(width: 5),
                         Text(
                           mobile,
-                          style: GoogleFonts.inter(
-                            fontSize: 10,
-                            color: const Color(0xFF9CA3AF),
-                          ),
+                          style: AppTypography.caption,
                         ),
                       ],
                     ),
@@ -81,42 +76,41 @@ class ClientListItem extends StatelessWidget {
                     if (pendingAmount > 0) ...[
                       Text(
                         tr('filterPending').toUpperCase(),
-                        style: GoogleFonts.inter(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                          color: const Color(0xFFF87171),
-                          letterSpacing: 0.5,
+                        style: AppTypography.badgeText.copyWith(
+                          fontSize: 12,
+                          color: AppColors.danger,
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Text(
                         '₹${NumberFormat('#,##,###').format(pendingAmount.toInt())}',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
+                        style: AppTypography.cardHeader.copyWith(
+                          fontSize: 15,
                           fontWeight: FontWeight.w800,
-                          color: const Color(0xFFEF4444),
+                          color: AppColors.danger,
                         ),
                       ),
                     ] else ...[
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.transparent,
+                          color: AppColors.successBg,
                           borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.successBorder),
                         ),
                         child: Text(
                           tr('filterPaid') == 'filterPaid' ? 'Paid' : tr('filterPaid'),
-                          style: GoogleFonts.inter(
+                          style: AppTypography.badgeText.copyWith(
                             fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFF22C55E),
+                            color: AppColors.successDark,
                           ),
                         ),
                       ),
                     ],
                   ],
                 ),
-                const SizedBox(width: 12),
-                const Icon(Icons.chevron_right, size: 12, color: Color(0xFF9CA3AF)),
+                const SizedBox(width: 4),
+                const Icon(Icons.chevron_right, size: 20, color: AppColors.textSubtle),
               ],
             ),
           ],

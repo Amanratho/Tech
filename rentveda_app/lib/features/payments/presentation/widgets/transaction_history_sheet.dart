@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 
 class TransactionHistorySheet extends StatelessWidget {
   final List<dynamic> entries;
@@ -18,7 +19,7 @@ class TransactionHistorySheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFFF9F9F9),
+        color: AppColors.bgMain,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -27,8 +28,8 @@ class TransactionHistorySheet extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: const BoxDecoration(
-              color: Color(0xFFF9F9F9),
-              border: Border(bottom: BorderSide(color: Color(0xFFE2E2E2))),
+              color: AppColors.bgMain,
+              border: Border(bottom: BorderSide(color: AppColors.border)),
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Row(
@@ -37,7 +38,7 @@ class TransactionHistorySheet extends StatelessWidget {
                   onTap: () => Navigator.pop(context),
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: Icon(Icons.arrow_back, size: 20, color: Color(0xFF1A1C1C)),
+                    child: Icon(Icons.arrow_back, size: 22, color: AppColors.textMain),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -46,11 +47,11 @@ class TransactionHistorySheet extends StatelessWidget {
                   children: [
                     Text(
                       clientName,
-                      style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C)),
+                      style: AppTypography.sectionHeader,
                     ),
                     Text(
                       tr('billsHistory'),
-                      style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF9CA3AF)),
+                      style: AppTypography.bodySecondary,
                     ),
                   ],
                 ),
@@ -71,11 +72,12 @@ class TransactionHistorySheet extends StatelessWidget {
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: const Color(0xFFE2E2E2)),
+                    color: AppColors.bgSurface,
+                    border: Border.all(color: AppColors.border),
                     borderRadius: BorderRadius.circular(16),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4)],
                   ),
                   child: Column(
                     children: [
@@ -85,13 +87,13 @@ class TransactionHistorySheet extends StatelessWidget {
                         children: [
                           Text(
                             DateFormat('dd MMM yyyy').format(createdAt),
-                            style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF9CA3AF)),
+                            style: AppTypography.caption,
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: pendingAmount <= 0 ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
-                              border: Border.all(color: pendingAmount <= 0 ? const Color(0xFFBBF7D0) : const Color(0xFFFECACA)),
+                              color: pendingAmount <= 0 ? AppColors.successBg : AppColors.dangerBg,
+                              border: Border.all(color: pendingAmount <= 0 ? AppColors.successBorder : AppColors.dangerBorder),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -99,15 +101,15 @@ class TransactionHistorySheet extends StatelessWidget {
                               children: [
                                 Icon(
                                   pendingAmount <= 0 ? Icons.check_circle : Icons.error,
-                                  size: 10,
-                                  color: pendingAmount <= 0 ? const Color(0xFF22C55E) : const Color(0xFFF87171),
+                                  size: 12,
+                                  color: pendingAmount <= 0 ? AppColors.successDark : AppColors.dangerDark,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   pendingAmount <= 0 ? (tr('filterPaid') == 'filterPaid' ? 'Paid' : tr('filterPaid')) : (tr('filterPending') == 'filterPending' ? 'Pending' : tr('filterPending')),
-                                  style: GoogleFonts.inter(
-                                    fontSize: 10,
-                                    color: pendingAmount <= 0 ? const Color(0xFF22C55E) : const Color(0xFFF87171),
+                                  style: AppTypography.badgeText.copyWith(
+                                    fontSize: 12,
+                                    color: pendingAmount <= 0 ? AppColors.successDark : AppColors.dangerDark,
                                   ),
                                 ),
                               ],
@@ -125,39 +127,41 @@ class TransactionHistorySheet extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(tr('total'), style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF9CA3AF))),
-                              Text('₹${totalAmount.toInt()}', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C))),
+                              Text(tr('total'), style: AppTypography.bodySecondary.copyWith(fontSize: 12)),
+                              const SizedBox(height: 2),
+                              Text('₹${totalAmount.toInt()}', style: AppTypography.cardHeader.copyWith(fontSize: 15)),
                             ],
                           ),
                           if (pendingAmount > 0)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text(tr('pendingAmount'), style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF9CA3AF))),
-                                Text('₹${pendingAmount.toInt()}', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFFEF4444))),
+                                Text(tr('pendingAmount'), style: AppTypography.bodySecondary.copyWith(fontSize: 12, color: AppColors.dangerDark)),
+                                const SizedBox(height: 2),
+                                Text('₹${pendingAmount.toInt()}', style: AppTypography.screenHeader.copyWith(fontSize: 16, color: AppColors.danger)),
                               ],
                             )
                           else
-                            Text(tr('filterPaid') == 'filterPaid' ? 'Paid' : tr('filterPaid'), style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF22C55E))),
+                            Text(tr('filterPaid') == 'filterPaid' ? 'Paid' : tr('filterPaid'), style: AppTypography.cardHeader.copyWith(fontSize: 15, color: AppColors.successDark)),
                         ],
                       ),
 
                       // Collect Button
                       if (pendingAmount > 0) ...[
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 14),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
                             onPressed: () => onCollectPayment(entry),
-                            icon: const Icon(Icons.money, size: 16),
+                            icon: const Icon(Icons.money, size: 18),
                             label: Text(tr('submit') == 'submit' ? 'Collect Payment' : 'Collect Payment'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFFCC00),
-                              foregroundColor: Colors.black,
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: AppColors.textMain,
                               elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               padding: const EdgeInsets.symmetric(vertical: 12),
-                              textStyle: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700),
+                              textStyle: AppTypography.buttonText.copyWith(fontSize: 14),
                             ),
                           ),
                         ),

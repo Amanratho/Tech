@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -9,6 +8,8 @@ import '../widgets/client_list_item.dart';
 import '../widgets/transaction_history_sheet.dart';
 import '../widgets/collect_payment_dialog.dart';
 import '../../../../core/widgets/top_app_bar.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 
 class PaymentTrackingScreen extends ConsumerStatefulWidget {
   const PaymentTrackingScreen({super.key});
@@ -112,14 +113,14 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
+      backgroundColor: AppColors.bgMain,
       body: Column(
         children: [
           const RentVedaAppBar(),
           
           // Header section with sticky feel
           Container(
-            color: Colors.white.withValues(alpha: 0.95),
+            color: AppColors.bgSurface.withValues(alpha: 0.95),
             child: Column(
               children: [
                 // Title and Count
@@ -132,33 +133,32 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
                         children: [
                           GestureDetector(
                             onTap: () => context.pop(),
-                            child: const Icon(Icons.arrow_back, size: 20, color: Color(0xFF1A1C1C)),
+                            child: const Icon(Icons.arrow_back, size: 22, color: AppColors.textMain),
                           ),
                           const SizedBox(width: 8),
                           Text(
                             tr('paymentTrackingTitle').toUpperCase(),
-                            style: GoogleFonts.inter(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF9CA3AF),
-                              letterSpacing: 1.5,
+                            style: AppTypography.badgeText.copyWith(
+                              fontSize: 13,
+                              color: AppColors.textSubtle,
+                              letterSpacing: 1.2,
                             ),
                           ),
                         ],
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFBC02D).withValues(alpha: 0.2),
-                          border: Border.all(color: const Color(0xFFFBC02D)),
-                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.warning.withValues(alpha: 0.2),
+                          border: Border.all(color: AppColors.warning),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                         child: Text(
-                          '${filteredUsers.length} Clients', // TODO translation
-                          style: GoogleFonts.inter(
-                            fontSize: 10,
+                          '${filteredUsers.length} Clients',
+                          style: AppTypography.caption.copyWith(
+                            fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF6C5000),
+                            color: AppColors.warningDark,
                           ),
                         ),
                       ),
@@ -171,17 +171,17 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
                     onChanged: (val) => setState(() => _searchQuery = val),
-                    style: GoogleFonts.inter(fontSize: 12),
+                    style: AppTypography.bodyMain,
                     decoration: InputDecoration(
                       hintText: tr('searchPlaceholder'),
-                      hintStyle: GoogleFonts.inter(color: const Color(0xFF9CA3AF)),
-                      prefixIcon: const Icon(Icons.search, size: 16, color: Color(0xFF9CA3AF)),
+                      hintStyle: AppTypography.bodySecondary.copyWith(color: AppColors.textSubtle),
+                      prefixIcon: const Icon(Icons.search, size: 18, color: AppColors.textSubtle),
                       filled: true,
-                      fillColor: const Color(0xFFF9F9F9),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFFE2E2E2))),
-                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFFE2E2E2))),
-                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFFFFCC00))),
+                      fillColor: AppColors.bgMain,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.borderFocus, width: 2)),
                     ),
                   ),
                 ),
@@ -200,7 +200,7 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
                     ],
                   ),
                 ),
-                const Divider(height: 1, color: Color(0xFFE2E2E2)),
+                const Divider(height: 1, color: AppColors.border),
               ],
             ),
           ),
@@ -208,9 +208,9 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
           // Main List
           Expanded(
             child: state.isLoading
-                ? const Center(child: CircularProgressIndicator(color: Color(0xFFFBC02D)))
+                ? const Center(child: CircularProgressIndicator(color: AppColors.warning))
                 : RefreshIndicator(
-                    color: const Color(0xFFFBC02D),
+                    color: AppColors.warning,
                     onRefresh: () => ref.read(paymentTrackingProvider.notifier).loadPayments(),
                     child: filteredUsers.isEmpty
                         ? SingleChildScrollView(
@@ -218,7 +218,7 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
                             child: Container(
                               height: MediaQuery.of(context).size.height * 0.5,
                               alignment: Alignment.center,
-                              child: Text('No clients found', style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF9CA3AF))),
+                              child: Text('No clients found', style: AppTypography.bodySecondary),
                             ),
                           )
                         : ListView.builder(
@@ -245,18 +245,18 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
       onTap: () => setState(() => _filterType = value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFBC02D) : Colors.transparent,
-          border: Border.all(color: isSelected ? const Color(0xFF795900) : const Color(0xFFE2E2E2)),
+          color: isSelected ? AppColors.warning : Colors.transparent,
+          border: Border.all(color: isSelected ? AppColors.borderDarkGold : AppColors.border),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-            color: isSelected ? const Color(0xFF6C5000) : const Color(0xFF9CA3AF),
+          style: AppTypography.caption.copyWith(
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+            color: isSelected ? AppColors.warningDark : AppColors.textSubtle,
           ),
         ),
       ),

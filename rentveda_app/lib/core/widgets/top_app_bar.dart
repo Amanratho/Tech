@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_typography.dart';
 
 class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
   const RentVedaAppBar({super.key});
-
-  static const Color primaryColor = Color(0xFFFFCC00);
 
   @override
   Size get preferredSize => const Size.fromHeight(56);
@@ -18,8 +17,8 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
       height: 56 + MediaQuery.of(context).padding.top,
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.95),
-        border: const Border(bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
+        color: AppColors.bgSurface.withValues(alpha: 0.95),
+        border: const Border(bottom: BorderSide(color: AppColors.border, width: 1)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -30,14 +29,14 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
             Row(
               children: [
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: 34,
+                  height: 34,
                   decoration: BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
-                        color: primaryColor.withValues(alpha: 0.3),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -46,10 +45,10 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Center(
                     child: Text(
                       'R',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
+                      style: AppTypography.screenHeader.copyWith(
+                        fontSize: 20,
                         fontWeight: FontWeight.w900,
-                        color: Colors.black,
+                        color: AppColors.textMain,
                       ),
                     ),
                   ),
@@ -57,10 +56,10 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
                 const SizedBox(width: 8),
                 RichText(
                   text: TextSpan(
-                    style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800),
+                    style: AppTypography.screenHeader,
                     children: [
-                      const TextSpan(text: 'Rent', style: TextStyle(color: Color(0xFF1A1C1C))),
-                      TextSpan(text: 'Veda', style: TextStyle(color: primaryColor)),
+                      const TextSpan(text: 'Rent', style: TextStyle(color: AppColors.textMain)),
+                      TextSpan(text: 'Veda', style: TextStyle(color: AppColors.primaryGold)),
                     ],
                   ),
                 ),
@@ -80,20 +79,24 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
                     }
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8F9FA),
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      color: AppColors.bgPill,
+                      border: Border.all(color: AppColors.border),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.language, size: 14, color: primaryColor),
-                        const SizedBox(width: 4),
+                        const Icon(Icons.language, size: 16, color: AppColors.primaryGold),
+                        const SizedBox(width: 6),
                         Text(
                           isEn ? 'हिन्दी' : 'ENG',
-                          style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C)),
+                          style: AppTypography.bodySecondary.copyWith(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textMain,
+                          ),
                         ),
                       ],
                     ),
@@ -103,17 +106,17 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
                 // Notification bell
                 Stack(
                   children: [
-                    Icon(Icons.notifications_rounded, size: 24, color: primaryColor),
+                    const Icon(Icons.notifications_rounded, size: 26, color: AppColors.primaryGold),
                     Positioned(
                       top: 0,
                       right: 0,
                       child: Container(
-                        width: 8,
-                        height: 8,
+                        width: 9,
+                        height: 9,
                         decoration: BoxDecoration(
-                          color: Colors.red,
+                          color: AppColors.danger,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 1.5),
+                          border: Border.all(color: AppColors.bgSurface, width: 1.5),
                         ),
                       ),
                     ),
