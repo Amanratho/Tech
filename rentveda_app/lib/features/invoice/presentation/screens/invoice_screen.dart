@@ -10,6 +10,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/providers/auth_provider.dart';
+import '../widgets/formal_invoice_template.dart';
 
 class InvoiceScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> extra;
@@ -144,14 +145,34 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: RepaintBoundary(
-          key: _invoiceKey,
-          child: Container(
-            color: AppColors.bgMain,
-            padding: const EdgeInsets.all(16),
-            child: Column(
-          children: [
+      body: Stack(
+        children: [
+          // 1. HIDDEN FORMAL TEMPLATE (Rendered at bottom layer)
+          Positioned(
+            left: 0,
+            top: 0,
+            child: IgnorePointer(
+              child: RepaintBoundary(
+                key: _invoiceKey,
+                child: FormalInvoiceTemplate(
+                  user: user,
+                  entryData: _entryData,
+                  machineName: _machineName,
+                  formattedDate: formattedDate,
+                  totalAmount: totalAmount,
+                ),
+              ),
+            ),
+          ),
+          
+          // 2. VISIBLE MOBILE UI (Covers the template with solid background)
+          Positioned.fill(
+            child: Container(
+              color: AppColors.bgMain, // Ensures hidden template is not visible
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
             // Cards: From and Bill To
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,7 +424,11 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
             ),
           ],
         ),
-      ))),
+      ),
+    ),
+  ),
+],
+),
     );
   }
 }
