@@ -9,6 +9,7 @@ import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/payments/presentation/screens/payment_tracking_screen.dart';
 import '../../features/start_entry/presentation/screens/start_entry_screen.dart';
 import '../../features/invoice/presentation/screens/invoice_screen.dart';
+import '../../features/machine_maintenance/presentation/screens/machine_maintenance_screen.dart';
 import '../widgets/bottom_nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -59,6 +60,11 @@ class AppRouter {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return InvoiceScreen(extra: extra);
         },
+      ),
+      GoRoute(
+        path: '/machine-maintenance',
+        name: 'machine-maintenance',
+        builder: (context, state) => const MachineMaintenanceScreen(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
