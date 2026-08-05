@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../providers/start_entry_provider.dart';
@@ -118,6 +119,43 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     final paid = _totalAmount - pending;
     if (_paidController.text != paid.toStringAsFixed(0) && _paidController.text != paid.toString()) {
         _paidController.text = paid % 1 == 0 ? paid.toInt().toString() : paid.toStringAsFixed(2);
+    }
+  }
+
+  Future<void> _pickContact() async {
+    bool hasPermission = await FlutterContacts.permissions.has(PermissionType.read);
+    if (!hasPermission) {
+      final status = await FlutterContacts.permissions.request(PermissionType.read);
+      hasPermission = status == PermissionStatus.granted || status == PermissionStatus.limited;
+    }
+    
+    if (hasPermission) {
+      final contact = await FlutterContacts.native.showPicker();
+      if (contact != null && contact.id != null) {
+        final fullContact = await FlutterContacts.get(contact.id!, properties: ContactProperties.allProperties);
+        if (fullContact != null) {
+          if (fullContact.phones.isNotEmpty) {
+            String phone = fullContact.phones.first.number;
+            phone = phone.replaceAll(RegExp(r'\D'), '');
+            if (phone.length > 10) {
+              phone = phone.substring(phone.length - 10);
+            }
+            _mobileController.text = phone;
+            _handleMobileChange(phone);
+          }
+          if (fullContact.displayName != null && fullContact.displayName!.isNotEmpty) {
+            _nameController.text = fullContact.displayName!;
+          }
+        }
+      }
+    } else {
+      if (mounted) {
+        Fluttertoast.showToast(
+          msg: "Contact permission is required to pick a contact.",
+          backgroundColor: AppColors.danger,
+          textColor: Colors.white,
+        );
+      }
     }
   }
 
@@ -252,8 +290,22 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
                     keyboardType: TextInputType.phone,
                     maxLength: 10,
                     onChanged: _handleMobileChange,
-                    suffixIcon: _isCustomerFound ? Icons.check_circle : null,
-                    suffixColor: AppColors.successDark,
+                    suffixWidget: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_isCustomerFound)
+                          const Padding(
+                            padding: EdgeInsets.only(right: 8.0),
+                            child: Icon(Icons.check_circle, size: 18, color: AppColors.successDark),
+                          ),
+                        IconButton(
+                          icon: const Icon(Icons.contacts, color: AppColors.primary),
+                          onPressed: _pickContact,
+                          constraints: const BoxConstraints(),
+                          padding: const EdgeInsets.only(right: 12.0),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 12),
                   _buildInput(
@@ -473,6 +525,7 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     ValueChanged<String>? onChanged,
     IconData? suffixIcon,
     Color? suffixColor,
+    Widget? suffixWidget,
     bool enabled = true,
   }) {
     return TextField(
@@ -486,7 +539,7 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
         hintText: hint,
         hintStyle: AppTypography.bodyMain.copyWith(color: AppColors.textMuted, fontSize: 14),
         prefixIcon: Icon(icon, size: 16, color: AppColors.textMuted),
-        suffixIcon: suffixIcon != null ? Icon(suffixIcon, size: 18, color: suffixColor) : null,
+        suffixIcon: suffixWidget ?? (suffixIcon != null ? Icon(suffixIcon, size: 18, color: suffixColor) : null),
         counterText: '',
         filled: true,
         fillColor: AppColors.bgSurface,

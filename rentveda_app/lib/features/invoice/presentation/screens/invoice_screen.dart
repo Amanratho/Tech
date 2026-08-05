@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:whatsapp_share_plus/whatsapp_share_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -55,7 +56,7 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
     }
   }
 
-  Future<void> _shareOnWhatsApp(Map<String, dynamic>? user) async {
+  Future<void> _shareOnWhatsApp(Map<String, dynamic>? user, {bool directToWhatsApp = false}) async {
     if (_isGenerating) return;
     setState(() => _isGenerating = true);
     
@@ -91,8 +92,22 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
       final message = '$greeting $customerName,\n\n$bodyText';
       
       // 5. Share via Native Share Sheet (Works perfectly for WhatsApp with images)
-      // ignore: deprecated_member_use
-      await Share.shareXFiles([XFile(imagePath)], text: message);
+      if (directToWhatsApp) {
+        String phone = _entryData['mobileNumber']?.toString() ?? '';
+        if (phone.startsWith('+')) {
+          phone = phone.substring(1);
+        } else if (phone.length == 10) {
+          phone = '91$phone';
+        }
+        await WhatsappSharePlus.shareImageToWhatsapp(
+          imagePath: imagePath,
+          text: message,
+          phone: phone,
+        );
+      } else {
+        // ignore: deprecated_member_use
+        await Share.shareXFiles([XFile(imagePath)], text: message);
+      }
 
     } catch (e) {
       debugPrint('Failed to generate or share invoice image: $e');
@@ -387,25 +402,40 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
             const SizedBox(height: 24),
             
             // ACTION BUTTONS
-            ElevatedButton(
-              onPressed: () => _shareOnWhatsApp(user),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF25D366),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                elevation: 2,
-              ),
-              child: _isGenerating
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.chat, size: 18),
-                        const SizedBox(width: 8),
-                        Text('Share on WhatsApp', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w800, color: Colors.white)),
-                      ],
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _shareOnWhatsApp(user, directToWhatsApp: false),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      elevation: 2,
                     ),
+                    child: _isGenerating
+                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.share, size: 24),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _shareOnWhatsApp(user, directToWhatsApp: true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF25D366),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      elevation: 2,
+                    ),
+                    child: _isGenerating
+                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.chat, size: 24),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             OutlinedButton(
