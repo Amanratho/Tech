@@ -13,7 +13,7 @@ class QuickActions extends StatelessWidget {
       _Action(title: tr('explore'), icon: Icons.receipt_long, color: AppColors.successDark, bgColor: AppColors.successBg, borderColor: AppColors.successBorder, path: '/payment-tracking'),
       _Action(title: tr('seeBills'), icon: Icons.history, color: const Color(0xFF2563EB), bgColor: const Color(0xFFEFF6FF), borderColor: const Color(0xFFBFDBFE), path: '/summary'),
       _Action(title: tr('seeStatus'), icon: Icons.build_circle, color: const Color(0xFFEA580C), bgColor: const Color(0xFFFFF7ED), borderColor: const Color(0xFFFED7AA), path: '/machine-maintenance'),
-      _Action(title: tr('calculator'), icon: Icons.calculate, color: const Color(0xFFD97706), bgColor: const Color(0xFFFFFBEB), borderColor: const Color(0xFFFDE68A), path: '/summary'),
+      _Action(title: tr('calculator'), icon: Icons.calculate, color: const Color(0xFFD97706), bgColor: const Color(0xFFFFFBEB), borderColor: const Color(0xFFFDE68A), path: '/calculator'),
     ];
 
     return Padding(

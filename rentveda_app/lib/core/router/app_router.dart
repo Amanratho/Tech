@@ -10,6 +10,7 @@ import '../../features/payments/presentation/screens/payment_tracking_screen.dar
 import '../../features/start_entry/presentation/screens/start_entry_screen.dart';
 import '../../features/invoice/presentation/screens/invoice_screen.dart';
 import '../../features/machine_maintenance/presentation/screens/machine_maintenance_screen.dart';
+import '../../features/calculator/presentation/screens/calculator_screen.dart';
 import '../widgets/bottom_nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -41,11 +42,6 @@ class AppRouter {
         builder: (context, state) => const WelcomeScreen(),
       ),
       GoRoute(
-        path: '/payment-tracking',
-        name: 'payment-tracking',
-        builder: (context, state) => const PaymentTrackingScreen(),
-      ),
-      GoRoute(
         path: '/start-entry',
         name: 'start-entry',
         builder: (context, state) {
@@ -60,11 +56,6 @@ class AppRouter {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return InvoiceScreen(extra: extra);
         },
-      ),
-      GoRoute(
-        path: '/machine-maintenance',
-        name: 'machine-maintenance',
-        builder: (context, state) => const MachineMaintenanceScreen(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
@@ -106,6 +97,21 @@ class AppRouter {
             path: '/profile',
             name: 'profile',
             pageBuilder: (context, state) => const NoTransitionPage(child: ProfileScreen()),
+          ),
+          GoRoute(
+            path: '/payment-tracking',
+            name: 'payment-tracking',
+            pageBuilder: (context, state) => const NoTransitionPage(child: PaymentTrackingScreen()),
+          ),
+          GoRoute(
+            path: '/machine-maintenance',
+            name: 'machine-maintenance',
+            pageBuilder: (context, state) => const NoTransitionPage(child: MachineMaintenanceScreen()),
+          ),
+          GoRoute(
+            path: '/calculator',
+            name: 'calculator',
+            pageBuilder: (context, state) => const NoTransitionPage(child: CalculatorScreen()),
           ),
         ],
       ),
