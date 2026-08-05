@@ -6,7 +6,6 @@ import '../widgets/dashboard_header.dart';
 import '../widgets/quick_actions.dart';
 import '../widgets/machine_gallery.dart';
 import '../widgets/recent_activity.dart';
-import '../../../../core/widgets/top_app_bar.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -33,7 +32,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: const Color(0xFFF9F9F9),
       body: Column(
         children: [
-          const RentVedaAppBar(),
           Expanded(
             child: homeState.isLoading
                 ? const Center(child: CircularProgressIndicator(color: Color(0xFFFBC02D)))

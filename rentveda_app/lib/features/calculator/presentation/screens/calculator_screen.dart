@@ -111,12 +111,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgMain,
-      appBar: AppBar(
-        title: Text(tr('rentalCalculator'), style: AppTypography.screenHeader),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.textMain),
-      ),
       body: SafeArea(
         child: Column(
           children: [

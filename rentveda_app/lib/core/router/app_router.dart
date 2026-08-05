@@ -12,6 +12,7 @@ import '../../features/invoice/presentation/screens/invoice_screen.dart';
 import '../../features/machine_maintenance/presentation/screens/machine_maintenance_screen.dart';
 import '../../features/calculator/presentation/screens/calculator_screen.dart';
 import '../widgets/bottom_nav_bar.dart';
+import '../widgets/top_app_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -68,6 +69,7 @@ class AppRouter {
           if (state.uri.toString().startsWith('/profile')) currentIndex = 4;
 
           return Scaffold(
+            appBar: const RentVedaAppBar(),
             body: child,
             bottomNavigationBar: BottomNavBar(currentIndex: currentIndex),
           );

@@ -7,7 +7,6 @@ import '../../providers/payment_tracking_provider.dart';
 import '../widgets/client_list_item.dart';
 import '../widgets/transaction_history_sheet.dart';
 import '../widgets/collect_payment_dialog.dart';
-import '../../../../core/widgets/top_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
@@ -116,7 +115,6 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
       backgroundColor: AppColors.bgMain,
       body: Column(
         children: [
-          const RentVedaAppBar(),
           
           // Header section with sticky feel
           Container(

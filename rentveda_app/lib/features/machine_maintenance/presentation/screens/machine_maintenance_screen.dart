@@ -27,19 +27,6 @@ class _MachineMaintenanceScreenState extends ConsumerState<MachineMaintenanceScr
 
     return Scaffold(
       backgroundColor: AppColors.bgSurface,
-      appBar: AppBar(
-        title: Text(
-          tr('machineStatusTitle'),
-          style: AppTypography.screenHeader.copyWith(color: AppColors.textDarkBrown),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.textDarkBrown),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(color: AppColors.border, height: 1),
-        ),
-      ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(machineMaintenanceProvider.notifier).fetchMachineSummary(),
         color: AppColors.primary,

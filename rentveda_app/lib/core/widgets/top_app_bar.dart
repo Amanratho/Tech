@@ -4,7 +4,9 @@ import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 
 class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const RentVedaAppBar({super.key});
+  final bool showBackButton;
+  
+  const RentVedaAppBar({super.key, this.showBackButton = false});
 
   @override
   Size get preferredSize => const Size.fromHeight(56);
@@ -25,9 +27,25 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Logo
+            // Logo / Back Button
             Row(
               children: [
+                if (showBackButton)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.bgMain,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: const Icon(Icons.arrow_back, size: 20, color: AppColors.textMain),
+                      ),
+                    ),
+                  ),
                 Container(
                   width: 34,
                   height: 34,

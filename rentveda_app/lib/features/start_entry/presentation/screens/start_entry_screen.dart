@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/top_app_bar.dart';
 import '../../providers/start_entry_provider.dart';
 
 class StartEntryScreen extends ConsumerStatefulWidget {
@@ -253,25 +254,7 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.bgMain,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgMain,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textMain, size: 20),
-          onPressed: () => context.pop(),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(tr('addNewEntry'), style: AppTypography.cardHeader),
-            Text('$_machineName • $_rentType', style: AppTypography.badgeText.copyWith(color: AppColors.primaryDark, fontSize: 10)),
-          ],
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(color: AppColors.border, height: 1),
-        ),
-      ),
+      appBar: const RentVedaAppBar(showBackButton: true),
       body: Column(
         children: [
           Expanded(

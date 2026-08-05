@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/top_app_bar.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../widgets/formal_invoice_template.dart';
 
@@ -135,31 +136,8 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.bgMain,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgSurface,
-        elevation: 1,
-        shadowColor: Colors.black.withValues(alpha: 0.1),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textMain, size: 20),
-          onPressed: () {
-            // We want to go back to Home (reset the stack so back button doesn't take us back to form)
-            context.go('/home');
-          },
-        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(tr('invoice').toUpperCase(), style: AppTypography.badgeText.copyWith(color: AppColors.textMuted, fontSize: 10, letterSpacing: 1.2)),
-            Row(
-              children: [
-                const Icon(Icons.receipt_long, size: 14, color: AppColors.primary),
-                const SizedBox(width: 4),
-                Text('#${currentDate.millisecondsSinceEpoch.toString().substring(7)}', style: AppTypography.badgeText.copyWith(color: AppColors.textMuted, fontSize: 10)),
-              ],
-            )
-          ],
-        ),
-      ),
+      appBar: const RentVedaAppBar(showBackButton: true),
+
       body: Stack(
         children: [
           // 1. HIDDEN FORMAL TEMPLATE (Rendered at bottom layer)
