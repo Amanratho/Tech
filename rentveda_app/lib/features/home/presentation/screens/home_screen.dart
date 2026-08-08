@@ -58,7 +58,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const SizedBox(height: 24),
 
                           // 3. Machine Gallery
-                          MachineGallery(machines: homeState.machines),
+                          MachineGallery(
+                            machines: homeState.machines,
+                            onAddTap: () => context.push('/add-machine'),
+                          ),
                           const SizedBox(height: 24),
 
                           // 4. Recent Activity Feed

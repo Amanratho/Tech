@@ -11,6 +11,7 @@ import '../../features/start_entry/presentation/screens/start_entry_screen.dart'
 import '../../features/invoice/presentation/screens/invoice_screen.dart';
 import '../../features/machine_maintenance/presentation/screens/machine_maintenance_screen.dart';
 import '../../features/calculator/presentation/screens/calculator_screen.dart';
+import '../../features/machine_registration/presentation/screens/add_machine_screen.dart';
 import '../widgets/bottom_nav_bar.dart';
 import '../widgets/top_app_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -57,6 +58,11 @@ class AppRouter {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return InvoiceScreen(extra: extra);
         },
+      ),
+      GoRoute(
+        path: '/add-machine',
+        name: 'add-machine',
+        builder: (context, state) => const AddMachineScreen(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

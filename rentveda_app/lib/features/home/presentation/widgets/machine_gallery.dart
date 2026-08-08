@@ -4,14 +4,26 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
-class MachineGallery extends StatelessWidget {
+class MachineGallery extends StatefulWidget {
   final List<dynamic> machines;
   final VoidCallback? onAddTap;
 
   const MachineGallery({super.key, required this.machines, this.onAddTap});
 
   @override
+  State<MachineGallery> createState() => _MachineGalleryState();
+}
+
+class _MachineGalleryState extends State<MachineGallery> {
+  bool _isSearchVisible = false;
+  String _searchQuery = '';
+
+  @override
   Widget build(BuildContext context) {
+    final filteredMachines = widget.machines.where((machine) {
+      final name = (machine['Machine_name'] ?? '').toString().toLowerCase();
+      return name.contains(_searchQuery.toLowerCase());
+    }).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -30,30 +42,73 @@ class MachineGallery extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${machines.length} ${tr('machinesCount')}',
+                    '${widget.machines.length} ${tr('machinesCount')}',
                     style: AppTypography.bodySecondary,
                   ),
                 ],
               ),
               Row(
                 children: [
-                  _iconButton(Icons.search, onTap: () {}),
+                  _iconButton(Icons.search, onTap: () {
+                    setState(() {
+                      _isSearchVisible = !_isSearchVisible;
+                      if (!_isSearchVisible) {
+                        _searchQuery = '';
+                      }
+                    });
+                  }),
                   const SizedBox(width: 8),
-                  if (machines.isNotEmpty)
-                    _iconButton(Icons.add, isPrimary: true, onTap: onAddTap),
+                  if (widget.machines.isNotEmpty)
+                    _iconButton(Icons.add, isPrimary: true, onTap: widget.onAddTap),
                 ],
               ),
             ],
           ),
         ),
+        
+        // Search Input Field
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          height: _isSearchVisible ? 56 : 0,
+          margin: EdgeInsets.only(
+            top: _isSearchVisible ? 12 : 0,
+            left: 16,
+            right: 16,
+            bottom: _isSearchVisible ? 4 : 0,
+          ),
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: TextField(
+              onChanged: (val) {
+                setState(() {
+                  _searchQuery = val;
+                });
+              },
+              style: AppTypography.bodyMain,
+              decoration: InputDecoration(
+                hintText: tr('searchMachine'),
+                hintStyle: AppTypography.bodySecondary.copyWith(color: AppColors.textSubtle),
+                prefixIcon: const Icon(Icons.search, size: 18, color: AppColors.textSubtle),
+                filled: true,
+                fillColor: AppColors.bgSurface,
+                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.primaryGold, width: 2)),
+              ),
+            ),
+          ),
+        ),
+        
         const SizedBox(height: 12),
 
         // Machine cards or empty state
-        if (machines.isEmpty)
+        if (widget.machines.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: GestureDetector(
-              onTap: onAddTap,
+              onTap: widget.onAddTap,
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 32),
@@ -89,19 +144,26 @@ class MachineGallery extends StatelessWidget {
               ),
             ),
           )
+        else if (filteredMachines.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Center(
+              child: Text("No machines found", style: AppTypography.bodySecondary),
+            ),
+          )
         else
           SizedBox(
             height: 190,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: machines.length + 1, // +1 for "Add New" card
+              itemCount: filteredMachines.length + 1, // +1 for "Add New" card
               separatorBuilder: (context, index) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
-                if (index == machines.length) {
+                if (index == filteredMachines.length) {
                   // "Add New" card at end
                   return GestureDetector(
-                    onTap: onAddTap,
+                    onTap: widget.onAddTap,
                     child: Container(
                       width: 155,
                       decoration: BoxDecoration(
@@ -130,7 +192,7 @@ class MachineGallery extends StatelessWidget {
                   );
                 }
 
-                final machine = machines[index];
+                final machine = filteredMachines[index];
                 final name = machine['Machine_name'] ?? 'Machine';
                 final rentType = machine['RentType'] ?? 'Rate';
                 final image = machine['image'];

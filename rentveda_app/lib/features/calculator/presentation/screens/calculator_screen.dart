@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key});
