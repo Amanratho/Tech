@@ -40,9 +40,11 @@ class _ContactScreenState extends State<ContactScreen> {
 
     setState(() => _isLoading = true);
 
-    // Provide your actual support email here
+    // Simulated delay like in React app
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    // Email launching functionality
     const String supportEmail = 'support@rentveda.com'; 
-    
     final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
       path: supportEmail,
@@ -55,7 +57,7 @@ class _ContactScreenState extends State<ContactScreen> {
     try {
       if (await canLaunchUrl(emailLaunchUri)) {
         await launchUrl(emailLaunchUri);
-        Fluttertoast.showToast(msg: "Opening Email App...", backgroundColor: AppColors.successDark);
+        Fluttertoast.showToast(msg: "Message Sent!", backgroundColor: AppColors.successDark);
         if (mounted) {
           _nameController.clear();
           _emailController.clear();
@@ -86,67 +88,89 @@ class _ContactScreenState extends State<ContactScreen> {
       backgroundColor: AppColors.bgMain,
       appBar: const RentVedaAppBar(showBackButton: true),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                tr('contactUs'),
-                style: AppTypography.screenHeader,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                tr('contactSubtitle'),
-                style: AppTypography.bodyMain.copyWith(color: AppColors.textSubtle),
-              ),
-              const SizedBox(height: 32),
+        child: Column(
+          children: [
+            // SCROLLABLE CONTENT AREA
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tr('contactUs'),
+                      style: AppTypography.screenHeader.copyWith(fontSize: 20, letterSpacing: 0.5),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      tr('contactSubtitle'),
+                      style: AppTypography.bodyMain.copyWith(color: AppColors.textSubtle, fontSize: 14, height: 1.5),
+                    ),
+                    const SizedBox(height: 32),
 
-              _buildTextField(
-                controller: _nameController,
-                icon: Icons.person_outline,
-                hintText: tr('fullNamePlaceholder'),
-              ),
-              const SizedBox(height: 20),
-              
-              _buildTextField(
-                controller: _emailController,
-                icon: Icons.email_outlined,
-                hintText: tr('emailPlaceholder'),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 20),
+                    _buildTextField(
+                      controller: _nameController,
+                      icon: Icons.person,
+                      hintText: tr('fullNamePlaceholder'),
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    _buildTextField(
+                      controller: _emailController,
+                      icon: Icons.email,
+                      hintText: tr('emailPlaceholder'),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 20),
 
-              _buildTextField(
-                controller: _messageController,
-                icon: Icons.chat_bubble_outline,
-                hintText: tr('messagePlaceholder'),
-                maxLines: 5,
-              ),
-              const SizedBox(height: 40),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _isLoading ? null : _sendEmail,
-                  icon: _isLoading 
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: AppColors.textMain, strokeWidth: 2))
-                    : const Icon(Icons.send),
-                  label: Text(
-                    _isLoading ? "Sending..." : tr('sendMessage'),
-                    style: AppTypography.buttonText,
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGold,
-                    foregroundColor: AppColors.textMain,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    elevation: 0,
-                  ),
+                    _buildTextField(
+                      controller: _messageController,
+                      icon: Icons.chat,
+                      hintText: tr('messagePlaceholder'),
+                      maxLines: 5,
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+
+            // BOTTOM ACTION AREA (Sticky Button at bottom)
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              color: AppColors.bgMain,
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _sendEmail,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.warning, // Yellow like React
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    elevation: 4,
+                    shadowColor: AppColors.warning.withValues(alpha: 0.4),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              tr('sendMessage') == 'sendMessage' ? 'Send Message' : tr('sendMessage'),
+                              style: AppTypography.buttonText.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(Icons.send, size: 16),
+                          ],
+                        ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -159,31 +183,50 @@ class _ContactScreenState extends State<ContactScreen> {
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
   }) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: AppTypography.bodySecondary,
-        prefixIcon: Padding(
-          padding: EdgeInsets.only(bottom: maxLines > 1 ? (maxLines * 12.0) : 0),
-          child: Icon(icon, color: AppColors.textSubtle, size: 20),
-        ),
-        filled: true,
-        fillColor: AppColors.bgSurface,
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(maxLines > 1 ? 16 : 30), 
-          borderSide: const BorderSide(color: Colors.transparent)
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(maxLines > 1 ? 16 : 30), 
-          borderSide: const BorderSide(color: Colors.transparent)
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(maxLines > 1 ? 16 : 30), 
-          borderSide: const BorderSide(color: AppColors.primaryGold, width: 2)
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(maxLines > 1 ? 24 : 30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        style: AppTypography.bodyMain.copyWith(fontSize: 14),
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: AppTypography.bodySecondary.copyWith(color: AppColors.textSubtle),
+          prefixIcon: Padding(
+            padding: EdgeInsets.only(
+              left: 20, 
+              right: 12, 
+              bottom: maxLines > 1 ? (maxLines * 16.0) : 0, 
+              top: maxLines > 1 ? 16.0 : 0
+            ),
+            child: Icon(icon, color: AppColors.textSubtle, size: 16),
+          ),
+          filled: true,
+          fillColor: Colors.transparent,
+          contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(maxLines > 1 ? 24 : 30), 
+            borderSide: const BorderSide(color: Colors.transparent)
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(maxLines > 1 ? 24 : 30), 
+            borderSide: const BorderSide(color: Colors.transparent)
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(maxLines > 1 ? 24 : 30), 
+            borderSide: const BorderSide(color: AppColors.primary, width: 2) // primary border color on focus
+          ),
         ),
       ),
     );

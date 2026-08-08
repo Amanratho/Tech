@@ -64,7 +64,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (profileState.isLoading && user == null) {
       return const Scaffold(
         backgroundColor: AppColors.bgMain,
-        body: Center(child: CircularProgressIndicator(color: AppColors.primaryGold)),
+        body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
       );
     }
 
@@ -95,10 +95,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             children: [
               // HEADER
               Container(
+                color: Colors.white.withValues(alpha: 0.8),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 width: double.infinity,
                 child: Text(
-                  tr('profileTitle'),
+                  tr('profileTitle') == 'profileTitle' ? 'MY PROFILE' : tr('profileTitle'),
                   textAlign: TextAlign.center,
                   style: AppTypography.caption.copyWith(
                     fontWeight: FontWeight.w800,
@@ -116,85 +117,91 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     Stack(
                       alignment: Alignment.center,
                       children: [
+                        // Glow Effect
                         Container(
-                          width: 140,
-                          height: 140,
+                          width: 160,
+                          height: 160,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primaryGold.withValues(alpha: 0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            boxShadow: [
+                              BoxShadow(color: AppColors.primary.withValues(alpha: 0.2), blurRadius: 40, spreadRadius: 10),
+                            ],
                           ),
                         ),
+                        // Avatar Circle
                         Container(
-                          width: 110,
-                          height: 110,
+                          width: 112, // w-28
+                          height: 112, // h-28
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             gradient: const LinearGradient(
-                              colors: [Color(0xFFF5F5F5), Color(0xFFE0E0E0)],
+                              colors: [Color(0xFFF3F4F6), Color(0xFFE5E7EB)], // gray-100 to gray-200
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
-                            border: Border.all(color: AppColors.bgMain, width: 4),
+                            border: Border.all(color: AppColors.bgMain, width: 4), // ring-4 ring-[var(--bg-main)]
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primaryGold.withValues(alpha: 0.2),
+                                color: AppColors.primary.withValues(alpha: 0.1),
                                 blurRadius: 20,
-                                offset: const Offset(0, 8),
+                                offset: const Offset(0, 10),
                               ),
                             ],
                           ),
-                          child: const Icon(Icons.person, size: 70, color: AppColors.primaryGold),
+                          child: const Icon(Icons.account_circle, size: 80, color: AppColors.primary),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
                     Text(
                       user['username'] ?? 'User',
-                      style: AppTypography.screenHeader.copyWith(fontSize: 24),
+                      style: AppTypography.screenHeader.copyWith(fontSize: 24, fontWeight: FontWeight.w900),
                     ),
                     const SizedBox(height: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGold,
+                        color: AppColors.primary,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primaryGold.withValues(alpha: 0.3),
+                            color: AppColors.primary.withValues(alpha: 0.2),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
                         ],
                       ),
                       child: Text(
-                        tr('businessOwner'),
+                        tr('businessOwner') == 'businessOwner' ? 'BUSINESS OWNER' : tr('businessOwner').toUpperCase(),
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textMain,
-                          fontWeight: FontWeight.w800,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w900,
                           letterSpacing: 1.2,
+                          fontSize: 10,
                         ),
                       ),
                     ),
                     const SizedBox(height: 40),
 
                     // USER DETAILS
-                    _buildDetailRow(Icons.phone, tr('mobile'), "+91 ${user['mobileNo'] ?? ''}"),
+                    _buildDetailRow(Icons.phone, tr('mobileLabel') == 'mobileLabel' ? 'Mobile' : tr('mobileLabel'), "+91 ${user['mobileNo'] ?? ''}"),
                     const SizedBox(height: 24),
-                    _buildDetailRow(Icons.email, tr('email'), user['email'] ?? ''),
+                    _buildDetailRow(Icons.email, tr('email') == 'email' ? 'Email' : tr('email'), user['email'] ?? ''),
                     const SizedBox(height: 24),
-                    _buildDetailRow(Icons.business, tr('company'), user['companyName'] ?? ''),
-                    const SizedBox(height: 32),
+                    _buildDetailRow(Icons.business, tr('companyNameLabel') == 'companyNameLabel' ? 'Company' : tr('companyNameLabel'), user['companyName'] ?? ''),
+                    const SizedBox(height: 40),
 
                     // SETTINGS MENU
                     Container(
                       decoration: BoxDecoration(
-                        color: AppColors.bgSurface,
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(32),
                         border: Border.all(color: AppColors.border),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 10,
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 16,
                             offset: const Offset(0, 4),
                           )
                         ],
@@ -210,7 +217,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFFFDF0),
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.4)),
+                                border: Border.all(color: const Color(0xFFFBC02D).withValues(alpha: 0.4)),
                               ),
                               child: Row(
                                 children: [
@@ -221,8 +228,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(color: AppColors.border),
+                                      boxShadow: [
+                                        BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 4),
+                                      ],
                                     ),
-                                    child: const Icon(Icons.qr_code_2, color: Color(0xFF795900)),
+                                    child: const Icon(Icons.qr_code_2, color: Color(0xFF795900), size: 22),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
@@ -233,12 +243,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                           children: [
                                             Text(
                                               tr('paymentQrTitle'),
-                                              style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.bold, color: const Color(0xFF1A1C1C)),
+                                              style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.bold, color: const Color(0xFF1A1C1C), fontSize: 14),
                                             ),
                                             const SizedBox(width: 8),
                                             if (user['qrCodeUrl'] == null || user['qrCodeUrl'].isEmpty)
                                               Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                                 decoration: BoxDecoration(
                                                   color: Colors.amber.shade100,
                                                   borderRadius: BorderRadius.circular(12),
@@ -269,6 +279,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(color: AppColors.border),
+                                      boxShadow: [
+                                        BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 4),
+                                      ],
                                     ),
                                     child: user['qrCodeUrl'] != null && user['qrCodeUrl'].isNotEmpty
                                         ? ClipRRect(
@@ -283,17 +296,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          _buildMenuItem(Icons.settings, tr('editProfileButton'), () => context.push('/edit-profile')),
-                          _buildMenuItem(Icons.edit_note, tr('updateMachineryButton'), () {
-                            context.push('/update-machinery');
-                          }),
-                          _buildMenuItem(Icons.support_agent, tr('contactSupport'), () {
-                            context.push('/contact');
-                          }, iconColor: Colors.green),
-                          _buildMenuItem(Icons.info_outline, tr('aboutUs'), () {
-                            context.push('/about');
-                          }, iconColor: Colors.purple),
+                          const SizedBox(height: 4),
+                          _buildMenuItem(Icons.settings, tr('editProfileButton'), () => context.push('/edit-profile'), iconColor: AppColors.textSubtle),
+                          _buildMenuItem(Icons.edit_note, tr('updateMachineryButton'), () => context.push('/update-machinery'), iconColor: Colors.blue.shade500),
+                          _buildMenuItem(Icons.support_agent, tr('contactSupport'), () => context.push('/contact'), iconColor: Colors.green.shade500),
+                          _buildMenuItem(Icons.info_outline, tr('aboutUs'), () => context.push('/about'), iconColor: Colors.purple.shade500),
                         ],
                       ),
                     ),
@@ -303,18 +310,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: _showLogoutConfirm,
-                        icon: const Icon(Icons.logout, size: 18),
-                        label: Text(tr('logoutButton'), style: AppTypography.buttonText.copyWith(fontSize: 14)),
+                         onPressed: _showLogoutConfirm,
+                        icon: const Icon(Icons.logout, size: 14),
+                        label: Text(tr('logoutButton'), style: AppTypography.buttonText.copyWith(fontSize: 12, fontWeight: FontWeight.bold)),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.shade50,
-                          foregroundColor: AppColors.danger,
+                          backgroundColor: const Color(0xFFFEF2F2), // red-50
+                          foregroundColor: const Color(0xFFDC2626), // red-600
                           elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: Colors.red.shade100),
+                            side: const BorderSide(color: Color(0xFFFECACA)), // red-200
                           ),
+                          shadowColor: Colors.transparent,
                         ),
                       ),
                     ),
@@ -332,15 +340,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.textSubtle),
+        Icon(icon, size: 16, color: AppColors.textSubtle),
         const SizedBox(width: 20),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label.toUpperCase(), style: AppTypography.caption.copyWith(fontWeight: FontWeight.w700)),
+              Text(label.toUpperCase(), style: AppTypography.caption.copyWith(fontWeight: FontWeight.w700, fontSize: 10, letterSpacing: 1.0)),
               const SizedBox(height: 2),
-              Text(value, style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text(value, style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 16, letterSpacing: 0.5), maxLines: 1, overflow: TextOverflow.ellipsis),
             ],
           ),
         )
@@ -353,15 +361,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: iconColor),
+            Icon(icon, size: 18, color: iconColor),
             const SizedBox(width: 16),
             Expanded(
-              child: Text(label, style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.bold)),
+              child: Text(label, style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 0.5)),
             ),
-            const Icon(Icons.chevron_right, size: 16, color: AppColors.textSubtle),
+            const Icon(Icons.chevron_right, size: 12, color: AppColors.textSubtle),
           ],
         ),
       ),

@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dotted_border/dotted_border.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/top_app_bar.dart';
@@ -81,14 +82,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: AppColors.bgSurface,
+          backgroundColor: AppColors.bgMain, // equivalent to bg-[var(--bg-main)]
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(tr('deleteAccountButton'), style: AppTypography.cardHeader),
-          content: Text(tr('confirmDelete'), style: AppTypography.bodyMain),
+          content: Text(tr('confirmDelete'), style: AppTypography.bodyMain.copyWith(color: AppColors.textSubtle, fontSize: 13)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text(tr('cancelButton'), style: AppTypography.buttonText.copyWith(color: AppColors.textSubtle)),
+              child: Text(tr('cancelButton'), style: AppTypography.buttonText.copyWith(color: AppColors.textMain)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -126,121 +127,195 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       appBar: const RentVedaAppBar(showBackButton: true),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                tr('editProfileTitle'),
-                style: AppTypography.screenHeader,
-              ),
-              const SizedBox(height: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.border),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                )
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Input Fields
+                _buildInputLabel(tr('nameLabel')),
+                _buildTextField(_usernameController, Icons.person, "Enter full name"),
+                const SizedBox(height: 20),
 
-              // Username
-              _buildInputLabel("Name"),
-              _buildTextField(_usernameController, Icons.person, "Enter your name"),
-              const SizedBox(height: 16),
+                _buildInputLabel(tr('mobileLabel') == 'mobileLabel' ? 'Mobile Number' : tr('mobileLabel')),
+                _buildTextField(_mobileController, Icons.phone, "Enter mobile number", keyboardType: TextInputType.phone),
+                const SizedBox(height: 20),
 
-              // Mobile
-              _buildInputLabel(tr('mobile')),
-              _buildTextField(_mobileController, Icons.phone, "Enter mobile number", keyboardType: TextInputType.phone),
-              const SizedBox(height: 16),
+                _buildInputLabel(tr('companyNameLabel') == 'companyNameLabel' ? 'Company Name' : tr('companyNameLabel')),
+                _buildTextField(_companyController, Icons.business, "Enter company name"),
+                const SizedBox(height: 24),
+                
+                const Divider(color: AppColors.border),
+                const SizedBox(height: 16),
 
-              // Company
-              _buildInputLabel(tr('company')),
-              _buildTextField(_companyController, Icons.business, "Enter company name"),
-              const SizedBox(height: 24),
-
-              // QR Code Upload
-              _buildInputLabel(tr('paymentQrTitle')),
-              const SizedBox(height: 8),
-              GestureDetector(
-                onTap: _pickQrCode,
-                child: Container(
-                  width: double.infinity,
-                  height: 180,
-                  decoration: BoxDecoration(
-                    color: AppColors.bgSurface,
-                    border: Border.all(color: AppColors.border, width: 2),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: _qrImage != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
-                          child: Image.file(_qrImage!, fit: BoxFit.cover, width: double.infinity),
-                        )
-                      : (user != null && user['qrCodeUrl'] != null && user['qrCodeUrl'].isNotEmpty)
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(14),
-                              child: Image.network(user['qrCodeUrl'], fit: BoxFit.cover, width: double.infinity),
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                // QR Code Upload
+                Row(
+                  children: [
+                    const Icon(Icons.qr_code, color: AppColors.primary, size: 16),
+                    const SizedBox(width: 8),
+                    _buildInputLabel(tr('paymentQrTitle'), padBottom: false),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                GestureDetector(
+                  onTap: _pickQrCode,
+                  child: DottedBorder(
+                    options: const RoundedRectDottedBorderOptions(
+                      color: AppColors.border,
+                      strokeWidth: 2,
+                      dashPattern: [8, 4],
+                      radius: Radius.circular(16),
+                    ),
+                    child: Container(
+                      width: double.infinity,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        color: AppColors.bgMain,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: _qrImage != null
+                          ? Stack(
+                              fit: StackFit.expand,
                               children: [
-                                const Icon(Icons.qr_code_scanner, size: 48, color: AppColors.textSubtle),
-                                const SizedBox(height: 12),
-                                Text(tr('tapToUploadQr'), style: AppTypography.bodySecondary),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: Image.file(_qrImage!, fit: BoxFit.contain, width: double.infinity),
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.8),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.edit, color: Colors.white, size: 12),
+                                        const SizedBox(width: 8),
+                                        Text("Change QR", style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ],
-                            ),
-                ),
-              ),
-              const SizedBox(height: 40),
-
-              // Save Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: state.isLoading ? null : _saveProfile,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGold,
-                    foregroundColor: AppColors.textMain,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 0,
-                  ),
-                  child: state.isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textMain),
-                        )
-                      : Text(
-                          "Save Profile",
-                          style: AppTypography.buttonText,
-                        ),
-                ),
-              ),
-              const SizedBox(height: 40),
-
-              // Danger Zone
-              const Divider(color: AppColors.border),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: _showDeleteConfirm,
-                  icon: const Icon(Icons.delete_outline, size: 18),
-                  label: Text(tr('deleteAccountButton'), style: AppTypography.buttonText.copyWith(color: AppColors.danger)),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.danger,
-                    side: const BorderSide(color: AppColors.danger),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            )
+                          : (user != null && user['qrCodeUrl'] != null && user['qrCodeUrl'].isNotEmpty)
+                              ? Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(14),
+                                      child: Image.network(user['qrCodeUrl'], fit: BoxFit.contain, width: double.infinity),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: AppColors.border),
+                                        boxShadow: [
+                                          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2), blurStyle: BlurStyle.inner),
+                                        ],
+                                      ),
+                                      child: const Icon(Icons.cloud_upload_outlined, color: AppColors.textSubtle, size: 24),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(tr('tapToUploadQr'), style: AppTypography.bodySecondary.copyWith(fontWeight: FontWeight.bold, color: AppColors.textMain, fontSize: 13)),
+                                    const SizedBox(height: 4),
+                                    Text("JPG, PNG up to 2MB", style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 10)),
+                                  ],
+                                ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-            ],
+                const SizedBox(height: 32),
+
+                // Save Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: state.isLoading ? null : _saveProfile,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.warning,
+                      foregroundColor: AppColors.warningDark,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 0,
+                    ),
+                    child: state.isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.warningDark),
+                          )
+                        : Text(
+                            tr('editProfileTitle') == 'editProfileTitle' ? 'Save Profile' : tr('editProfileTitle'),
+                            style: AppTypography.buttonText,
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Delete Account Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _showDeleteConfirm,
+                    icon: const Icon(Icons.delete_outline, size: 16),
+                    label: Text(tr('deleteAccountButton'), style: AppTypography.buttonText),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.danger,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 4,
+                      shadowColor: AppColors.danger.withValues(alpha: 0.4),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildInputLabel(String label) {
+  Widget _buildInputLabel(String label, {bool padBottom = true}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0, left: 4),
-      child: Text(label, style: AppTypography.caption.copyWith(fontWeight: FontWeight.w700)),
+      padding: EdgeInsets.only(bottom: padBottom ? 8.0 : 0, left: 4),
+      child: Text(label, style: AppTypography.caption.copyWith(fontWeight: FontWeight.w700, color: AppColors.textSubtle)),
     );
   }
 
@@ -248,16 +323,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
+      style: AppTypography.bodyMain.copyWith(fontSize: 13, fontWeight: FontWeight.w600),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: AppTypography.bodySecondary,
-        prefixIcon: Icon(icon, color: AppColors.textSubtle, size: 20),
+        prefixIcon: Icon(icon, color: AppColors.textSubtle, size: 16),
         filled: true,
-        fillColor: AppColors.bgSurface,
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primaryGold, width: 2)),
+        fillColor: AppColors.bgMain,
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.primary, width: 2)),
       ),
     );
   }
