@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../providers/profile_provider.dart';
@@ -287,13 +286,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           const SizedBox(height: 8),
                           _buildMenuItem(Icons.settings, tr('editProfileButton'), () => context.push('/edit-profile')),
                           _buildMenuItem(Icons.edit_note, tr('updateMachineryButton'), () {
-                            Fluttertoast.showToast(msg: "Coming Soon", backgroundColor: AppColors.primaryGold, textColor: AppColors.textMain);
+                            context.push('/update-machinery');
                           }),
                           _buildMenuItem(Icons.support_agent, tr('contactSupport'), () {
-                            Fluttertoast.showToast(msg: "Coming Soon", backgroundColor: AppColors.primaryGold, textColor: AppColors.textMain);
+                            context.push('/contact');
                           }, iconColor: Colors.green),
                           _buildMenuItem(Icons.info_outline, tr('aboutUs'), () {
-                            Fluttertoast.showToast(msg: "Coming Soon", backgroundColor: AppColors.primaryGold, textColor: AppColors.textMain);
+                            context.push('/about');
                           }, iconColor: Colors.purple),
                         ],
                       ),

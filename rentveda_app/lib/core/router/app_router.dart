@@ -7,6 +7,10 @@ import '../../features/reminders/presentation/screens/reminders_screen.dart';
 import '../../features/statement/presentation/screens/statement_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/profile/presentation/screens/edit_profile_screen.dart';
+import '../../features/profile/presentation/screens/about_screen.dart';
+import '../../features/profile/presentation/screens/contact_screen.dart';
+import '../../features/machine_registration/presentation/screens/update_machinery_screen.dart';
+import '../../features/machine_registration/presentation/screens/edit_machine_screen.dart';
 import '../../features/payments/presentation/screens/payment_tracking_screen.dart';
 import '../../features/start_entry/presentation/screens/start_entry_screen.dart';
 import '../../features/invoice/presentation/screens/invoice_screen.dart';
@@ -69,6 +73,30 @@ class AppRouter {
         path: '/edit-profile',
         name: 'edit-profile',
         builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: '/about',
+        name: 'about',
+        builder: (context, state) => const AboutScreen(),
+      ),
+      GoRoute(
+        path: '/contact',
+        name: 'contact',
+        builder: (context, state) => const ContactScreen(),
+      ),
+      GoRoute(
+        path: '/update-machinery',
+        name: 'update-machinery',
+        builder: (context, state) => const UpdateMachineryScreen(),
+      ),
+      GoRoute(
+        path: '/edit-machine/:id',
+        name: 'edit-machine',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          final extra = state.extra as Map<String, dynamic>?;
+          return EditMachineScreen(machineId: id, extraMachineData: extra);
+        },
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

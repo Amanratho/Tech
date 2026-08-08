@@ -589,5 +589,19 @@
     "profileUpdateFailed": "Failed to update profile.",
     "accountDeletedSuccess": "Your account has been deleted successfully.",
     "accountDeleteFailed": "Failed to delete account. Please try again.",
-    "fetchProfileFailed": "Failed to fetch user profile"
+    "fetchProfileFailed": "Failed to fetch user profile",
+    "manageMachinery": "Manage Machines",
+    "registeredMachines": "registered machines",
+    "editMachine": "Edit Machine",
+    "archiveMachine": "Archive",
+    "noMachinesFound": "No machines found. Register a new machine first.",
+    "contactUs": "Contact Us",
+    "contactSubtitle": "Have a question about machinery? Fill the form below.",
+    "fullNamePlaceholder": "Enter your full name",
+    "emailPlaceholder": "Enter your email",
+    "messagePlaceholder": "Type your message here...",
+    "sendMessage": "Send Message via Email",
+    "aboutRentVeda": "About RentVeda",
+    "aboutDescription": "RentVeda is your complete solution for managing heavy machinery, tracking rent, and maintaining efficient operations.",
+    "appVersion": "Version 1.0.0"
   }

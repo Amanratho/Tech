@@ -592,5 +592,19 @@
   "profileUpdateFailed": "प्रोफ़ाइल अपडेट करने में विफल।",
   "accountDeletedSuccess": "आपका खाता सफलतापूर्वक हटा दिया गया है।",
   "accountDeleteFailed": "खाता हटाने में विफल। कृपया पुन: प्रयास करें।",
-  "fetchProfileFailed": "उपयोगकर्ता प्रोफ़ाइल लाने में विफल"
+  "fetchProfileFailed": "उपयोगकर्ता प्रोफ़ाइल लाने में विफल",
+  "manageMachinery": "मशीनें प्रबंधित करें",
+  "registeredMachines": "पंजीकृत मशीनें",
+  "editMachine": "मशीन संपादित करें",
+  "archiveMachine": "संग्रहीत करें",
+  "noMachinesFound": "कोई मशीन नहीं मिली। पहले एक नई मशीन पंजीकृत करें।",
+  "contactUs": "हमसे संपर्क करें",
+  "contactSubtitle": "मशीनरी के बारे में कोई सवाल है? नीचे दिया गया फॉर्म भरें।",
+  "fullNamePlaceholder": "अपना पूरा नाम दर्ज करें",
+  "emailPlaceholder": "अपना ईमेल दर्ज करें",
+  "messagePlaceholder": "अपना संदेश यहाँ टाइप करें...",
+  "sendMessage": "ईमेल के माध्यम से संदेश भेजें",
+  "aboutRentVeda": "RentVeda के बारे में",
+  "aboutDescription": "RentVeda भारी मशीनरी के प्रबंधन, किराए को ट्रैक करने और कुशल संचालन बनाए रखने के लिए आपका संपूर्ण समाधान है।",
+  "appVersion": "संस्करण 1.0.0"
 }
