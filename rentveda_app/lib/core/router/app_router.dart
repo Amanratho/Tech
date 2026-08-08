@@ -6,6 +6,7 @@ import '../../features/summary/presentation/screens/summary_screen.dart';
 import '../../features/reminders/presentation/screens/reminders_screen.dart';
 import '../../features/statement/presentation/screens/statement_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/profile/presentation/screens/edit_profile_screen.dart';
 import '../../features/payments/presentation/screens/payment_tracking_screen.dart';
 import '../../features/start_entry/presentation/screens/start_entry_screen.dart';
 import '../../features/invoice/presentation/screens/invoice_screen.dart';
@@ -63,6 +64,11 @@ class AppRouter {
         path: '/add-machine',
         name: 'add-machine',
         builder: (context, state) => const AddMachineScreen(),
+      ),
+      GoRoute(
+        path: '/edit-profile',
+        name: 'edit-profile',
+        builder: (context, state) => const EditProfileScreen(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
