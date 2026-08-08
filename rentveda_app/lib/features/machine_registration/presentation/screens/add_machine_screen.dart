@@ -24,11 +24,13 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
   final ImagePicker _picker = ImagePicker();
 
   final List<String> _rentTypes = [
-    'Units',
-    'Hourly',
     'Acre',
-    'Month',
-    'Fix',
+    'Hour',
+    'Quantity',
+    'Days',
+    'Contract',
+    'Kilometers',
+    'Foot',
   ];
 
   Future<void> _pickImage() async {
@@ -155,19 +157,24 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
               // Rent Type
               Text("Rent Type", style: AppTypography.caption.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.bgSurface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
+              InputDecorator(
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.category, color: AppColors.textSubtle, size: 20),
+                  filled: true,
+                  fillColor: AppColors.bgSurface,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primaryGold, width: 2)),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     isExpanded: true,
-                    value: _rentType.isEmpty ? null : _rentType,
+                    value: _rentType.isEmpty || !_rentTypes.contains(_rentType) ? null : _rentType,
                     hint: Text("Select rent type", style: AppTypography.bodySecondary),
                     icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.textSubtle),
+                    dropdownColor: AppColors.bgSurface,
+                    borderRadius: BorderRadius.circular(16),
                     items: _rentTypes.map((type) {
                       return DropdownMenuItem(
                         value: type,

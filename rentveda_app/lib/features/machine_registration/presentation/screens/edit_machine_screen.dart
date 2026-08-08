@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dotted_border/dotted_border.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/top_app_bar.dart';
@@ -26,7 +26,17 @@ class EditMachineScreen extends ConsumerStatefulWidget {
 
 class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
   final TextEditingController _machineNameController = TextEditingController();
-  final TextEditingController _rentTypeController = TextEditingController();
+  String _rentType = '';
+
+  final List<String> _rentTypes = [
+    'Acre',
+    'Hour',
+    'Quantity',
+    'Days',
+    'Contract',
+    'Kilometers',
+    'Foot',
+  ];
   
   File? _imageFile;
   String? _existingImageUrl;
@@ -38,7 +48,7 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
     // Load existing data if available
     if (widget.extraMachineData != null) {
       _machineNameController.text = widget.extraMachineData!['Machine_name'] ?? '';
-      _rentTypeController.text = widget.extraMachineData!['RentType'] ?? '';
+      _rentType = widget.extraMachineData!['RentType'] ?? '';
       _existingImageUrl = widget.extraMachineData!['image'];
     } else {
       // If no extra data, find from provider state
@@ -49,7 +59,7 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
       );
       
       _machineNameController.text = existingMachine['Machine_name'] ?? '';
-      _rentTypeController.text = existingMachine['RentType'] ?? '';
+      _rentType = existingMachine['RentType'] ?? '';
       _existingImageUrl = existingMachine['image'];
     }
   }
@@ -57,7 +67,6 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
   @override
   void dispose() {
     _machineNameController.dispose();
-    _rentTypeController.dispose();
     super.dispose();
   }
 
@@ -76,7 +85,7 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
 
   void _submitForm() async {
     final name = _machineNameController.text.trim();
-    final rentType = _rentTypeController.text.trim();
+    final rentType = _rentType;
 
     if (name.isEmpty || rentType.isEmpty) {
       Fluttertoast.showToast(msg: "Please fill required fields", backgroundColor: AppColors.danger);
@@ -104,89 +113,217 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
     final state = ref.watch(updateMachineryProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.bgMain,
+      backgroundColor: AppColors.bgMain, // bg-[#f9f9f9]
       appBar: const RentVedaAppBar(showBackButton: true),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                tr('editMachine'),
-                style: AppTypography.screenHeader,
-              ),
-              const SizedBox(height: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.border),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                )
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header inside Card
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Edit Machine Details", style: AppTypography.screenHeader.copyWith(fontSize: 18)),
+                    const SizedBox(height: 4),
+                    Text("Update name, rental rate unit, or photo", style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    const Divider(color: AppColors.border),
+                    const SizedBox(height: 20),
+                  ],
+                ),
 
-              // Image Upload
-              Center(
-                child: GestureDetector(
-                  onTap: _pickImage,
-                  child: Container(
-                    width: double.infinity,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: AppColors.bgSurface,
-                      border: Border.all(color: AppColors.border, width: 2),
+                // Form
+                _buildInputLabel("Machine Name"),
+                _buildTextField(_machineNameController, Icons.precision_manufacturing, "e.g. Harvester 2000"),
+                const SizedBox(height: 20),
+
+                _buildInputLabel("Rent Type (Pricing Unit)"),
+                InputDecorator(
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.settings, color: AppColors.textSubtle, size: 16),
+                    filled: true,
+                    fillColor: AppColors.bgMain,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.primaryGold, width: 2)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: _rentType.isEmpty || !_rentTypes.contains(_rentType) ? null : _rentType,
+                      hint: Text("Select Unit", style: AppTypography.bodySecondary),
+                      icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.textSubtle, size: 20),
+                      dropdownColor: AppColors.bgSurface,
                       borderRadius: BorderRadius.circular(16),
+                      items: _rentTypes.map((type) {
+                        return DropdownMenuItem(
+                          value: type,
+                          child: Text(type, style: AppTypography.bodyMain.copyWith(fontSize: 13, fontWeight: FontWeight.w600)),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _rentType = value ?? '';
+                        });
+                      },
                     ),
-                    child: _imageFile != null
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(14),
-                            child: Image.file(_imageFile!, fit: BoxFit.cover, width: double.infinity),
-                          )
-                        : (_existingImageUrl != null && _existingImageUrl!.isNotEmpty)
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(14),
-                                child: Image.network(_existingImageUrl!, fit: BoxFit.cover, width: double.infinity),
-                              )
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.add_a_photo, size: 48, color: AppColors.textSubtle),
-                                  const SizedBox(height: 12),
-                                  Text("Tap to upload new image", style: AppTypography.bodySecondary),
-                                ],
-                              ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
-              // Form
-              _buildInputLabel("Machine Name"),
-              _buildTextField(_machineNameController, Icons.precision_manufacturing, "Enter machine name"),
-              const SizedBox(height: 16),
-
-              _buildInputLabel("Rent Type"),
-              _buildTextField(_rentTypeController, Icons.category, "e.g. Per Hour, Per Day"),
-              const SizedBox(height: 40),
-
-              // Submit Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: state.isLoading ? null : _submitForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGold,
-                    foregroundColor: AppColors.textMain,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 0,
+                // Image Upload Area
+                _buildInputLabel("Machine Image"),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: DottedBorder(
+                    options: const RoundedRectDottedBorderOptions(
+                      color: AppColors.border,
+                      strokeWidth: 2,
+                      dashPattern: [8, 4],
+                      radius: Radius.circular(16),
+                    ),
+                    child: Container(
+                      width: double.infinity,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        color: AppColors.bgMain,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: _imageFile != null
+                          ? Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: Image.file(_imageFile!, fit: BoxFit.cover),
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.3),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.7),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.edit, color: Colors.white, size: 12),
+                                        const SizedBox(width: 8),
+                                        Text("Change Image", style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : (_existingImageUrl != null && _existingImageUrl!.isNotEmpty)
+                              ? Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(14),
+                                      child: Image.network(_existingImageUrl!, fit: BoxFit.cover),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: AppColors.border),
+                                        boxShadow: [
+                                          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2)),
+                                        ],
+                                      ),
+                                      child: const Icon(Icons.cloud_upload, color: Color(0xFF795900), size: 24),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text("Tap to update photo", style: AppTypography.bodySecondary.copyWith(fontWeight: FontWeight.bold, color: AppColors.textMain, fontSize: 13)),
+                                    const SizedBox(height: 4),
+                                    Text("Leave blank to keep current photo", style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 10)),
+                                  ],
+                                ),
+                    ),
                   ),
-                  child: state.isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textMain),
-                        )
-                      : Text(
-                          "Save Changes",
-                          style: AppTypography.buttonText,
+                ),
+                const SizedBox(height: 32),
+
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => context.pop(),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          side: const BorderSide(color: AppColors.border),
+                          foregroundColor: AppColors.textMain,
                         ),
+                        child: Text("Cancel", style: AppTypography.buttonText.copyWith(color: AppColors.textMain)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: state.isLoading ? null : _submitForm,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryGold,
+                          foregroundColor: AppColors.textMain,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          elevation: 0,
+                        ),
+                        child: state.isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textMain),
+                              )
+                            : Text(
+                                "Save Changes",
+                                style: AppTypography.buttonText,
+                              ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -196,23 +333,24 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
   Widget _buildInputLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, left: 4),
-      child: Text(label, style: AppTypography.caption.copyWith(fontWeight: FontWeight.w700)),
+      child: Text(label, style: AppTypography.caption.copyWith(fontWeight: FontWeight.w700, color: AppColors.textSubtle)),
     );
   }
 
   Widget _buildTextField(TextEditingController controller, IconData icon, String hint) {
     return TextField(
       controller: controller,
+      style: AppTypography.bodyMain.copyWith(fontSize: 13, fontWeight: FontWeight.w600),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: AppTypography.bodySecondary,
-        prefixIcon: Icon(icon, color: AppColors.textSubtle, size: 20),
+        prefixIcon: Icon(icon, color: AppColors.textSubtle, size: 16),
         filled: true,
-        fillColor: AppColors.bgSurface,
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primaryGold, width: 2)),
+        fillColor: AppColors.bgMain,
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.primaryGold, width: 2)),
       ),
     );
   }
