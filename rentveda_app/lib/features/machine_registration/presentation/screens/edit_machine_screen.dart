@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -139,9 +140,9 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Edit Machine Details", style: AppTypography.screenHeader.copyWith(fontSize: 18)),
+                    Text(tr('editMachineDetails'), style: AppTypography.screenHeader.copyWith(fontSize: 18)),
                     const SizedBox(height: 4),
-                    Text("Update name, rental rate unit, or photo", style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontWeight: FontWeight.bold)),
+                    Text(tr('editMachineSubtitle'), style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 16),
                     const Divider(color: AppColors.border),
                     const SizedBox(height: 20),
@@ -149,11 +150,11 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
                 ),
 
                 // Form
-                _buildInputLabel("Machine Name"),
-                _buildTextField(_machineNameController, Icons.precision_manufacturing, "e.g. Harvester 2000"),
+                _buildInputLabel(tr('machineName')),
+                _buildTextField(_machineNameController, Icons.precision_manufacturing, tr('enterMachineName')),
                 const SizedBox(height: 20),
 
-                _buildInputLabel("Rent Type (Pricing Unit)"),
+                _buildInputLabel(tr('rentType')),
                 InputDecorator(
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.settings, color: AppColors.textSubtle, size: 16),
@@ -168,7 +169,7 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
                     child: DropdownButton<String>(
                       isExpanded: true,
                       value: _rentType.isEmpty || !_rentTypes.contains(_rentType) ? null : _rentType,
-                      hint: Text("Select Unit", style: AppTypography.bodySecondary),
+                      hint: Text(tr('selectRentType'), style: AppTypography.bodySecondary),
                       icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.textSubtle, size: 20),
                       dropdownColor: AppColors.bgSurface,
                       borderRadius: BorderRadius.circular(16),
@@ -189,7 +190,7 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
                 const SizedBox(height: 20),
 
                 // Image Upload Area
-                _buildInputLabel("Machine Image"),
+                _buildInputLabel(tr('uploadMachineImage')),
                 GestureDetector(
                   onTap: _pickImage,
                   child: DottedBorder(
@@ -231,7 +232,7 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
                                       children: [
                                         const Icon(Icons.edit, color: Colors.white, size: 12),
                                         const SizedBox(width: 8),
-                                        Text("Change Image", style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                                        Text(tr('changeImage'), style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                   ),
@@ -272,9 +273,9 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
                                       child: const Icon(Icons.cloud_upload, color: Color(0xFF795900), size: 24),
                                     ),
                                     const SizedBox(height: 12),
-                                    Text("Tap to update photo", style: AppTypography.bodySecondary.copyWith(fontWeight: FontWeight.bold, color: AppColors.textMain, fontSize: 13)),
+                                    Text(tr('tapToUpdatePhoto'), style: AppTypography.bodySecondary.copyWith(fontWeight: FontWeight.bold, color: AppColors.textMain, fontSize: 13)),
                                     const SizedBox(height: 4),
-                                    Text("Leave blank to keep current photo", style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 10)),
+                                    Text(tr('leaveBlankPhoto'), style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 10)),
                                   ],
                                 ),
                     ),
@@ -294,7 +295,7 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
                           side: const BorderSide(color: AppColors.border),
                           foregroundColor: AppColors.textMain,
                         ),
-                        child: Text("Cancel", style: AppTypography.buttonText.copyWith(color: AppColors.textMain)),
+                        child: Text(tr('cancelButton'), style: AppTypography.buttonText.copyWith(color: AppColors.textMain)),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -302,8 +303,8 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
                       child: ElevatedButton(
                         onPressed: state.isLoading ? null : _submitForm,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryGold,
-                          foregroundColor: AppColors.textMain,
+                          backgroundColor: AppColors.warning,
+                          foregroundColor: AppColors.warningDark,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           elevation: 0,
@@ -312,10 +313,10 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
                             ? const SizedBox(
                                 width: 20,
                                 height: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textMain),
+                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.warningDark),
                               )
                             : Text(
-                                "Save Changes",
+                                tr('saveChangesButton'),
                                 style: AppTypography.buttonText,
                               ),
                       ),

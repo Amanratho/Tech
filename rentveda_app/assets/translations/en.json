@@ -603,5 +603,14 @@
     "sendMessage": "Send Message via Email",
     "aboutRentVeda": "About RentVeda",
     "aboutDescription": "RentVeda is your complete solution for managing heavy machinery, tracking rent, and maintaining efficient operations.",
-    "appVersion": "Version 1.0.0"
+    "appVersion": "Version 1.0.0",
+    "archiveConfirmMessage": "This will mark the machine as sold/archived. All historical income & expense data will be preserved for your reports.",
+    "addNewButton": "Add New",
+    "rateLabel": "Rate",
+    "editMachineDetails": "Edit Machine Details",
+    "editMachineSubtitle": "Update name, rental rate unit, or photo",
+    "changeImage": "Change Image",
+    "tapToUpdatePhoto": "Tap to update photo",
+    "leaveBlankPhoto": "Leave blank to keep current photo",
+    "saveChangesButton": "Save Changes"
   }

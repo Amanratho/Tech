@@ -197,8 +197,8 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
                 child: ElevatedButton(
                   onPressed: isLoading ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGold,
-                    foregroundColor: AppColors.textMain,
+                    backgroundColor: AppColors.warning,
+                    foregroundColor: AppColors.warningDark,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 0,
@@ -207,7 +207,7 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
                       ? const SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textMain),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.warningDark),
                         )
                       : Text(
                           "Register Machine",
