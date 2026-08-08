@@ -272,13 +272,13 @@ class _MachineGalleryState extends State<MachineGallery> {
                                       ),
                                     ),
                                     Container(
-                                      width: 24,
-                                      height: 24,
+                                      width: 32,
+                                      height: 32,
                                       decoration: const BoxDecoration(
                                         color: Color(0xFFFBC02D),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: const Icon(Icons.chevron_right, size: 14, color: Color(0xFF6C5000)),
+                                      child: const Icon(Icons.add, size: 20, color: Color(0xFF6C5000)),
                                     ),
                                   ],
                                 ),
