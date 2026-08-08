@@ -115,19 +115,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9), // Match React bg
-      appBar: AppBar(
-        backgroundColor: Colors.white.withValues(alpha: 0.95),
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          tr('reminderTitle').toUpperCase(),
-          style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold, letterSpacing: 2.0),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: AppColors.border, height: 1.0),
-        ),
-      ),
       body: Column(
         children: [
           // ── UNIFIED STICKY SEARCH BAR & FILTERS ──
