@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/top_app_bar.dart';
@@ -54,6 +55,38 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     _qtyController.addListener(_calculateTotal);
     _paidController.addListener(_handlePaidChange);
     _pendingController.addListener(_handlePendingChange);
+
+    _autoFillFromTracker();
+  }
+
+  Future<void> _autoFillFromTracker() async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    final rentTypeLower = _rentType.toLowerCase();
+    
+    if (rentTypeLower == 'hour') {
+      final time = prefs.getInt('rentveda_pending_time_entry');
+      if (time != null) {
+        final double hours = time / 3600;
+        _qtyController.text = hours.toStringAsFixed(2);
+        prefs.remove('rentveda_pending_time_entry');
+        Fluttertoast.showToast(msg: "Auto-filled from Tracker", backgroundColor: AppColors.primaryGold);
+      }
+    } else if (['count', 'trip', 'load'].contains(rentTypeLower)) {
+      final count = prefs.getInt('rentveda_pending_count_entry');
+      if (count != null) {
+        _qtyController.text = count.toString();
+        prefs.remove('rentveda_pending_count_entry');
+        Fluttertoast.showToast(msg: "Auto-filled from Tracker", backgroundColor: AppColors.primaryGold);
+      }
+    } else if (rentTypeLower == 'km' || rentTypeLower == 'distance') {
+      final km = prefs.getDouble('rentveda_pending_km_entry');
+      if (km != null) {
+        _qtyController.text = km.toStringAsFixed(2);
+        prefs.remove('rentveda_pending_km_entry');
+        Fluttertoast.showToast(msg: "Auto-filled from Tracker", backgroundColor: AppColors.primaryGold);
+      }
+    }
   }
 
   @override

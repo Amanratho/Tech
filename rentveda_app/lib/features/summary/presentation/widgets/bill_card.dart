@@ -60,8 +60,8 @@ class BillCard extends StatelessWidget {
                   onTap: mobileNumber.isNotEmpty ? () => _makePhoneCall(mobileNumber) : null,
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    width: 32,
-                    height: 32,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
                       color: AppColors.successBg,
                       border: Border.all(color: AppColors.successBorder),
@@ -69,7 +69,7 @@ class BillCard extends StatelessWidget {
                     ),
                     child: const Icon(
                       Icons.phone,
-                      size: 14,
+                      size: 20,
                       color: AppColors.success,
                     ),
                   ),
@@ -192,8 +192,8 @@ class _ActionButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        width: 28,
-        height: 28,
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
           border: Border.all(color: color.withValues(alpha: 0.2)),
@@ -201,7 +201,7 @@ class _ActionButton extends StatelessWidget {
         ),
         child: Icon(
           icon,
-          size: 14,
+          size: 20,
           color: color,
         ),
       ),

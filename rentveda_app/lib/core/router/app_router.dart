@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/eod_dashboard/presentation/screens/eod_dashboard_screen.dart';
 import '../../features/summary/presentation/screens/summary_screen.dart';
 import '../../features/reminders/presentation/screens/reminders_screen.dart';
 import '../../features/statement/presentation/screens/statement_screen.dart';
@@ -123,7 +124,7 @@ class AppRouter {
           GoRoute(
             path: '/summary',
             name: 'summary',
-            pageBuilder: (context, state) => const NoTransitionPage(child: SummaryScreen()),
+            pageBuilder: (context, state) => const NoTransitionPage(child: EodDashboardScreen()),
           ),
           GoRoute(
             path: '/reminders',
@@ -144,6 +145,11 @@ class AppRouter {
             path: '/payment-tracking',
             name: 'payment-tracking',
             pageBuilder: (context, state) => const NoTransitionPage(child: PaymentTrackingScreen()),
+          ),
+          GoRoute(
+            path: '/bill-history',
+            name: 'bill-history',
+            pageBuilder: (context, state) => const NoTransitionPage(child: SummaryScreen()),
           ),
           GoRoute(
             path: '/machine-maintenance',

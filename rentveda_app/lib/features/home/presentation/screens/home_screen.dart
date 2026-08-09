@@ -6,6 +6,7 @@ import '../widgets/dashboard_header.dart';
 import '../widgets/quick_actions.dart';
 import '../widgets/machine_gallery.dart';
 import '../widgets/recent_activity.dart';
+import '../../../tracker/presentation/widgets/tracker_card.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -53,18 +54,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             onPaymentsTap: () => context.push('/payment-tracking'),
                           ),
 
-                          // 2. Quick Action Shortcuts
+                          // 2. Work Tracker
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: TrackerCard(),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // 3. Quick Action Shortcuts
                           const QuickActions(),
                           const SizedBox(height: 24),
 
-                          // 3. Machine Gallery
+                          // 4. Machine Gallery
                           MachineGallery(
                             machines: homeState.machines,
                             onAddTap: () => context.push('/add-machine'),
                           ),
                           const SizedBox(height: 24),
 
-                          // 4. Recent Activity Feed
+                          // 5. Recent Activity Feed
                           RecentActivity(payments: homeState.payments),
                           const SizedBox(height: 24),
                         ],

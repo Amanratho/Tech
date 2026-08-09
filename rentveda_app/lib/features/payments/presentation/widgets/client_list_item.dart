@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
 
 class ClientListItem extends StatelessWidget {
   final Map<String, dynamic> user;
@@ -23,12 +22,11 @@ class ClientListItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(12), // p-3
         decoration: BoxDecoration(
-          color: AppColors.bgSurface,
+          color: Colors.white, // bg-white
           border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4)],
+          borderRadius: BorderRadius.circular(12), // rounded-xl
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -36,14 +34,14 @@ class ClientListItem extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 40, // w-10
+                  height: 40, // h-10
                   decoration: BoxDecoration(
                     color: AppColors.bgMain,
                     border: Border.all(color: AppColors.border),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.person_outline, size: 20, color: AppColors.textSubtle),
+                  child: const Icon(Icons.person, size: 16, color: AppColors.textMuted), // FaUser
                 ),
                 const SizedBox(width: 12),
                 Column(
@@ -51,68 +49,82 @@ class ClientListItem extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: AppTypography.cardHeader,
-                    ),
-                    const SizedBox(height: 3),
-                    Row(
-                      children: [
-                        const Icon(Icons.phone, size: 10, color: AppColors.textSubtle),
-                        const SizedBox(width: 5),
-                        Text(
-                          mobile,
-                          style: AppTypography.caption,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    if (pendingAmount > 0) ...[
-                      Text(
-                        tr('filterPending').toUpperCase(),
-                        style: AppTypography.badgeText.copyWith(
-                          fontSize: 12,
-                          color: AppColors.danger,
-                        ),
+                      style: const TextStyle(
+                        fontSize: 14, // text-sm
+                        fontWeight: FontWeight.bold, // font-bold
+                        color: AppColors.textMain, // text-main
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '₹${NumberFormat('#,##,###').format(pendingAmount.toInt())}',
-                        style: AppTypography.cardHeader.copyWith(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.danger,
-                        ),
-                      ),
-                    ] else ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.successBg,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.successBorder),
-                        ),
-                        child: Text(
-                          tr('filterPaid') == 'filterPaid' ? 'Paid' : tr('filterPaid'),
-                          style: AppTypography.badgeText.copyWith(
-                            fontSize: 12,
-                            color: AppColors.successDark,
+                    ),
+                    const SizedBox(height: 2), // mt-0.5
+                    GestureDetector(
+                      // We don't have openPhoneDialer here, but we match the UI
+                      onTap: () {},
+                      child: Row(
+                        children: [
+                          const Icon(Icons.phone, size: 10, color: Colors.green), // text-green-500
+                          const SizedBox(width: 6), // gap-1.5
+                          Text(
+                            mobile,
+                            style: const TextStyle(
+                              fontSize: 11, // text-[11px]
+                              color: AppColors.textMuted, // text-muted
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ],
                 ),
-                const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, size: 20, color: AppColors.textSubtle),
               ],
             ),
+            if (pendingAmount > 0)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  const Text(
+                    'PENDING', // text-[10px] font-bold text-red-500 uppercase tracking-wider
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(height: 2), // mb-0.5
+                  Text(
+                    '₹${NumberFormat('#,##,###').format(pendingAmount.toInt())}',
+                    style: TextStyle(
+                      fontSize: 14, // text-sm
+                      fontWeight: FontWeight.w900, // font-black
+                      color: Colors.red.shade700, // text-red-600
+                    ),
+                  ),
+                ],
+              )
+            else
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), // px-2 py-1
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50, // bg-green-50
+                  borderRadius: BorderRadius.circular(8), // rounded-lg
+                  border: Border.all(color: Colors.green.shade200), // border-green-200
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.check_circle, size: 10, color: Colors.green.shade600), // text-green-600
+                    const SizedBox(width: 4), // gap-1
+                    Text(
+                      'FULLY PAID', // text-[10px] font-bold uppercase tracking-wider
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade600,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),

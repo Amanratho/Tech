@@ -2,7 +2,7 @@ package com.rentveda.app;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
+import android.content.Intent;  
 import android.os.Build;
 
 import com.getcapacitor.JSObject;

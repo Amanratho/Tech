@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../providers/payment_tracking_provider.dart';
@@ -127,36 +126,28 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => context.pop(),
-                            child: const Icon(Icons.arrow_back, size: 22, color: AppColors.textMain),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            tr('paymentTrackingTitle').toUpperCase(),
-                            style: AppTypography.badgeText.copyWith(
-                              fontSize: 13,
-                              color: AppColors.textSubtle,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        tr('paymentTrackingTitle').toUpperCase(),
+                        style: AppTypography.caption.copyWith(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textMuted,
+                          letterSpacing: 2.0, // tracking-widest
+                        ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2), // px-2.5 py-0.5
                         decoration: BoxDecoration(
-                          color: AppColors.warning.withValues(alpha: 0.2),
-                          border: Border.all(color: AppColors.warning),
-                          borderRadius: BorderRadius.circular(14),
+                          color: const Color(0xFFFBC02D).withValues(alpha: 0.2), // bg-[#fbc02d]/20
+                          border: Border.all(color: const Color(0xFFFBC02D)), // border-[#fbc02d]
+                          borderRadius: BorderRadius.circular(20), // rounded-full
                         ),
                         child: Text(
                           '${filteredUsers.length} Clients',
                           style: AppTypography.caption.copyWith(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.warningDark,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF6C5000), // text-[#6c5000]
                           ),
                         ),
                       ),
@@ -243,18 +234,19 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
       onTap: () => setState(() => _filterType = value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), // px-3.5 py-1.5
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.warning : Colors.transparent,
-          border: Border.all(color: isSelected ? AppColors.borderDarkGold : AppColors.border),
-          borderRadius: BorderRadius.circular(20),
+          color: isSelected ? const Color(0xFFFBC02D) : Colors.transparent, // bg-[#fbc02d]
+          border: Border.all(color: isSelected ? const Color(0xFF795900) : AppColors.border), // border-[#795900]
+          borderRadius: BorderRadius.circular(20), // rounded-full
+          boxShadow: isSelected ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)] : null, // shadow-sm
         ),
         child: Text(
           label,
           style: AppTypography.caption.copyWith(
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-            color: isSelected ? AppColors.warningDark : AppColors.textSubtle,
+            fontSize: 12, // text-xs
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600, // font-bold / font-semibold
+            color: isSelected ? const Color(0xFF6C5000) : AppColors.textMuted, // text-[#6c5000]
           ),
         ),
       ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
-
+import 'notification_bell.dart';
 class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton;
   
@@ -120,26 +120,9 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 // Notification bell
-                Stack(
-                  children: [
-                    const Icon(Icons.notifications_rounded, size: 26, color: AppColors.primaryGold),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: Container(
-                        width: 9,
-                        height: 9,
-                        decoration: BoxDecoration(
-                          color: AppColors.danger,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.bgSurface, width: 1.5),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                const NotificationBell(),
               ],
             ),
           ],
