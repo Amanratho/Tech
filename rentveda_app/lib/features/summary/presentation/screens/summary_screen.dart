@@ -44,11 +44,11 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
       return val.contains(_searchQuery.toLowerCase());
     }).toList();
 
-    // 2. Sort by Amount
+    // 2. Sort by Date (newest first by default)
     filtered.sort((a, b) {
-      final amtA = ((a['paidAmount'] ?? 0) + (a['pendingAmount'] ?? 0)).toDouble();
-      final amtB = ((b['paidAmount'] ?? 0) + (b['pendingAmount'] ?? 0)).toDouble();
-      return _sortAscending ? amtA.compareTo(amtB) : amtB.compareTo(amtA);
+      final dateA = DateTime.tryParse(a['createdAt']?.toString() ?? '') ?? DateTime(2000);
+      final dateB = DateTime.tryParse(b['createdAt']?.toString() ?? '') ?? DateTime(2000);
+      return _sortAscending ? dateA.compareTo(dateB) : dateB.compareTo(dateA);
     });
 
     return filtered;

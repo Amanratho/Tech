@@ -259,16 +259,16 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                                                         // Call Button
                                                         InkWell(
                                                           onTap: () => _makePhoneCall(mobile),
-                                                          borderRadius: BorderRadius.circular(12),
+                                                          borderRadius: BorderRadius.circular(20),
                                                           child: Container(
                                                             width: 40,
                                                             height: 40,
                                                             decoration: BoxDecoration(
-                                                              color: Colors.green.shade50,
-                                                              border: Border.all(color: Colors.green.shade200),
-                                                              borderRadius: BorderRadius.circular(12),
+                                                              color: AppColors.successBg,
+                                                              border: Border.all(color: AppColors.successBorder),
+                                                              shape: BoxShape.circle,
                                                             ),
-                                                            child: Icon(Icons.phone, size: 16, color: Colors.green.shade600),
+                                                            child: const Icon(Icons.phone, size: 20, color: AppColors.success),
                                                           ),
                                                         ),
                                                         const SizedBox(width: 12),
@@ -317,10 +317,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                                                       spacing: 16,
                                                       runSpacing: 12,
                                                       children: [
-                                                        _buildInfoItem(Icons.agriculture, rem['machineName']?.toString() ?? tr('reminderMachine'), Colors.grey.shade600),
+                                                        _buildInfoItem(Icons.agriculture, rem['machineName']?.toString() ?? 'Machine', Colors.grey.shade600),
                                                         _buildInfoItem(Icons.calendar_today, formattedDate, Colors.red.shade500),
-                                                        _buildInfoItem(Icons.currency_rupee, tr('reminderPendingAmt', namedArgs: {'amt': pendingAmt}), Colors.yellow.shade800),
-                                                        _buildInfoItem(Icons.access_time, _timeAgo(rem['createdAt']), Colors.blue.shade500),
+                                                        _buildInfoItem(Icons.currency_rupee, '₹$pendingAmt', Colors.yellow.shade800),
+                                                        _buildInfoItem(Icons.access_time, _daysRemaining(rem['reminderDate']?.toString()), Colors.blue.shade500),
                                                       ],
                                                     ),
                                                     

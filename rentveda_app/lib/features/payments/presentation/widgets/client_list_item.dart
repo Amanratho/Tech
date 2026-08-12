@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class ClientListItem extends StatelessWidget {
@@ -34,14 +35,23 @@ class ClientListItem extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  width: 40, // w-10
-                  height: 40, // h-10
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.bgMain,
-                    border: Border.all(color: AppColors.border),
+                    color: AppColors.successBg,
+                    border: Border.all(color: AppColors.successBorder),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.person, size: 16, color: AppColors.textMuted), // FaUser
+                  child: InkWell(
+                    onTap: mobile.isNotEmpty ? () async {
+                      final Uri launchUri = Uri(scheme: 'tel', path: mobile);
+                      if (await canLaunchUrl(launchUri)) {
+                        await launchUrl(launchUri);
+                      }
+                    } : null,
+                    borderRadius: BorderRadius.circular(20),
+                    child: const Icon(Icons.phone, size: 20, color: AppColors.success),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Column(

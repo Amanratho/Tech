@@ -79,15 +79,15 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
             ),
             const SizedBox(height: 20),
 
-            // Input fields
+            // Input fields (read-only, just for display)
             Text(tr('customerName'), style: AppTypography.bodySecondary),
             const SizedBox(height: 4),
-            _buildTextField(_nameController),
+            _buildTextField(_nameController, readOnly: true),
             const SizedBox(height: 12),
 
             Text(tr('mobileNumber'), style: AppTypography.bodySecondary),
             const SizedBox(height: 4),
-            _buildTextField(_mobileController, keyboardType: TextInputType.phone),
+            _buildTextField(_mobileController, keyboardType: TextInputType.phone, readOnly: true),
             const SizedBox(height: 16),
 
             // Pending amount display
@@ -151,17 +151,22 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, {TextInputType keyboardType = TextInputType.text}) {
+  Widget _buildTextField(TextEditingController controller, {TextInputType keyboardType = TextInputType.text, bool readOnly = false}) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      style: AppTypography.bodyMain,
+      readOnly: readOnly,
+      enabled: !readOnly,
+      style: AppTypography.bodyMain.copyWith(
+        color: readOnly ? AppColors.textMuted : AppColors.textMain,
+      ),
       decoration: InputDecoration(
         filled: true,
-        fillColor: AppColors.bgMain,
+        fillColor: readOnly ? AppColors.bgMain.withValues(alpha: 0.5) : AppColors.bgMain,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
+        disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.borderFocus, width: 2)),
       ),
     );

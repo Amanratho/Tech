@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/top_app_bar.dart';
@@ -29,7 +30,8 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
   
   Map<String, dynamic>? _user;
   final GlobalKey _invoiceKey = GlobalKey();
-  bool _isGenerating = false;
+  // Track which button is loading: null = none, 'download', 'share', 'whatsapp'
+  String? _activeAction;
   
   @override
   void initState() {
@@ -57,30 +59,70 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
     }
   }
 
+  Future<File?> _generateImageFile() async {
+    try {
+      RenderRepaintBoundary boundary = _invoiceKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      
+      if (byteData == null) return null;
+      
+      final pngBytes = byteData.buffer.asUint8List();
+      final directory = await getTemporaryDirectory();
+      final imagePath = '${directory.path}/Invoice_${_entryData['customerName']?.toString().replaceAll(' ', '_') ?? 'Customer'}_${DateTime.now().millisecondsSinceEpoch}.png';
+      final file = File(imagePath);
+      await file.writeAsBytes(pngBytes);
+      return file;
+    } catch (e) {
+      debugPrint('Error generating image: $e');
+      return null;
+    }
+  }
+
+  Future<void> _handleDownload() async {
+    if (_activeAction != null) return;
+    setState(() => _activeAction = 'download');
+    final file = await _generateImageFile();
+
+    if (file != null && mounted) {
+      try {
+        Directory? downloadDir;
+        if (Platform.isAndroid) {
+          downloadDir = Directory('/storage/emulated/0/Download');
+          if (!await downloadDir.exists()) {
+            downloadDir = await getExternalStorageDirectory();
+          }
+        } else {
+          downloadDir = await getApplicationDocumentsDirectory();
+        }
+        
+        final finalPath = '${downloadDir!.path}/${file.path.split('/').last}';
+        await file.copy(finalPath);
+        
+        Fluttertoast.showToast(
+          msg: 'Invoice saved to Downloads!',
+          backgroundColor: AppColors.successDark,
+        );
+      } catch (e) {
+        Fluttertoast.showToast(msg: 'Failed to save invoice', backgroundColor: AppColors.danger);
+      }
+    } else if (mounted) {
+      Fluttertoast.showToast(msg: 'Failed to generate invoice', backgroundColor: AppColors.danger);
+    }
+    if (mounted) setState(() => _activeAction = null);
+  }
+
   Future<void> _shareOnWhatsApp(Map<String, dynamic>? user, {bool directToWhatsApp = false}) async {
-    if (_isGenerating) return;
-    setState(() => _isGenerating = true);
+    if (_activeAction != null) return;
+    setState(() => _activeAction = directToWhatsApp ? 'whatsapp' : 'share');
     
-    // Store localized strings before async gaps
     final langCode = context.locale.languageCode;
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     
     try {
-      // 1. Capture the Widget as an Image
-      RenderRepaintBoundary boundary = _invoiceKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      ui.Image image = await boundary.toImage(pixelRatio: 2.0); // High quality
-      
-      // 2. Convert to ByteData (PNG)
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      final pngBytes = byteData!.buffer.asUint8List();
-      
-      // 3. Save to Temporary Directory
-      final directory = await getTemporaryDirectory();
-      final imagePath = '${directory.path}/Invoice_${_entryData['customerName']}_${DateTime.now().millisecondsSinceEpoch}.png';
-      final file = File(imagePath);
-      await file.writeAsBytes(pngBytes);
-      
-      // 4. Create the WhatsApp Message Text
+      final file = await _generateImageFile();
+      if (file == null) throw Exception("Could not generate image file");
+
       final customerName = _entryData['customerName'] ?? 'Customer';
       final pendingAmount = _entryData['pendingAmount'] ?? 0;
       final companyName = user?['companyName'] ?? 'Our Company';
@@ -92,7 +134,6 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
 
       final message = '$greeting $customerName,\n\n$bodyText';
       
-      // 5. Share via Native Share Sheet (Works perfectly for WhatsApp with images)
       if (directToWhatsApp) {
         String phone = _entryData['mobileNumber']?.toString() ?? '';
         if (phone.startsWith('+')) {
@@ -101,27 +142,24 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
           phone = '91$phone';
         }
         await WhatsappSharePlus.shareImageToWhatsapp(
-          imagePath: imagePath,
+          imagePath: file.path,
           text: message,
           phone: phone,
         );
       } else {
         // ignore: deprecated_member_use
-        await Share.shareXFiles([XFile(imagePath)], text: message);
+        await Share.shareXFiles([XFile(file.path)], text: message);
       }
-
     } catch (e) {
-      debugPrint('Failed to generate or share invoice image: $e');
+      debugPrint('Failed to share invoice: $e');
       scaffoldMessenger.showSnackBar(SnackBar(content: Text('Failed to share invoice: $e')));
     } finally {
-      if (mounted) setState(() => _isGenerating = false);
+      if (mounted) setState(() => _activeAction = null);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = _user;
-    
     if (_entryData.isEmpty) {
       return Scaffold(
         backgroundColor: AppColors.bgMain,
@@ -130,313 +168,160 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
     }
 
     final currentDate = DateTime.now();
-    final formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
+    final formattedDate = DateFormat('dd MMM yyyy').format(currentDate);
     final totalAmount = (double.tryParse(_entryData['paidAmount'].toString()) ?? 0) + 
                         (double.tryParse(_entryData['pendingAmount'].toString()) ?? 0);
 
     return Scaffold(
-      backgroundColor: AppColors.bgMain,
-      appBar: const RentVedaAppBar(showBackButton: true),
-
-      body: Stack(
-        children: [
-          // 1. HIDDEN FORMAL TEMPLATE (Rendered at bottom layer)
-          Positioned(
-            left: 0,
-            top: 0,
-            child: IgnorePointer(
-              child: RepaintBoundary(
-                key: _invoiceKey,
-                child: FormalInvoiceTemplate(
-                  user: user,
-                  entryData: _entryData,
-                  machineName: _machineName,
-                  formattedDate: formattedDate,
-                  totalAmount: totalAmount,
+      backgroundColor: Colors.grey.shade900,
+      appBar: AppBar(
+        backgroundColor: AppColors.bgMain,
+        elevation: 0,
+        title: Text(
+          'Invoice Generated',
+          style: AppTypography.cardHeader,
+        ),
+        iconTheme: const IconThemeData(color: AppColors.textMain),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/home'),
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Invoice Preview Area
+            Expanded(
+              child: InteractiveViewer(
+                boundaryMargin: const EdgeInsets.all(40),
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: RepaintBoundary(
+                        key: _invoiceKey,
+                        child: Material(
+                          color: Colors.white,
+                          elevation: 10,
+                          child: FormalInvoiceTemplate(
+                            user: _user,
+                            entryData: _entryData,
+                            machineName: _machineName,
+                            formattedDate: formattedDate,
+                            totalAmount: totalAmount,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-          
-          // 2. VISIBLE MOBILE UI (Covers the template with solid background)
-          Positioned.fill(
-            child: Container(
-              color: AppColors.bgMain, // Ensures hidden template is not visible
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-            // Cards: From and Bill To
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // FROM
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.bgSurface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('FROM', style: AppTypography.badgeText.copyWith(color: AppColors.textMuted, fontSize: 9, letterSpacing: 1.2)),
-                        const SizedBox(height: 6),
-                        Text(user?['companyName'] ?? tr('companyName'), style: AppTypography.cardHeader.copyWith(fontSize: 14)),
-                        const SizedBox(height: 4),
-                        Text(user?['username'] ?? '...', style: AppTypography.caption.copyWith(color: AppColors.textMuted)),
-                        Text('+91 ${user?['mobileNo'] ?? '---'}', style: AppTypography.caption.copyWith(color: AppColors.textMuted)),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                // BILL TO
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.bgSurface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('BILL TO', style: AppTypography.badgeText.copyWith(color: AppColors.textMuted, fontSize: 9, letterSpacing: 1.2)),
-                        const SizedBox(height: 6),
-                        Text(_entryData['customerName'] ?? 'N/A', style: AppTypography.cardHeader.copyWith(fontSize: 14, color: AppColors.primaryDark)),
-                        const SizedBox(height: 4),
-                        Text(_entryData['address'] ?? 'No Address', style: AppTypography.caption.copyWith(color: AppColors.textMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
-                        Text('+91 ${_entryData['mobileNumber'] ?? '---'}', style: AppTypography.caption.copyWith(color: AppColors.textMuted)),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // WORK DETAILS
+            
+            // Bottom Actions
             Container(
-              decoration: BoxDecoration(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
                 color: AppColors.bgSurface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
+                border: Border(top: BorderSide(color: AppColors.border)),
               ),
-              clipBehavior: Clip.antiAlias,
               child: Column(
                 children: [
-                  // Header
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: const BoxDecoration(
-                      color: AppColors.bgMain,
-                      border: Border(bottom: BorderSide(color: AppColors.border)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Job Details', style: AppTypography.bodyMain.copyWith(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textMuted)),
-                        Text(formattedDate, style: AppTypography.caption.copyWith(color: AppColors.textMuted)),
-                      ],
-                    ),
-                  ),
-                  
-                  // Body
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(_machineName, style: AppTypography.cardHeader),
-                        const SizedBox(height: 4),
-                        Text('Job: ${_entryData['jobWork'] ?? '---'} • Op: ${_entryData['operatorName'] ?? '---'}', style: AppTypography.caption.copyWith(color: AppColors.textMuted)),
-                        
-                        const SizedBox(height: 12),
-                        const Divider(height: 1, color: AppColors.border),
-                        const SizedBox(height: 12),
-                        
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Text('WORK', style: AppTypography.badgeText.copyWith(color: AppColors.textMuted, fontSize: 9)),
-                                  const SizedBox(height: 4),
-                                  Text('${_entryData['quantity']} ${_entryData['rentType']}', style: AppTypography.bodyMain.copyWith(fontSize: 12, fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                            ),
-                            Container(width: 1, height: 30, color: AppColors.border),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Text('RATE', style: AppTypography.badgeText.copyWith(color: AppColors.textMuted, fontSize: 9)),
-                                  const SizedBox(height: 4),
-                                  Text('₹${_entryData['price']}', style: AppTypography.bodyMain.copyWith(fontSize: 12, fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                            ),
-                            Container(width: 1, height: 30, color: AppColors.border),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Text('AMOUNT', style: AppTypography.badgeText.copyWith(color: AppColors.textMuted, fontSize: 9)),
-                                  const SizedBox(height: 4),
-                                  Text('₹$totalAmount', style: AppTypography.bodyMain.copyWith(fontSize: 12, fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        
-                        const SizedBox(height: 12),
-                        const Divider(height: 1, color: AppColors.border),
-                        const SizedBox(height: 12),
-                        
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(color: AppColors.successBg, borderRadius: BorderRadius.circular(6)),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.check_circle, size: 12, color: AppColors.successDark),
-                                  const SizedBox(width: 4),
-                                  Text('Paid: ₹${_entryData['paidAmount']}', style: AppTypography.caption.copyWith(color: AppColors.successDark, fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(color: AppColors.dangerBg, borderRadius: BorderRadius.circular(6)),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.error, size: 12, color: AppColors.dangerDark),
-                                  const SizedBox(width: 4),
-                                  Text('Due: ₹${_entryData['pendingAmount']}', style: AppTypography.caption.copyWith(color: AppColors.dangerDark, fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // NO QR NOTICE
-            if (user != null && (user['qrCodeUrl'] == null || user['qrCodeUrl'].isEmpty))
-              GestureDetector(
-                onTap: () => context.push('/profile'),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGoldBg,
-                    border: Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
+                  Row(
                     children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryGold,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.qr_code, color: AppColors.textMain, size: 20),
-                      ),
-                      const SizedBox(width: 12),
+                      // Download
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(tr('noQrNoticeTitle'), style: AppTypography.cardHeader.copyWith(fontSize: 12)),
-                            Text(tr('noQrNoticeMsg'), style: AppTypography.caption.copyWith(color: AppColors.textDarkBrown, fontSize: 10)),
-                          ],
+                        child: OutlinedButton(
+                          onPressed: _activeAction != null ? null : _handleDownload,
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            side: const BorderSide(color: AppColors.border),
+                          ),
+                          child: _activeAction == 'download'
+                              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.download, size: 18),
+                                    const SizedBox(width: 4),
+                                    Text('Download', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
+                                  ],
+                                ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryGold,
-                          borderRadius: BorderRadius.circular(20),
+                      const SizedBox(width: 8),
+                      // Share
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _activeAction != null ? null : () => _shareOnWhatsApp(_user, directToWhatsApp: false),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: AppColors.textMain,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0,
+                          ),
+                          child: _activeAction == 'share'
+                              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textMain))
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.share, size: 18),
+                                    const SizedBox(width: 4),
+                                    Text('Share', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
+                                  ],
+                                ),
                         ),
-                        child: Text(tr('uploadNow'), style: AppTypography.badgeText.copyWith(color: AppColors.textMain, fontSize: 9)),
-                      )
+                      ),
+                      const SizedBox(width: 8),
+                      // WhatsApp
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _activeAction != null ? null : () => _shareOnWhatsApp(_user, directToWhatsApp: true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF25D366),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0,
+                          ),
+                          child: _activeAction == 'whatsapp'
+                              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.chat, size: 18),
+                                    const SizedBox(width: 4),
+                                    Text('WhatsApp', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white)),
+                                  ],
+                                ),
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              ),
-
-            const SizedBox(height: 24),
-            
-            // ACTION BUTTONS
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => _shareOnWhatsApp(user, directToWhatsApp: false),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      elevation: 2,
+                  const SizedBox(height: 12),
+                  // Back to Home
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () => context.go('/home'),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text('Back to Home', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w700, color: AppColors.primaryDark)),
                     ),
-                    child: _isGenerating
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Icon(Icons.share, size: 24),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => _shareOnWhatsApp(user, directToWhatsApp: true),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF25D366),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      elevation: 2,
-                    ),
-                    child: _isGenerating
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Icon(Icons.chat, size: 24),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: () => context.go('/home'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                side: const BorderSide(color: AppColors.borderFocus),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Back to Home', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w700, color: AppColors.textMain)),
                 ],
               ),
             ),
           ],
         ),
       ),
-    ),
-  ),
-],
-),
     );
   }
 }
