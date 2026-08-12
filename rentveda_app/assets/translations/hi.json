@@ -555,5 +555,12 @@
   "reminderHoursAgo": "{{hours}} घंटे पहले",
   "reminderMinsAgo": "{{mins}} मिनट पहले",
   "reminderJustNow": "अभी-अभी",
-  "reminderMachine": "मशीन"
+  "reminderMachine": "मशीन",
+  "editBill": "बिल संपादित करें",
+  "customerInfo": "ग्राहक की जानकारी",
+  "pricing": "मूल्य निर्धारण",
+  "payment": "भुगतान",
+  "priceRs": "मूल्य (₹)",
+  "paidRs": "भुगतान किया (₹)",
+  "pendingRs": "बकाया (₹)"
 }

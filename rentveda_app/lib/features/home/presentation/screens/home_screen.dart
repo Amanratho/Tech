@@ -51,7 +51,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             payments: homeState.payments,
                             reminders: homeState.reminders,
                             machines: homeState.machines,
+                            onSummaryTap: () => context.go('/summary'),
                             onPaymentsTap: () => context.push('/payment-tracking'),
+                            onBillsTap: () => context.push('/bill-history'),
+                            onMachinesTap: () => context.push('/machine-maintenance'),
                           ),
 
                           // 2. Work Tracker
@@ -73,7 +76,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const SizedBox(height: 24),
 
                           // 5. Recent Activity Feed
-                          RecentActivity(payments: homeState.payments),
+                          RecentActivity(
+                            payments: homeState.payments,
+                            onViewAllTap: () => context.push('/bill-history'),
+                          ),
                           const SizedBox(height: 24),
                         ],
                       ),

@@ -8,14 +8,14 @@ class BillCard extends StatelessWidget {
   final Map<String, dynamic> bill;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
-  final VoidCallback onPdf;
+  final VoidCallback onView;
 
   const BillCard({
     super.key,
     required this.bill,
     required this.onEdit,
     required this.onDelete,
-    required this.onPdf,
+    required this.onView,
   });
 
   Future<void> _makePhoneCall(String phoneNumber) async {
@@ -161,11 +161,11 @@ class BillCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               
-              // PDF
+              // View
               _ActionButton(
-                icon: Icons.picture_as_pdf,
+                icon: Icons.visibility,
                 color: Colors.orange,
-                onTap: onPdf,
+                onTap: onView,
               ),
             ],
           ),

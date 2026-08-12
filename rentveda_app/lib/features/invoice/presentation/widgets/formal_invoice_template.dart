@@ -60,22 +60,25 @@ class FormalInvoiceTemplate extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      companyName.toUpperCase(),
-                      style: const TextStyle(color: Color(0xFFFBC02D), fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+                    const Text(
+                      'INVOICE',
+                      style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w300, letterSpacing: 4),
                     ),
-                    const SizedBox(height: 4),
-                    Text(ownerName, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                    const SizedBox(height: 8),
+                    const Text('Bill From:', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                    const SizedBox(height: 2),
+                    Text(ownerName, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                     Text('+91 $ownerMobile', style: const TextStyle(color: Colors.white70, fontSize: 14)),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text(
-                      'INVOICE',
-                      style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w300, letterSpacing: 4),
+                    Text(
+                      companyName.toUpperCase(),
+                      style: const TextStyle(color: Color(0xFFFBC02D), fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 2),
                     ),
+                    const SizedBox(height: 4),
                     const Text(
                       'Original Copy',
                       style: TextStyle(color: Colors.white54, fontSize: 12),
@@ -295,9 +298,18 @@ class FormalInvoiceTemplate extends StatelessWidget {
                   style: TextStyle(color: Colors.black54, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 16),
-                Text(
-                  'Veda',
-                  style: TextStyle(color: Color(0xFFFBC02D), fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 2),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'made by ',
+                      style: TextStyle(color: Colors.black45, fontSize: 12, fontStyle: FontStyle.italic),
+                    ),
+                    Text(
+                      'RentVeda',
+                      style: TextStyle(color: Color(0xFFFBC02D), fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1),
+                    ),
+                  ],
                 ),
               ],
             ),

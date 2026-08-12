@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -43,10 +44,63 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
     _pendingController = TextEditingController(text: widget.bill['pendingAmount']?.toString() ?? '0');
     
     _jobWorkController = TextEditingController(text: widget.bill['jobWork']?.toString() ?? '');
+
+    if (!_isFullyPaid) {
+      _priceController.addListener(_recalculateAmounts);
+      _quantityController.addListener(_recalculateAmounts);
+      _paidController.addListener(_recalculatePending);
+    }
+  }
+
+  bool get _isFullyPaid {
+    final pending = double.tryParse(widget.bill['pendingAmount']?.toString() ?? '0') ?? 0;
+    final paid = double.tryParse(widget.bill['paidAmount']?.toString() ?? '0') ?? 0;
+    return pending <= 0 && paid > 0;
+  }
+
+  void _recalculateAmounts() {
+    final price = double.tryParse(_priceController.text) ?? 0;
+    final qty = double.tryParse(_quantityController.text) ?? 0;
+    final total = price * qty;
+    final currentPaid = double.tryParse(_paidController.text) ?? 0;
+    
+    final newPending = total - currentPaid;
+    final displayPending = newPending < 0 ? 0.0 : newPending;
+    if (displayPending.toStringAsFixed(0) != _pendingController.text) {
+      _pendingController.text = displayPending.toStringAsFixed(0);
+    }
+    setState(() {}); // Trigger rebuild for total text and validation
+  }
+
+  void _recalculatePending() {
+    final price = double.tryParse(_priceController.text) ?? 0;
+    final qty = double.tryParse(_quantityController.text) ?? 0;
+    final total = price * qty;
+    final currentPaid = double.tryParse(_paidController.text) ?? 0;
+    
+    final newPending = total - currentPaid;
+    final displayPending = newPending < 0 ? 0.0 : newPending;
+    if (displayPending.toStringAsFixed(0) != _pendingController.text) {
+      _pendingController.text = displayPending.toStringAsFixed(0);
+    }
+    setState(() {});
+  }
+
+  bool get _hasError {
+    final price = double.tryParse(_priceController.text) ?? 0;
+    final qty = double.tryParse(_quantityController.text) ?? 0;
+    final total = price * qty;
+    final currentPaid = double.tryParse(_paidController.text) ?? 0;
+    return currentPaid > total;
   }
 
   @override
   void dispose() {
+    if (!_isFullyPaid) {
+      _priceController.removeListener(_recalculateAmounts);
+      _quantityController.removeListener(_recalculateAmounts);
+      _paidController.removeListener(_recalculatePending);
+    }
     _nameController.dispose();
     _mobileController.dispose();
     _addressController.dispose();
@@ -87,7 +141,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
     }
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, {bool isNumber = false, Color focusColor = AppColors.primary}) {
+  Widget _buildTextField(String label, TextEditingController controller, {bool isNumber = false, Color focusColor = AppColors.primary, bool readOnly = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -98,11 +152,16 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
         const SizedBox(height: 4),
         TextField(
           controller: controller,
+          readOnly: readOnly,
           keyboardType: isNumber ? const TextInputType.numberWithOptions(decimal: true) : TextInputType.text,
-          style: AppTypography.bodyMain.copyWith(fontSize: 12),
+          inputFormatters: isNumber ? [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))] : null,
+          style: AppTypography.bodyMain.copyWith(
+            fontSize: 12,
+            color: readOnly ? AppColors.textMuted : AppColors.textMain,
+          ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: AppColors.bgMain,
+            fillColor: readOnly ? AppColors.border.withValues(alpha: 0.3) : AppColors.bgMain,
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -114,7 +173,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: focusColor, width: 1.5),
+              borderSide: BorderSide(color: readOnly ? AppColors.border : focusColor, width: 1.5),
             ),
           ),
         ),
@@ -152,7 +211,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                     const Icon(Icons.edit, color: AppColors.primary, size: 18),
                     const SizedBox(width: 8),
                     Text(
-                      'Edit Bill', // Keeping English as per React code for this specific modal title
+                      tr('editBill'),
                       style: AppTypography.cardHeader.copyWith(fontSize: 14),
                     ),
                   ],
@@ -191,7 +250,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'CUSTOMER INFO',
+                          tr('customerInfo'),
                           style: AppTypography.caption.copyWith(
                             color: AppColors.textMuted,
                             fontSize: 10,
@@ -200,13 +259,13 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        _buildTextField('Customer Name', _nameController),
+                        _buildTextField(tr('customerName'), _nameController),
                         const SizedBox(height: 12),
-                        _buildTextField('Mobile Number', _mobileController, isNumber: true),
+                        _buildTextField(tr('mobileNumber'), _mobileController, isNumber: true),
                         const SizedBox(height: 12),
-                        _buildTextField('Address', _addressController),
+                        _buildTextField(tr('address'), _addressController),
                         const SizedBox(height: 12),
-                        _buildTextField('Operator Name', _operatorController),
+                        _buildTextField(tr('operatorName'), _operatorController),
                       ],
                     ),
                   ),
@@ -224,7 +283,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'PRICING',
+                          tr('pricing'),
                           style: AppTypography.caption.copyWith(
                             color: AppColors.textMuted,
                             fontSize: 10,
@@ -235,9 +294,9 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            Expanded(child: _buildTextField('Price (₹)', _priceController, isNumber: true)),
+                            Expanded(child: _buildTextField(tr('priceRs'), _priceController, isNumber: true, readOnly: _isFullyPaid)),
                             const SizedBox(width: 12),
-                            Expanded(child: _buildTextField('Quantity', _quantityController, isNumber: true)),
+                            Expanded(child: _buildTextField(tr('quantity'), _quantityController, isNumber: true, readOnly: _isFullyPaid)),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -251,7 +310,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Total Amount', style: AppTypography.caption.copyWith(fontSize: 10, color: AppColors.textMuted)),
+                              Text(tr('totalAmount'), style: AppTypography.caption.copyWith(fontSize: 10, color: AppColors.textMuted)),
                               Text(
                                 '₹${total.toStringAsFixed(0)}',
                                 style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w700, color: AppColors.primaryDark),
@@ -276,7 +335,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'PAYMENT',
+                          tr('payment'),
                           style: AppTypography.caption.copyWith(
                             color: AppColors.textMuted,
                             fontSize: 10,
@@ -287,16 +346,31 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            Expanded(child: _buildTextField('Paid (₹)', _paidController, isNumber: true, focusColor: AppColors.success)),
+                            Expanded(child: _buildTextField(tr('paidRs'), _paidController, isNumber: true, focusColor: AppColors.success, readOnly: _isFullyPaid)),
                             const SizedBox(width: 12),
-                            Expanded(child: _buildTextField('Pending (₹)', _pendingController, isNumber: true, focusColor: AppColors.danger)),
+                            Expanded(child: _buildTextField(tr('pendingRs'), _pendingController, isNumber: true, focusColor: AppColors.danger, readOnly: true)),
                           ],
                         ),
                         const SizedBox(height: 12),
-                        _buildTextField('Job Work', _jobWorkController),
+                        _buildTextField(tr('jobWork'), _jobWorkController, readOnly: _isFullyPaid),
                       ],
                     ),
                   ),
+                  if (_hasError) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const Icon(Icons.error_outline, color: AppColors.danger, size: 14),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'Total Amount cannot be less than Paid Amount.',
+                            style: AppTypography.caption.copyWith(color: AppColors.danger, fontSize: 11),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -325,16 +399,17 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: _isSaving ? null : _handleSave,
+                    onPressed: (_isSaving || _hasError) ? null : _handleSave,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
+                      disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
                       foregroundColor: AppColors.textMain,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
                     ),
                     child: _isSaving
-                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textMain))
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

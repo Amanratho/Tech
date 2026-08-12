@@ -552,5 +552,12 @@
   "reminderHoursAgo": "{{hours}}h ago",
   "reminderMinsAgo": "{{mins}}m ago",
   "reminderJustNow": "Just now",
-  "reminderMachine": "Machine"
+  "reminderMachine": "Machine",
+  "editBill": "Edit Bill",
+  "customerInfo": "CUSTOMER INFO",
+  "pricing": "PRICING",
+  "payment": "PAYMENT",
+  "priceRs": "Price (₹)",
+  "paidRs": "Paid (₹)",
+  "pendingRs": "Pending (₹)"
 }

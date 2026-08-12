@@ -6,6 +6,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../widgets/bill_card.dart';
 import '../widgets/edit_bill_sheet.dart';
 import '../widgets/delete_bill_dialog.dart';
+import '../screens/invoice_preview_screen.dart';
 import '../../providers/billing_history_provider.dart';
 
 class SummaryScreen extends ConsumerStatefulWidget {
@@ -53,83 +54,11 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
     return filtered;
   }
 
-  void _showLanguageModal(BuildContext context, Map<String, dynamic> bill) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: AppColors.bgSurface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.language, color: AppColors.primary, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Select Language',
-                      style: AppTypography.cardHeader,
-                    ),
-                  ],
-                ),
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: const Icon(Icons.close, color: AppColors.textMuted),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Choose the language in which you want to generate the PDF invoice for ${bill['customerName']}.',
-              style: AppTypography.caption.copyWith(color: AppColors.textMuted),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  // TODO: Trigger PDF generation
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  side: const BorderSide(color: AppColors.border),
-                ),
-                child: Text('English Invoice', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w700)),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  // TODO: Trigger PDF generation
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.textMain,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 2,
-                  shadowColor: AppColors.primary.withValues(alpha: 0.3),
-                ),
-                child: Text('हिंदी में डाउनलोड करें (Hindi)', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w700)),
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
+  void _openInvoicePreview(BuildContext context, Map<String, dynamic> bill) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => InvoicePreviewScreen(bill: bill),
       ),
     );
   }
@@ -319,7 +248,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                       builder: (context) => DeleteBillDialog(bill: bill),
                                     );
                                   },
-                                  onPdf: () => _showLanguageModal(context, bill),
+                                  onView: () => _openInvoicePreview(context, bill),
                                 );
                               },
                             ),

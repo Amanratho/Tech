@@ -4,8 +4,9 @@ import 'package:easy_localization/easy_localization.dart';
 
 class RecentActivity extends StatelessWidget {
   final List<dynamic> payments;
+  final VoidCallback? onViewAllTap;
 
-  const RecentActivity({super.key, required this.payments});
+  const RecentActivity({super.key, required this.payments, this.onViewAllTap});
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +31,15 @@ class RecentActivity extends StatelessWidget {
             children: [
               Text(tr('recentActivityTitle'),
                 style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1C))),
-              Row(
-                children: [
-                  Text(tr('viewAllHistory'), style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF795900))),
-                  const SizedBox(width: 4),
-                  const Icon(Icons.arrow_forward, size: 12, color: Color(0xFF795900)),
-                ],
+              GestureDetector(
+                onTap: onViewAllTap,
+                child: Row(
+                  children: [
+                    Text(tr('viewAllHistory'), style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF795900))),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.arrow_forward, size: 12, color: Color(0xFF795900)),
+                  ],
+                ),
               ),
             ],
           ),
