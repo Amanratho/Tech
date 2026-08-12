@@ -317,7 +317,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                                                       spacing: 16,
                                                       runSpacing: 12,
                                                       children: [
-                                                        _buildInfoItem(Icons.agriculture, rem['machineName']?.toString() ?? 'Machine', Colors.grey.shade600),
                                                         _buildInfoItem(Icons.calendar_today, formattedDate, Colors.red.shade500),
                                                         _buildInfoItem(Icons.currency_rupee, '₹$pendingAmt', Colors.yellow.shade800),
                                                         _buildInfoItem(Icons.access_time, _daysRemaining(rem['reminderDate']?.toString()), Colors.blue.shade500),
@@ -430,15 +429,18 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     );
   }
 
-  String _timeAgo(String? dateStr) {
+  String _daysRemaining(String? dateStr) {
     if (dateStr == null) return '';
     final date = DateTime.tryParse(dateStr);
     if (date == null) return '';
-    final diff = DateTime.now().difference(date);
-    if (diff.inDays > 0) return tr('reminderDaysAgo', namedArgs: {'days': diff.inDays.toString()});
-    if (diff.inHours > 0) return tr('reminderHoursAgo', namedArgs: {'hours': diff.inHours.toString()});
-    if (diff.inMinutes > 0) return tr('reminderMinsAgo', namedArgs: {'mins': diff.inMinutes.toString()});
-    return tr('reminderJustNow');
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final reminderDay = DateTime(date.year, date.month, date.day);
+    final diff = reminderDay.difference(today).inDays;
+    if (diff < 0) return '${diff.abs()} days overdue';
+    if (diff == 0) return 'Due today';
+    if (diff == 1) return '1 day left';
+    return '$diff days left';
   }
 }
 
