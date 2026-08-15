@@ -400,7 +400,7 @@ class _EodDashboardScreenState extends ConsumerState<EodDashboardScreen> {
             children: [
               Text('₹${value ?? 0}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF6C5000))),
               const SizedBox(height: 4),
-              const Text('Net Profit', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6C5000))),
+              Text(tr('eodNetProfit'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6C5000))),
             ],
           )
         ],

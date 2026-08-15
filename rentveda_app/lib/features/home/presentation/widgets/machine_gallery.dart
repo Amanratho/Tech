@@ -148,7 +148,7 @@ class _MachineGalleryState extends State<MachineGallery> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Center(
-              child: Text("No machines found", style: AppTypography.bodySecondary),
+              child: Text(tr('noMachinesFound'), style: AppTypography.bodySecondary),
             ),
           )
         else

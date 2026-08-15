@@ -22,35 +22,127 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     });
   }
 
+  void _showLanguageBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.bgSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (bottomSheetContext) {
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                tr('changeLanguage'),
+                style: AppTypography.cardHeader.copyWith(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: _LanguageBox(
+                      title: tr('english'),
+                      subtitle: 'ENG',
+                      isSelected: context.locale.languageCode == 'en',
+                      onTap: () {
+                        context.setLocale(const Locale('en'));
+                        Navigator.pop(bottomSheetContext);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _LanguageBox(
+                      title: tr('hindi'),
+                      subtitle: 'HI',
+                      isSelected: context.locale.languageCode == 'hi',
+                      onTap: () {
+                        context.setLocale(const Locale('hi'));
+                        Navigator.pop(bottomSheetContext);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _showLogoutConfirm() {
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
+        return Dialog(
           backgroundColor: AppColors.bgSurface,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(tr('logoutButton'), style: AppTypography.cardHeader),
-          content: Text(tr('confirmLogout'), style: AppTypography.bodyMain),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(tr('cancelButton'), style: AppTypography.buttonText.copyWith(color: AppColors.textSubtle)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.danger.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.logout, color: AppColors.danger, size: 32),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  tr('logoutButton'),
+                  style: AppTypography.cardHeader.copyWith(fontSize: 20),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  tr('confirmLogout'),
+                  style: AppTypography.bodyMain.copyWith(color: AppColors.textSubtle),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 32),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        Navigator.pop(dialogContext);
+                        await ref.read(profileProvider.notifier).logout();
+                        if (!mounted) return;
+                        context.go('/login');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: AppColors.danger,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text(tr('logoutButton'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text(tr('cancelButton'), style: TextStyle(color: AppColors.textSubtle, fontWeight: FontWeight.bold, fontSize: 16)),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.pop(dialogContext);
-                await ref.read(profileProvider.notifier).logout();
-                if (!mounted) return;
-                context.go('/login');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.danger,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: Text(tr('logoutButton')),
-            ),
-          ],
+          ),
         );
       },
     );
@@ -79,7 +171,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.read(profileProvider.notifier).fetchProfile(),
-                child: const Text("Retry"),
+                child: Text(tr('retryBtn')),
               )
             ],
           ),
@@ -99,7 +191,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 width: double.infinity,
                 child: Text(
-                  tr('profileTitle') == 'profileTitle' ? 'MY PROFILE' : tr('profileTitle'),
+                  tr('profileTitle'),
                   textAlign: TextAlign.center,
                   style: AppTypography.caption.copyWith(
                     fontWeight: FontWeight.w800,
@@ -173,7 +265,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ],
                       ),
                       child: Text(
-                        tr('businessOwner') == 'businessOwner' ? 'BUSINESS OWNER' : tr('businessOwner').toUpperCase(),
+                        tr('businessOwner').toUpperCase(),
                         style: AppTypography.caption.copyWith(
                           color: Colors.black,
                           fontWeight: FontWeight.w900,
@@ -185,11 +277,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(height: 40),
 
                     // USER DETAILS
-                    _buildDetailRow(Icons.phone, tr('mobileLabel') == 'mobileLabel' ? 'Mobile' : tr('mobileLabel'), "+91 ${user['mobileNo'] ?? ''}"),
+                    _buildDetailRow(Icons.phone, tr('mobileLabel'), "+91 ${user['mobileNo'] ?? ''}"),
                     const SizedBox(height: 24),
-                    _buildDetailRow(Icons.email, tr('email') == 'email' ? 'Email' : tr('email'), user['email'] ?? ''),
+                    _buildDetailRow(Icons.email, tr('email'), user['email'] ?? ''),
                     const SizedBox(height: 24),
-                    _buildDetailRow(Icons.business, tr('companyNameLabel') == 'companyNameLabel' ? 'Company' : tr('companyNameLabel'), user['companyName'] ?? ''),
+                    _buildDetailRow(Icons.business, tr('companyNameLabel'), user['companyName'] ?? ''),
                     const SizedBox(height: 40),
 
                     // SETTINGS MENU
@@ -288,8 +380,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                             borderRadius: BorderRadius.circular(10),
                                             child: Image.network(user['qrCodeUrl'], fit: BoxFit.cover),
                                           )
-                                        : const Center(
-                                            child: Text("ADD", style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF795900))),
+                                        : Center(
+                                            child: Text(tr('addBtn'), style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF795900))),
                                           ),
                                   ),
                                 ],
@@ -299,6 +391,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           const SizedBox(height: 4),
                           _buildMenuItem(Icons.settings, tr('editProfileButton'), () => context.push('/edit-profile'), iconColor: AppColors.textSubtle),
                           _buildMenuItem(Icons.edit_note, tr('updateMachineryButton'), () => context.push('/update-machinery'), iconColor: Colors.blue.shade500),
+                          _buildMenuItem(Icons.language, tr('changeLanguage'), _showLanguageBottomSheet, iconColor: Colors.orange.shade500),
                           _buildMenuItem(Icons.support_agent, tr('contactSupport'), () => context.push('/contact'), iconColor: Colors.green.shade500),
                           _buildMenuItem(Icons.info_outline, tr('aboutUs'), () => context.push('/about'), iconColor: Colors.purple.shade500),
                         ],
@@ -370,6 +463,67 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Text(label, style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 0.5)),
             ),
             const Icon(Icons.chevron_right, size: 12, color: AppColors.textSubtle),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LanguageBox extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _LanguageBox({
+    required this.title,
+    required this.subtitle,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary.withOpacity(0.1) : AppColors.bgSurface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: [
+            if (isSelected)
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: isSelected ? AppColors.primary : AppColors.textSubtle,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textMain,
+              ),
+            ),
           ],
         ),
       ),

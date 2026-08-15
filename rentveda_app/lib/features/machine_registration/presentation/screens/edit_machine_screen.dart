@@ -80,7 +80,7 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
         });
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "Failed to pick image", backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('failedToPickImage'), backgroundColor: AppColors.danger);
     }
   }
 
@@ -89,7 +89,7 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
     final rentType = _rentType;
 
     if (name.isEmpty || rentType.isEmpty) {
-      Fluttertoast.showToast(msg: "Please fill required fields", backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('fillAllFieldsErr'), backgroundColor: AppColors.danger);
       return;
     }
 
@@ -101,11 +101,10 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
     );
 
     if (success) {
-      Fluttertoast.showToast(msg: "Machine updated successfully!", backgroundColor: AppColors.successDark);
+      Fluttertoast.showToast(msg: tr('machineUpdateSuccess'), backgroundColor: AppColors.successDark);
       if (mounted) context.pop();
     } else {
-      final error = ref.read(updateMachineryProvider).error ?? "Failed to update machine";
-      Fluttertoast.showToast(msg: error, backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('machineUpdateFailed'), backgroundColor: AppColors.danger);
     }
   }
 

@@ -42,7 +42,7 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
         });
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "Failed to pick image", backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('failedToPickImage'), backgroundColor: AppColors.danger);
     }
   }
 
@@ -52,11 +52,11 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
       return;
     }
     if (_rentType.isEmpty) {
-      Fluttertoast.showToast(msg: "Please select rent type", backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('selectRentTypeErr'), backgroundColor: AppColors.danger);
       return;
     }
     if (_image == null) {
-      Fluttertoast.showToast(msg: "Please upload an image", backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('uploadImageErr'), backgroundColor: AppColors.danger);
       return;
     }
 
@@ -102,7 +102,7 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                "Register your machine for tracking.",
+                tr('registerMachineDesc'),
                 style: AppTypography.bodySecondary,
               ),
               const SizedBox(height: 24),
@@ -128,7 +128,7 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
                           children: [
                             const Icon(Icons.cloud_upload_outlined, size: 48, color: AppColors.textSubtle),
                             const SizedBox(height: 12),
-                            Text("Tap to upload photo", style: AppTypography.bodySecondary),
+                            Text(tr('tapToUploadPhoto'), style: AppTypography.bodySecondary),
                           ],
                         ),
                 ),
@@ -136,12 +136,12 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
               const SizedBox(height: 24),
 
               // Machine Name
-              Text("Machine Name", style: AppTypography.caption.copyWith(fontWeight: FontWeight.w700)),
+              Text(tr('machineNameLabel'), style: AppTypography.caption.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               TextField(
                 controller: _machineNameController,
                 decoration: InputDecoration(
-                  hintText: "Enter machine name (e.g. Tractor)",
+                  hintText: tr('machineNameHint'),
                   hintStyle: AppTypography.bodySecondary,
                   prefixIcon: const Icon(Icons.agriculture, color: AppColors.primaryGold),
                   filled: true,
@@ -155,7 +155,7 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
               const SizedBox(height: 24),
 
               // Rent Type
-              Text("Rent Type", style: AppTypography.caption.copyWith(fontWeight: FontWeight.w700)),
+              Text(tr('rentTypeLabel'), style: AppTypography.caption.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               InputDecorator(
                 decoration: InputDecoration(
@@ -171,14 +171,14 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
                   child: DropdownButton<String>(
                     isExpanded: true,
                     value: _rentType.isEmpty || !_rentTypes.contains(_rentType) ? null : _rentType,
-                    hint: Text("Select rent type", style: AppTypography.bodySecondary),
+                    hint: Text(tr('selectRentTypeHint'), style: AppTypography.bodySecondary),
                     icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.textSubtle),
                     dropdownColor: AppColors.bgSurface,
                     borderRadius: BorderRadius.circular(16),
                     items: _rentTypes.map((type) {
                       return DropdownMenuItem(
                         value: type,
-                        child: Text(type, style: AppTypography.bodyMain),
+                        child: Text(tr('${type.toLowerCase()}RentType'), style: AppTypography.bodyMain),
                       );
                     }).toList(),
                     onChanged: (value) {
@@ -210,7 +210,7 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.warningDark),
                         )
                       : Text(
-                          "Register Machine",
+                          tr('registerMachineBtn'),
                           style: AppTypography.buttonText,
                         ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class FormalInvoiceTemplate extends StatelessWidget {
   final Map<String, dynamic>? user;
@@ -60,12 +61,12 @@ class FormalInvoiceTemplate extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'INVOICE',
-                      style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w300, letterSpacing: 4),
+                    Text(
+                      tr('invoiceHeader'),
+                      style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w300, letterSpacing: 4),
                     ),
                     const SizedBox(height: 8),
-                    const Text('Bill From:', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                    Text(tr('billFromLabel'), style: const TextStyle(color: Colors.white54, fontSize: 12)),
                     const SizedBox(height: 2),
                     Text(ownerName, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                     Text('+91 $ownerMobile', style: const TextStyle(color: Colors.white70, fontSize: 14)),
@@ -79,9 +80,9 @@ class FormalInvoiceTemplate extends StatelessWidget {
                       style: const TextStyle(color: Color(0xFFFBC02D), fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 2),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Original Copy',
-                      style: TextStyle(color: Colors.white54, fontSize: 12),
+                    Text(
+                      tr('originalCopyLabel'),
+                      style: const TextStyle(color: Colors.white54, fontSize: 12),
                     ),
                   ],
                 )
@@ -99,7 +100,7 @@ class FormalInvoiceTemplate extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Bill To:', style: TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.bold)),
+                  Text(tr('billToLabel'), style: const TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   Text(customerName, style: const TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
@@ -116,14 +117,14 @@ class FormalInvoiceTemplate extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Text('Date: ', style: TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.bold)),
+                      Text('${tr('dateLabel')} ', style: const TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.bold)),
                       Text(formattedDate, style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Text('Invoice No: ', style: TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.bold)),
+                      Text('${tr('invoiceNoLabel')} ', style: const TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.bold)),
                       Text('#INV-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}', style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
                     ],
                   ),
@@ -148,7 +149,7 @@ class FormalInvoiceTemplate extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Machine', style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text(tr('machineLabel'), style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
                     Text(machineName, style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600)),
                   ],
@@ -156,7 +157,7 @@ class FormalInvoiceTemplate extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text('Job Work', style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text(tr('jobWorkLabel'), style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
                     Text(jobWork, style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600)),
                   ],
@@ -164,7 +165,7 @@ class FormalInvoiceTemplate extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text('Operator', style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text(tr('operatorLabel'), style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
                     Text(operatorName, style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600)),
                   ],
@@ -190,10 +191,10 @@ class FormalInvoiceTemplate extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   child: Row(
                     children: [
-                      const Expanded(flex: 4, child: Text('Description', style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold))),
-                      Expanded(flex: 2, child: Center(child: Text('Qty ($rentType)', style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
-                      const Expanded(flex: 2, child: Center(child: Text('Rate', style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
-                      const Expanded(flex: 2, child: Align(alignment: Alignment.centerRight, child: Text('Amount', style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
+                      Expanded(flex: 4, child: Text(tr('descriptionCol'), style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold))),
+                      Expanded(flex: 2, child: Center(child: Text(tr('qtyCol', namedArgs: {'unit': rentType}), style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
+                      Expanded(flex: 2, child: Center(child: Text(tr('rateCol'), style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
+                      Expanded(flex: 2, child: Align(alignment: Alignment.centerRight, child: Text(tr('amountCol'), style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold)))),
                     ],
                   ),
                 ),
@@ -203,10 +204,10 @@ class FormalInvoiceTemplate extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                   child: Row(
                     children: [
-                      const Expanded(flex: 4, child: Text('Machine Rental Charges', style: TextStyle(color: Colors.black87, fontSize: 16))),
+                      Expanded(flex: 4, child: Text(tr('machineRentalCharges'), style: const TextStyle(color: Colors.black87, fontSize: 16))),
                       Expanded(flex: 2, child: Center(child: Text('$qty', style: const TextStyle(color: Colors.black87, fontSize: 16)))),
-                      Expanded(flex: 2, child: Center(child: Text('Rs $price', style: const TextStyle(color: Colors.black87, fontSize: 16)))),
-                      Expanded(flex: 2, child: Align(alignment: Alignment.centerRight, child: Text('Rs $totalAmount', style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)))),
+                      Expanded(flex: 2, child: Center(child: Text('${tr('rsSymbol')} $price', style: const TextStyle(color: Colors.black87, fontSize: 16)))),
+                      Expanded(flex: 2, child: Align(alignment: Alignment.centerRight, child: Text('${tr('rsSymbol')} $totalAmount', style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)))),
                     ],
                   ),
                 ),
@@ -238,7 +239,7 @@ class FormalInvoiceTemplate extends StatelessWidget {
                         : const Center(child: Icon(Icons.qr_code, size: 64, color: Colors.black12)),
                   ),
                   const SizedBox(height: 8),
-                  const Text('Scan to Pay', style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(tr('scanToPay'), style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),
               
@@ -256,16 +257,16 @@ class FormalInvoiceTemplate extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Paid Amount:', style: TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.bold)),
-                        Text('Rs $paidAmount', style: const TextStyle(color: Colors.green, fontSize: 14, fontWeight: FontWeight.bold)),
+                        Text(tr('paidAmountLabel'), style: const TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.bold)),
+                        Text('${tr('rsSymbol')} $paidAmount', style: const TextStyle(color: Colors.green, fontSize: 14, fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Pending Due:', style: TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.bold)),
-                        Text('Rs $pendingAmount', style: const TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold)),
+                        Text(tr('pendingDueLabel'), style: const TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.bold)),
+                        Text('${tr('rsSymbol')} $pendingAmount', style: const TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const Padding(
@@ -275,8 +276,8 @@ class FormalInvoiceTemplate extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Total:', style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900)),
-                        Text('Rs $totalAmount', style: const TextStyle(color: Color(0xFFFBC02D), fontSize: 24, fontWeight: FontWeight.w900)),
+                        Text(tr('totalLabel'), style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900)),
+                        Text('${tr('rsSymbol')} $totalAmount', style: const TextStyle(color: Color(0xFFFBC02D), fontSize: 24, fontWeight: FontWeight.w900)),
                       ],
                     ),
                   ],
@@ -288,24 +289,24 @@ class FormalInvoiceTemplate extends StatelessWidget {
           const SizedBox(height: 60),
           
           // 6. BOTTOM GREETING
-          const Center(
+          Center(
             child: Column(
               children: [
-                Divider(color: Color(0xFFE0E0E0), height: 1),
-                SizedBox(height: 24),
+                const Divider(color: Color(0xFFE0E0E0), height: 1),
+                const SizedBox(height: 24),
                 Text(
-                  'Thank you for your business!',
-                  style: TextStyle(color: Colors.black54, fontSize: 20, fontWeight: FontWeight.bold),
+                  tr('thankYouBusiness'),
+                  style: const TextStyle(color: Colors.black54, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'made by ',
-                      style: TextStyle(color: Colors.black45, fontSize: 12, fontStyle: FontStyle.italic),
+                      tr('madeBy'),
+                      style: const TextStyle(color: Colors.black45, fontSize: 12, fontStyle: FontStyle.italic),
                     ),
-                    Text(
+                    const Text(
                       'RentVeda',
                       style: TextStyle(color: Color(0xFFFBC02D), fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1),
                     ),

@@ -41,7 +41,7 @@ class _UpdateMachineryScreenState extends ConsumerState<UpdateMachineryScreen> {
                 Navigator.pop(dialogContext);
                 final success = await ref.read(updateMachineryProvider.notifier).archiveMachine(machineId);
                 if (success) {
-                  Fluttertoast.showToast(msg: "Machine archived successfully!", backgroundColor: AppColors.successDark);
+                  Fluttertoast.showToast(msg: tr('archiveSuccessToast'), backgroundColor: AppColors.successDark);
                 } else {
                   final error = ref.read(updateMachineryProvider).error ?? "Failed to archive machine";
                   Fluttertoast.showToast(msg: error, backgroundColor: AppColors.danger);

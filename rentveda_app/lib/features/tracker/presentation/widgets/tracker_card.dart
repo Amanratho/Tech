@@ -272,7 +272,7 @@ class TrackerCard extends ConsumerWidget {
                 Expanded(child: _ActionBtn(label: tr('done'), icon: Icons.check, color: AppColors.textMain, bgColor: AppColors.success, borderColor: AppColors.success, onTap: () {
                   final finalKm = state.distance.toStringAsFixed(2);
                   notifier.doneDistance();
-                  Fluttertoast.showToast(msg: '${finalKm}KM Saved!');
+                  Fluttertoast.showToast(msg: tr('kmSavedSuccess', namedArgs: {'km': finalKm}));
                 })),
               ]
             ],

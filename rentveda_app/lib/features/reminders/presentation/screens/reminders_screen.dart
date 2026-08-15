@@ -40,7 +40,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     if (await canLaunchUrl(launchUri)) {
       await launchUrl(launchUri);
     } else {
-      Fluttertoast.showToast(msg: "Could not launch dialer");
+      Fluttertoast.showToast(msg: tr('couldNotLaunchDialer'));
     }
   }
 
@@ -340,7 +340,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                                                               );
                                                             },
                                                             icon: const Icon(Icons.edit, size: 14),
-                                                            label: Text(tr('reminderReschedule') == 'reminderReschedule' ? 'Reschedule' : tr('reminderReschedule'), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                                            label: Text(tr('reminderReschedule'), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                                             style: OutlinedButton.styleFrom(
                                                               foregroundColor: AppColors.textSubtle,
                                                               side: const BorderSide(color: AppColors.border),
@@ -437,10 +437,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     final today = DateTime(now.year, now.month, now.day);
     final reminderDay = DateTime(date.year, date.month, date.day);
     final diff = reminderDay.difference(today).inDays;
-    if (diff < 0) return '${diff.abs()} days overdue';
-    if (diff == 0) return 'Due today';
-    if (diff == 1) return '1 day left';
-    return '$diff days left';
+    if (diff < 0) return tr('daysOverdue', namedArgs: {'days': diff.abs().toString()});
+    if (diff == 0) return tr('reminderStatusDueToday');
+    if (diff == 1) return tr('oneDayLeft');
+    return tr('daysLeft', namedArgs: {'days': diff.toString()});
   }
 }
 

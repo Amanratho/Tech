@@ -91,8 +91,8 @@ class ClientListItem extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text(
-                    'PENDING', // text-[10px] font-bold text-red-500 uppercase tracking-wider
+                  Text(
+                    tr('statusPending').toUpperCase(), // text-[10px] font-bold text-red-500 uppercase tracking-wider
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,

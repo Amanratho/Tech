@@ -54,7 +54,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         });
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "Failed to pick image", backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('failedToPickImage'), backgroundColor: AppColors.danger);
     }
   }
 
@@ -147,15 +147,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               children: [
                 // Input Fields
                 _buildInputLabel(tr('nameLabel')),
-                _buildTextField(_usernameController, Icons.person, "Enter full name"),
+                _buildTextField(_usernameController, Icons.person, tr('enterFullName')),
                 const SizedBox(height: 20),
 
-                _buildInputLabel(tr('mobileLabel') == 'mobileLabel' ? 'Mobile Number' : tr('mobileLabel')),
-                _buildTextField(_mobileController, Icons.phone, "Enter mobile number", keyboardType: TextInputType.phone),
+                _buildInputLabel(tr('mobileLabel')),
+                _buildTextField(_mobileController, Icons.phone, tr('enterMobileNumber'), keyboardType: TextInputType.phone),
                 const SizedBox(height: 20),
 
-                _buildInputLabel(tr('companyNameLabel') == 'companyNameLabel' ? 'Company Name' : tr('companyNameLabel')),
-                _buildTextField(_companyController, Icons.business, "Enter company name"),
+                _buildInputLabel(tr('companyNameLabel')),
+                _buildTextField(_companyController, Icons.business, tr('enterCompanyName')),
                 const SizedBox(height: 24),
                 
                 const Divider(color: AppColors.border),
@@ -211,7 +211,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                       children: [
                                         const Icon(Icons.edit, color: Colors.white, size: 12),
                                         const SizedBox(width: 8),
-                                        Text("Change QR", style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                                        Text(tr('changeQr'), style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                   ),
@@ -253,7 +253,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                     const SizedBox(height: 12),
                                     Text(tr('tapToUploadQr'), style: AppTypography.bodySecondary.copyWith(fontWeight: FontWeight.bold, color: AppColors.textMain, fontSize: 13)),
                                     const SizedBox(height: 4),
-                                    Text("JPG, PNG up to 2MB", style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 10)),
+                                    Text(tr('imageFormatHint'), style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 10)),
                                   ],
                                 ),
                     ),
@@ -280,7 +280,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.warningDark),
                           )
                         : Text(
-                            tr('editProfileTitle') == 'editProfileTitle' ? 'Save Profile' : tr('editProfileTitle'),
+                            tr('editProfileTitle'),
                             style: AppTypography.buttonText,
                           ),
                   ),

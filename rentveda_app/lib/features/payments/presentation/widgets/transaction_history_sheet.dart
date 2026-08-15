@@ -154,7 +154,7 @@ class TransactionHistorySheet extends StatelessWidget {
                           child: ElevatedButton.icon(
                             onPressed: () => onCollectPayment(entry),
                             icon: const Icon(Icons.money, size: 18),
-                            label: Text(tr('submit') == 'submit' ? 'Collect Payment' : 'Collect Payment'),
+                            label: Text(tr('collectPayment')),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                               foregroundColor: AppColors.textMain,

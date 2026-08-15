@@ -75,7 +75,7 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
           final paidAmount = (entry['paidAmount'] ?? 0).toDouble();
 
           if (amount > pendingAmount) {
-            Fluttertoast.showToast(msg: "Payment amount cannot exceed pending amount.");
+            Fluttertoast.showToast(msg: tr('exceedPendingAmount'));
             return;
           }
 
@@ -91,9 +91,9 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
               );
 
           if (success) {
-            Fluttertoast.showToast(msg: "Payment updated successfully!");
+            Fluttertoast.showToast(msg: tr('paymentUpdatedSuccess'));
           } else {
-            Fluttertoast.showToast(msg: "Failed to update payment.");
+            Fluttertoast.showToast(msg: tr('paymentUpdateFailed'));
           }
         },
       ),
@@ -158,7 +158,7 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            'Total: ${filteredUsers.length}',
+                            '${tr('totalAmount')}: ${filteredUsers.length}',
                             style: AppTypography.caption.copyWith(
                               color: AppColors.primaryGold,
                               fontSize: 9,
@@ -280,7 +280,7 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
                                   child: Container(
                                     height: MediaQuery.of(context).size.height * 0.5,
                                     alignment: Alignment.center,
-                                    child: Text('No clients found', style: AppTypography.bodySecondary),
+                                    child: Text(tr('noClientsFound'), style: AppTypography.bodySecondary),
                                   ),
                                 )
                               : ListView.builder(

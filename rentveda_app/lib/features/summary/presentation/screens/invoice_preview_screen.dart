@@ -81,14 +81,14 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
         await file.copy(finalPath);
         
         Fluttertoast.showToast(
-          msg: 'Invoice saved to Downloads!',
+          msg: tr('invoiceSavedSuccess'),
           backgroundColor: AppColors.successDark,
         );
       } catch (e) {
-        Fluttertoast.showToast(msg: 'Failed to save invoice', backgroundColor: AppColors.danger);
+        Fluttertoast.showToast(msg: tr('invoiceSaveFailed'), backgroundColor: AppColors.danger);
       }
     } else if (mounted) {
-      Fluttertoast.showToast(msg: 'Failed to generate invoice', backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('invoiceGenerateFailed'), backgroundColor: AppColors.danger);
     }
     if (mounted) setState(() => _activeAction = null);
   }
@@ -101,10 +101,10 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
     if (file != null) {
       await Share.shareXFiles(
         [XFile(file.path)],
-        text: 'Invoice from RentVeda for ${widget.bill['customerName'] ?? 'Customer'}',
+        text: tr('invoiceShareText', namedArgs: {'customer': widget.bill['customerName'] ?? 'Customer'}),
       );
     } else {
-      Fluttertoast.showToast(msg: 'Failed to generate invoice', backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('invoiceGenerateFailed'), backgroundColor: AppColors.danger);
     }
     if (mounted) setState(() => _activeAction = null);
   }
@@ -112,8 +112,6 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
   Future<void> _handleWhatsApp() async {
     if (_activeAction != null) return;
     setState(() => _activeAction = 'whatsapp');
-
-    final langCode = context.locale.languageCode;
 
     try {
       final file = await _generateImageFile();
@@ -125,11 +123,14 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
       final pendingAmount = widget.bill['pendingAmount'] ?? 0;
       final machineName = widget.bill['machineName']?.toString() ?? 'Rental Service';
 
-      final greeting = langCode == 'hi' ? 'नमस्ते' : 'Hello';
-      final bodyText = langCode == 'hi'
-          ? 'यहाँ $companyName से आपका बिल संलग्न है:\n\nमशीन: $machineName\nकार्य: ${widget.bill['jobWork'] ?? 'N/A'}\nकुल बकाया राशि: ₹$pendingAmount\n\nधन्यवाद!'
-          : 'Here is your bill attached from $companyName:\n\nMachine: $machineName\nWork: ${widget.bill['jobWork'] ?? 'N/A'}\nTotal Due: ₹$pendingAmount\n\nThank you!';
-      final message = '$greeting $customerName,\n\n$bodyText';
+      final greeting = tr('whatsappInvoiceGreeting', namedArgs: {'customer': customerName});
+      final bodyText = tr('whatsappInvoiceBody', namedArgs: {
+        'companyName': companyName,
+        'machineName': machineName,
+        'jobWork': widget.bill['jobWork'] ?? 'N/A',
+        'pendingAmount': pendingAmount.toString()
+      });
+      final message = '$greeting$bodyText';
 
       String phone = widget.bill['mobileNumber']?.toString() ?? '';
       if (phone.startsWith('+')) {
@@ -144,7 +145,7 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
       );
     } catch (e) {
       debugPrint('Failed to share via WhatsApp: $e');
-      Fluttertoast.showToast(msg: 'Failed to share via WhatsApp', backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('whatsappShareFailed'), backgroundColor: AppColors.danger);
     }
     if (mounted) setState(() => _activeAction = null);
   }
@@ -174,7 +175,7 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
         backgroundColor: AppColors.bgMain,
         elevation: 0,
         title: Text(
-          'Invoice Preview',
+          tr('invoicePreview'),
           style: AppTypography.cardHeader,
         ),
         iconTheme: const IconThemeData(color: AppColors.textMain),
@@ -238,7 +239,7 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
                               children: [
                                 const Icon(Icons.download, size: 18),
                                 const SizedBox(width: 4),
-                                Text('Download', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
+                                Text(tr('downloadBtn'), style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
                               ],
                             ),
                     ),
@@ -262,7 +263,7 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
                               children: [
                                 const Icon(Icons.share, size: 18),
                                 const SizedBox(width: 4),
-                                Text('Share', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
+                                Text(tr('shareBtn'), style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
                               ],
                             ),
                     ),
@@ -286,7 +287,7 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
                               children: [
                                 const Icon(Icons.chat, size: 18),
                                 const SizedBox(width: 4),
-                                Text('WhatsApp', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white)),
+                                Text(tr('whatsappBtn'), style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white)),
                               ],
                             ),
                     ),

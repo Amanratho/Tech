@@ -11,7 +11,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/top_app_bar.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../widgets/formal_invoice_template.dart';
 
@@ -100,14 +99,14 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
         await file.copy(finalPath);
         
         Fluttertoast.showToast(
-          msg: 'Invoice saved to Downloads!',
+          msg: tr('invoiceSavedSuccess'),
           backgroundColor: AppColors.successDark,
         );
       } catch (e) {
-        Fluttertoast.showToast(msg: 'Failed to save invoice', backgroundColor: AppColors.danger);
+        Fluttertoast.showToast(msg: tr('invoiceSaveFailed'), backgroundColor: AppColors.danger);
       }
     } else if (mounted) {
-      Fluttertoast.showToast(msg: 'Failed to generate invoice', backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('invoiceGenerateFailed'), backgroundColor: AppColors.danger);
     }
     if (mounted) setState(() => _activeAction = null);
   }
@@ -116,7 +115,6 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
     if (_activeAction != null) return;
     setState(() => _activeAction = directToWhatsApp ? 'whatsapp' : 'share');
     
-    final langCode = context.locale.languageCode;
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     
     try {
@@ -127,12 +125,13 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
       final pendingAmount = _entryData['pendingAmount'] ?? 0;
       final companyName = user?['companyName'] ?? 'Our Company';
       
-      final greeting = langCode == 'hi' ? 'नमस्ते' : 'Hello';
-      final bodyText = langCode == 'hi'
-          ? 'यहाँ $companyName से आपका बिल संलग्न है:\n\nमशीन: $_machineName\nकार्य: ${_entryData['jobWork'] ?? 'N/A'}\nकुल बकाया राशि: ₹$pendingAmount\n\nधन्यवाद!'
-          : 'Here is your bill attached from $companyName:\n\nMachine: $_machineName\nWork: ${_entryData['jobWork'] ?? 'N/A'}\nTotal Due: ₹$pendingAmount\n\nThank you!';
-
-      final message = '$greeting $customerName,\n\n$bodyText';
+      final message = tr('whatsappInvoiceGreeting', namedArgs: {'customer': customerName}) +
+                      tr('whatsappInvoiceBody', namedArgs: {
+                        'companyName': companyName,
+                        'machineName': _machineName,
+                        'jobWork': _entryData['jobWork'] ?? 'N/A',
+                        'pendingAmount': pendingAmount.toString()
+                      });
       
       if (directToWhatsApp) {
         String phone = _entryData['mobileNumber']?.toString() ?? '';
@@ -152,7 +151,7 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
       }
     } catch (e) {
       debugPrint('Failed to share invoice: $e');
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text('Failed to share invoice: $e')));
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text(tr('whatsappShareFailed'))));
     } finally {
       if (mounted) setState(() => _activeAction = null);
     }
@@ -163,7 +162,7 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
     if (_entryData.isEmpty) {
       return Scaffold(
         backgroundColor: AppColors.bgMain,
-        body: Center(child: Text('No data found!', style: AppTypography.bodySecondary)),
+        body: Center(child: Text(tr('noDataFound'), style: AppTypography.bodySecondary)),
       );
     }
 
@@ -178,7 +177,7 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
         backgroundColor: AppColors.bgMain,
         elevation: 0,
         title: Text(
-          'Invoice Generated',
+          tr('invoiceGenerated'),
           style: AppTypography.cardHeader,
         ),
         iconTheme: const IconThemeData(color: AppColors.textMain),
@@ -248,7 +247,7 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
                                   children: [
                                     const Icon(Icons.download, size: 18),
                                     const SizedBox(width: 4),
-                                    Text('Download', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
+                                    Text(tr('downloadBtn'), style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
                                   ],
                                 ),
                         ),
@@ -272,7 +271,7 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
                                   children: [
                                     const Icon(Icons.share, size: 18),
                                     const SizedBox(width: 4),
-                                    Text('Share', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
+                                    Text(tr('shareBtn'), style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13)),
                                   ],
                                 ),
                         ),
@@ -296,7 +295,7 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
                                   children: [
                                     const Icon(Icons.chat, size: 18),
                                     const SizedBox(width: 4),
-                                    Text('WhatsApp', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white)),
+                                    Text(tr('whatsappBtn'), style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white)),
                                   ],
                                 ),
                         ),
@@ -313,7 +312,7 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: Text('Back to Home', style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w700, color: AppColors.primaryDark)),
+                      child: Text(tr('backToHome'), style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w700, color: AppColors.primaryDark)),
                     ),
                   ),
                 ],

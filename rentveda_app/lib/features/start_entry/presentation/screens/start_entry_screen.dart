@@ -57,6 +57,19 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     _pendingController.addListener(_handlePendingChange);
 
     _autoFillFromTracker();
+    _loadLastRate();
+  }
+
+  Future<void> _loadLastRate() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastRate = prefs.getString('last_rate_$_machineId');
+    if (lastRate != null && lastRate.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _priceController.text = lastRate;
+        });
+      }
+    }
   }
 
   Future<void> _autoFillFromTracker() async {
@@ -70,21 +83,21 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
         final double hours = time / 3600;
         _qtyController.text = hours.toStringAsFixed(2);
         prefs.remove('rentveda_pending_time_entry');
-        Fluttertoast.showToast(msg: "Auto-filled from Tracker", backgroundColor: AppColors.primaryGold);
+        Fluttertoast.showToast(msg: tr('autofilledFromTracker'), backgroundColor: AppColors.primaryGold);
       }
     } else if (['count', 'trip', 'load'].contains(rentTypeLower)) {
       final count = prefs.getInt('rentveda_pending_count_entry');
       if (count != null) {
         _qtyController.text = count.toString();
         prefs.remove('rentveda_pending_count_entry');
-        Fluttertoast.showToast(msg: "Auto-filled from Tracker", backgroundColor: AppColors.primaryGold);
+        Fluttertoast.showToast(msg: tr('autofilledFromTracker'), backgroundColor: AppColors.primaryGold);
       }
     } else if (rentTypeLower == 'km' || rentTypeLower == 'distance') {
       final km = prefs.getDouble('rentveda_pending_km_entry');
       if (km != null) {
         _qtyController.text = km.toStringAsFixed(2);
         prefs.remove('rentveda_pending_km_entry');
-        Fluttertoast.showToast(msg: "Auto-filled from Tracker", backgroundColor: AppColors.primaryGold);
+        Fluttertoast.showToast(msg: tr('autofilledFromTracker'), backgroundColor: AppColors.primaryGold);
       }
     }
   }
@@ -185,7 +198,7 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     } else {
       if (mounted) {
         Fluttertoast.showToast(
-          msg: "Contact permission is required to pick a contact.",
+          msg: tr('contactPermissionRequired'),
           backgroundColor: AppColors.danger,
           textColor: Colors.white,
         );
@@ -270,6 +283,10 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     final success = await ref.read(startEntryProvider.notifier).saveEntry(entryData);
 
     if (success && mounted) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('last_rate_$_machineId', _priceController.text);
+      if (!mounted) return;
+
       Fluttertoast.showToast(msg: tr('entrySaved'), backgroundColor: AppColors.successDark);
       context.pushReplacement('/invoice', extra: {
         'entryData': entryData,

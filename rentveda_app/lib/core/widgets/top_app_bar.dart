@@ -87,40 +87,6 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
             // Right side: Language toggle + Notification bell
             Row(
               children: [
-                // Language toggle pill
-                GestureDetector(
-                  onTap: () {
-                    if (isEn) {
-                      context.setLocale(const Locale('hi'));
-                    } else {
-                      context.setLocale(const Locale('en'));
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: AppColors.bgPill,
-                      border: Border.all(color: AppColors.border),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.language, size: 16, color: AppColors.primaryGold),
-                        const SizedBox(width: 6),
-                        Text(
-                          isEn ? 'हिन्दी' : 'ENG',
-                          style: AppTypography.bodySecondary.copyWith(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textMain,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
                 // Notification bell
                 const NotificationBell(),
               ],

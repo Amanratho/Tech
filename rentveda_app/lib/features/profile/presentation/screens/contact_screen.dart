@@ -34,7 +34,7 @@ class _ContactScreenState extends State<ContactScreen> {
     final message = _messageController.text.trim();
 
     if (name.isEmpty || email.isEmpty || message.isEmpty) {
-      Fluttertoast.showToast(msg: "Please fill all fields", backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('fillAllFieldsErr'), backgroundColor: AppColors.danger);
       return;
     }
 
@@ -57,17 +57,17 @@ class _ContactScreenState extends State<ContactScreen> {
     try {
       if (await canLaunchUrl(emailLaunchUri)) {
         await launchUrl(emailLaunchUri);
-        Fluttertoast.showToast(msg: "Message Sent!", backgroundColor: AppColors.successDark);
+        Fluttertoast.showToast(msg: tr('messageSentSuccess'), backgroundColor: AppColors.successDark);
         if (mounted) {
           _nameController.clear();
           _emailController.clear();
           _messageController.clear();
         }
       } else {
-        Fluttertoast.showToast(msg: "Could not launch email app", backgroundColor: AppColors.danger);
+        Fluttertoast.showToast(msg: tr('launchEmailErr'), backgroundColor: AppColors.danger);
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "Error launching email app", backgroundColor: AppColors.danger);
+      Fluttertoast.showToast(msg: tr('launchEmailErr'), backgroundColor: AppColors.danger);
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

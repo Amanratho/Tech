@@ -59,7 +59,7 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Collect Payment',
+                  tr('collectPayment'),
                   style: AppTypography.sectionHeader,
                 ),
                 GestureDetector(

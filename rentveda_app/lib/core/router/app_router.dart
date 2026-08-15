@@ -21,6 +21,8 @@ import '../../features/machine_registration/presentation/screens/add_machine_scr
 import '../widgets/bottom_nav_bar.dart';
 import '../widgets/top_app_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -30,20 +32,36 @@ class AppRouter {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/welcome',
     redirect: (context, state) async {
+      final prefs = await SharedPreferences.getInstance();
+      final hasSelectedLanguage = prefs.getBool('language_selected') ?? false;
+      final isGoingToLanguage = state.uri.toString() == '/language';
+
+      if (!hasSelectedLanguage) {
+        return isGoingToLanguage ? null : '/language';
+      }
+
+      // At this point, hasSelectedLanguage is true.
       // Very basic auth check for routing
       const storage = FlutterSecureStorage();
       final token = await storage.read(key: 'token');
-      final isGoingToWelcome = state.uri.toString() == '/welcome';
+      
+      // If they already selected a language, going to /language should redirect them to auth flow
+      final isGoingToWelcomeOrLanguage = state.uri.toString() == '/welcome' || state.uri.toString() == '/language';
 
-      if (token == null && !isGoingToWelcome) {
+      if (token == null && !isGoingToWelcomeOrLanguage) {
         return '/welcome';
       }
-      if (token != null && isGoingToWelcome) {
+      if (token != null && isGoingToWelcomeOrLanguage) {
         return '/home';
       }
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/language',
+        name: 'language',
+        builder: (context, state) => const LanguageSelectionScreen(),
+      ),
       GoRoute(
         path: '/welcome',
         name: 'welcome',
