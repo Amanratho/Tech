@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
@@ -56,7 +57,7 @@ class _NotificationBellState extends ConsumerState<NotificationBell> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Pending Collections',
+                  tr('pendingCollections'),
                   style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w700),
                 ),
                 GestureDetector(
@@ -82,7 +83,7 @@ class _NotificationBellState extends ConsumerState<NotificationBell> {
               padding: const EdgeInsets.symmetric(vertical: 32),
               alignment: Alignment.center,
               child: Text(
-                'No dues to collect today',
+                tr('noDuesToday'),
                 style: AppTypography.caption.copyWith(color: AppColors.textMuted, fontWeight: FontWeight.w600),
               ),
             ),
@@ -105,7 +106,7 @@ class _NotificationBellState extends ConsumerState<NotificationBell> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Due from:',
+                      tr('dueFrom'),
                       style: AppTypography.caption.copyWith(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 2),
@@ -121,7 +122,7 @@ class _NotificationBellState extends ConsumerState<NotificationBell> {
                           ),
                         ),
                         Text(
-                          'To Collect: ₹${amount.toStringAsFixed(0)}',
+                          '${tr('toCollect')} ₹${amount.toStringAsFixed(0)}',
                           style: AppTypography.caption.copyWith(color: AppColors.successDark, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -155,7 +156,7 @@ class _NotificationBellState extends ConsumerState<NotificationBell> {
                 borderRadius: BorderRadius.only(bottomLeft: Radius.circular(16), bottomRight: Radius.circular(16)),
               ),
               child: Text(
-                'View All Pending Dues',
+                tr('viewAllPendingDues'),
                 style: AppTypography.caption.copyWith(color: AppColors.primary, fontWeight: FontWeight.w700),
               ),
             ),

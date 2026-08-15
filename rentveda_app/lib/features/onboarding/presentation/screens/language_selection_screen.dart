@@ -66,32 +66,40 @@ class LanguageSelectionScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 48),
-
-              // Language Options
-              Row(
-                children: [
-                  Expanded(
-                    child: _LanguageBox(
-                      title: 'English',
-                      subtitle: 'ENG',
-                      isSelected: context.locale.languageCode == 'en',
-                      onTap: () => _selectLanguage(context, 'en'),
-                    ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: [
+                      _buildLangBox(context, 'english', 'ENG', 'en'),
+                      _buildLangBox(context, 'hindi', 'HI', 'hi'),
+                      _buildLangBox(context, 'marathi', 'MR', 'mr'),
+                      _buildLangBox(context, 'gujarati', 'GU', 'gu'),
+                      _buildLangBox(context, 'punjabi', 'PA', 'pa'),
+                      _buildLangBox(context, 'tamil', 'TA', 'ta'),
+                      _buildLangBox(context, 'telugu', 'TE', 'te'),
+                      _buildLangBox(context, 'kannada', 'KN', 'kn'),
+                      _buildLangBox(context, 'bengali', 'BN', 'bn'),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _LanguageBox(
-                      title: 'हिन्दी',
-                      subtitle: 'HI',
-                      isSelected: context.locale.languageCode == 'hi',
-                      onTap: () => _selectLanguage(context, 'hi'),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLangBox(BuildContext context, String key, String subtitle, String code) {
+    return SizedBox(
+      width: (MediaQuery.of(context).size.width - 48 - 32) / 3,
+      child: _LanguageBox(
+        title: tr(key),
+        subtitle: subtitle,
+        isSelected: context.locale.languageCode == code,
+        onTap: () => _selectLanguage(context, code),
       ),
     );
   }
@@ -137,16 +145,16 @@ class _LanguageBox extends StatelessWidget {
             Text(
               subtitle,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: isSelected ? AppColors.primary : AppColors.textSubtle,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               title,
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textMain,
               ),

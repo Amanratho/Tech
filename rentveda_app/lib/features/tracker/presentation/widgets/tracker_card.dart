@@ -156,7 +156,7 @@ class TrackerCard extends ConsumerWidget {
                 Expanded(child: _ActionBtn(label: tr('resume'), icon: Icons.play_arrow, color: AppColors.textMain, bgColor: AppColors.primary, borderColor: AppColors.primary, onTap: notifier.startTimer)),
               if (state.timerStatus != TimerStatus.idle) ...[
                 const SizedBox(width: 12),
-                Expanded(child: _ActionBtn(label: tr('done'), icon: Icons.check, color: AppColors.textMain, bgColor: AppColors.success, borderColor: AppColors.success, onTap: () {
+                Expanded(child: _ActionBtn(label: tr('doneAndSave'), icon: Icons.check, color: AppColors.textMain, bgColor: AppColors.success, borderColor: AppColors.success, onTap: () {
                   notifier.doneTime();
                   Fluttertoast.showToast(msg: tr('timeSavedSuccess'));
                 })),
@@ -269,7 +269,7 @@ class TrackerCard extends ConsumerWidget {
                 Expanded(child: _ActionBtn(label: tr('resume'), icon: Icons.play_arrow, color: AppColors.textMain, bgColor: AppColors.primary, borderColor: AppColors.primary, onTap: notifier.startTimer)),
               if (state.timerStatus != TimerStatus.idle) ...[
                 const SizedBox(width: 12),
-                Expanded(child: _ActionBtn(label: tr('done'), icon: Icons.check, color: AppColors.textMain, bgColor: AppColors.success, borderColor: AppColors.success, onTap: () {
+                Expanded(child: _ActionBtn(label: tr('doneAndSave'), icon: Icons.check, color: AppColors.textMain, bgColor: AppColors.success, borderColor: AppColors.success, onTap: () {
                   final finalKm = state.distance.toStringAsFixed(2);
                   notifier.doneDistance();
                   Fluttertoast.showToast(msg: tr('kmSavedSuccess', namedArgs: {'km': finalKm}));

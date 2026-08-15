@@ -12,7 +12,10 @@ void main() async {
   
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('hi')],
+      supportedLocales: const [
+        Locale('en'), Locale('hi'), Locale('mr'), Locale('gu'),
+        Locale('pa'), Locale('ta'), Locale('te'), Locale('kn'), Locale('bn')
+      ],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       child: const ProviderScope(

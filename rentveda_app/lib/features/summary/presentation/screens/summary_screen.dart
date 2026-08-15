@@ -121,7 +121,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                       onChanged: (val) => setState(() => _searchQuery = val),
                       style: AppTypography.bodyMain.copyWith(fontSize: 12),
                       decoration: InputDecoration(
-                        hintText: 'Search by ${_searchField.replaceAll('Name', '')}...',
+                        hintText: tr('searchPlaceholder1'),
                         hintStyle: AppTypography.caption.copyWith(color: AppColors.textMuted),
                         prefixIcon: const Icon(Icons.search, size: 16, color: AppColors.textMuted),
                         filled: true,

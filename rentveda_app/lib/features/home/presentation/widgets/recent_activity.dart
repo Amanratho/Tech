@@ -52,7 +52,7 @@ class RecentActivity extends StatelessWidget {
             final pendingAmount = (entry['pendingAmount'] ?? 0).toDouble();
             final createdAt = DateTime.tryParse(entry['createdAt'] ?? '');
             final dateStr = createdAt != null
-                ? DateFormat('dd MMM yyyy • hh:mm a').format(createdAt)
+                ? DateFormat('dd MMM yyyy • hh:mm a', context.locale.languageCode).format(createdAt)
                 : '';
 
             return Container(
@@ -106,7 +106,7 @@ class RecentActivity extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          pendingAmount > 0 ? 'Due ₹${pendingAmount.toInt()}' : 'Paid',
+                          pendingAmount > 0 ? '${tr('statusDue')} ₹${pendingAmount.toInt()}' : tr('statusPaid'),
                           style: GoogleFonts.inter(
                             fontSize: 9,
                             fontWeight: FontWeight.w800,

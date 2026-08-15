@@ -25,6 +25,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   void _showLanguageBottomSheet() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: AppColors.bgSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -42,38 +44,45 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: _LanguageBox(
-                      title: tr('english'),
-                      subtitle: 'ENG',
-                      isSelected: context.locale.languageCode == 'en',
-                      onTap: () {
-                        context.setLocale(const Locale('en'));
-                        Navigator.pop(bottomSheetContext);
-                      },
-                    ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: [
+                      _buildLangBox(context, bottomSheetContext, 'english', 'ENG', 'en'),
+                      _buildLangBox(context, bottomSheetContext, 'hindi', 'HI', 'hi'),
+                      _buildLangBox(context, bottomSheetContext, 'marathi', 'MR', 'mr'),
+                      _buildLangBox(context, bottomSheetContext, 'gujarati', 'GU', 'gu'),
+                      _buildLangBox(context, bottomSheetContext, 'punjabi', 'PA', 'pa'),
+                      _buildLangBox(context, bottomSheetContext, 'tamil', 'TA', 'ta'),
+                      _buildLangBox(context, bottomSheetContext, 'telugu', 'TE', 'te'),
+                      _buildLangBox(context, bottomSheetContext, 'kannada', 'KN', 'kn'),
+                      _buildLangBox(context, bottomSheetContext, 'bengali', 'BN', 'bn'),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _LanguageBox(
-                      title: tr('hindi'),
-                      subtitle: 'HI',
-                      isSelected: context.locale.languageCode == 'hi',
-                      onTap: () {
-                        context.setLocale(const Locale('hi'));
-                        Navigator.pop(bottomSheetContext);
-                      },
-                    ),
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 16),
             ],
           ),
         );
       },
+    );
+  }
+
+
+  Widget _buildLangBox(BuildContext context, BuildContext bottomSheetContext, String key, String subtitle, String code) {
+    return SizedBox(
+      width: (MediaQuery.of(context).size.width - 48 - 32) / 3,
+      child: _LanguageBox(
+        title: tr(key),
+        subtitle: subtitle,
+        isSelected: context.locale.languageCode == code,
+        onTap: () {
+          context.setLocale(Locale(code));
+          Navigator.pop(bottomSheetContext);
+        },
+      ),
     );
   }
 
@@ -510,16 +519,16 @@ class _LanguageBox extends StatelessWidget {
             Text(
               subtitle,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: isSelected ? AppColors.primary : AppColors.textSubtle,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               title,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textMain,
               ),

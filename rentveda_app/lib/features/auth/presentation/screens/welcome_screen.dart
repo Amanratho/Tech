@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -181,30 +182,25 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(height: 16),
-        RichText(
+        Text(
+          tr('welcomeTitle'),
           textAlign: TextAlign.center,
-          text: TextSpan(
-            style: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.w800, color: textMain),
-            children: [
-              const TextSpan(text: 'Welcome to '),
-              TextSpan(text: 'RentVeda', style: TextStyle(color: primaryDark)),
-            ],
-          ),
+          style: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.w800, color: textMain),
         ),
         const SizedBox(height: 8),
         Text(
-          'Manage your machinery effortlessly',
+          tr('manageMachinery'),
           style: GoogleFonts.inter(fontSize: 14, color: textMuted),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 40),
         _buildPrimaryButton(
-          text: 'Create Account',
+          text: tr('create_account'),
           onPressed: () => setState(() => _view = 'createAccount'),
         ),
         const SizedBox(height: 16),
         _buildOutlinedButton(
-          text: 'Login',
+          text: tr('login'),
           onPressed: () => setState(() => _view = 'login'),
         ),
         const SizedBox(height: 16),
@@ -222,12 +218,12 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildHeader('Create Account', () => setState(() => _view = 'welcome')),
+        _buildHeader(tr('create_account'), () => setState(() => _view = 'welcome')),
 
         // Username
         _buildInputField(
           controller: _usernameController,
-          placeholder: 'Username',
+          placeholder: tr('nameLabel'),
           icon: Icons.person_outline,
         ),
         const SizedBox(height: 16),
@@ -235,7 +231,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         // Email
         _buildInputField(
           controller: _emailController,
-          placeholder: 'Email',
+          placeholder: tr('email'),
           icon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
         ),
@@ -244,7 +240,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         // Mobile No.
         _buildInputField(
           controller: _mobileController,
-          placeholder: 'Mobile No.',
+          placeholder: tr('mobileLabel'),
           icon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
           maxLength: 10,
@@ -254,7 +250,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         // Company Name
         _buildInputField(
           controller: _companyController,
-          placeholder: 'Company',
+          placeholder: tr('companyNameLabel'),
           icon: Icons.business_outlined,
         ),
         const SizedBox(height: 16),
@@ -262,7 +258,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         // Password
         _buildInputField(
           controller: _passwordController,
-          placeholder: 'Password',
+          placeholder: tr('password'),
           icon: Icons.lock_outline,
           obscureText: _obscurePassword,
           suffixIcon: GestureDetector(
@@ -279,7 +275,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         // Confirm Password
         _buildInputField(
           controller: _confirmPasswordController,
-          placeholder: 'Confirm Password',
+          placeholder: tr('confirm_password'),
           icon: Icons.lock_outline,
           obscureText: true,
         ),
@@ -287,7 +283,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
         // Sign Up Button
         _buildPrimaryButton(
-          text: 'Sign Up',
+          text: tr('sign_up'),
           isLoading: authState.isLoading,
           onPressed: () async {
             // Validation (matching React's handleCreateAccount)
@@ -406,7 +402,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
         // Submit OTP Button
         _buildPrimaryButton(
-          text: 'Submit OTP',
+          text: tr('Submit OTP'),
           isLoading: authState.isLoading,
           onPressed: () async {
             if (_otpController.text.isEmpty) {
@@ -449,12 +445,12 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildHeader('Login', () => setState(() => _view = 'welcome')),
+        _buildHeader(tr('login'), () => setState(() => _view = 'welcome')),
 
         // Email
         _buildInputField(
           controller: _emailController,
-          placeholder: 'Email',
+          placeholder: tr('email'),
           icon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
         ),
@@ -463,7 +459,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         // Password with eye toggle
         _buildInputField(
           controller: _passwordController,
-          placeholder: 'Password',
+          placeholder: tr('password'),
           icon: Icons.lock_outline,
           obscureText: _obscurePassword,
           suffixIcon: GestureDetector(
@@ -486,7 +482,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               _isEmailSent = false;
             }),
             child: Text(
-              'Forgot Password?',
+              tr('forgot_password'),
               style: GoogleFonts.inter(fontSize: 12, color: textMuted),
             ),
           ),
@@ -495,7 +491,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
         // Login Button
         _buildPrimaryButton(
-          text: 'Login',
+          text: tr('login'),
           isLoading: authState.isLoading,
           onPressed: () async {
             if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
@@ -527,7 +523,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       // ─── SUCCESS STATE (matching React's checkmark view) ───
       return Column(
         children: [
-          _buildHeader('Check Inbox', () {
+          _buildHeader(tr('Check Inbox'), () {
             setState(() {
               _view = 'login';
               _isEmailSent = false;
@@ -546,7 +542,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Check Inbox',
+            tr('Check Inbox'),
             style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: textMain),
           ),
           const SizedBox(height: 12),
@@ -555,18 +551,18 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
             text: TextSpan(
               style: GoogleFonts.inter(fontSize: 14, color: textMuted, height: 1.5),
               children: [
-                const TextSpan(text: 'We have sent a secure password reset link to\n'),
+                TextSpan(text: tr('emailSentMsg1') + '\n'),
                 TextSpan(
                   text: _emailController.text,
                   style: GoogleFonts.inter(fontWeight: FontWeight.w700, color: textMain),
                 ),
-                const TextSpan(text: '\nClick the link in the email to set a new password, then return here to log in.'),
+                TextSpan(text: '\n' + tr('emailSentMsg2')),
               ],
             ),
           ),
           const SizedBox(height: 32),
           _buildPrimaryButton(
-            text: 'Back to Login',
+            text: tr('backToLogin'),
             onPressed: () => setState(() {
               _view = 'login';
               _isEmailSent = false;
@@ -581,35 +577,35 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildHeader(
-          'Reset Password',
+          tr('resetPassword'),
           () => setState(() {
             _view = 'login';
             _isEmailSent = false;
           }),
         ),
         Text(
-          'Enter your registered email address. We\'ll send you a link to reset your password.',
+          tr('forgotPasswordDesc'),
           style: GoogleFonts.inter(fontSize: 12, color: textMuted, height: 1.5),
         ),
         const SizedBox(height: 20),
         _buildInputField(
           controller: _emailController,
-          placeholder: 'Enter your email',
+          placeholder: tr('enterYourEmail'),
           icon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 20),
         _buildOutlinedButton(
-          text: 'Send Reset Link',
+          text: tr('sendResetLink'),
           onPressed: () async {
             if (_emailController.text.isEmpty) {
-              _showToast('Enter your email', isError: true);
+              _showToast(tr('enterYourEmail'), isError: true);
               return;
             }
             final success = await authNotifier.forgotPassword(_emailController.text);
             if (success) {
               setState(() => _isEmailSent = true);
-              _showToast('Link sent successfully!');
+              _showToast(tr('linkSentSuccess'));
             }
           },
         ),
