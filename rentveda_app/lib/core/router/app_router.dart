@@ -23,6 +23,8 @@ import '../widgets/top_app_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
+import '../../features/splash/presentation/screens/splash_screen.dart';
+
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -30,8 +32,11 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>()
 class AppRouter {
   static final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/welcome',
+    initialLocation: '/splash',
     redirect: (context, state) async {
+      final isGoingToSplash = state.uri.toString() == '/splash';
+      if (isGoingToSplash) return null;
+
       final prefs = await SharedPreferences.getInstance();
       final hasSelectedLanguage = prefs.getBool('language_selected') ?? false;
       final isGoingToLanguage = state.uri.toString() == '/language';
@@ -57,6 +62,11 @@ class AppRouter {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: '/language',
         name: 'language',
