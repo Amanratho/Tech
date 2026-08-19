@@ -15,6 +15,15 @@ class FinancialTracker extends ConsumerStatefulWidget {
 }
 
 class _FinancialTrackerState extends ConsumerState<FinancialTracker> {
+  String _formatDate(String dateStr) {
+    try {
+      final DateTime dt = DateTime.parse(dateStr);
+      return DateFormat('dd MMM yyyy, hh:mm a').format(dt);
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
   late Future<Map<String, dynamic>> _maintenanceFuture;
   bool _showLedger = false;
   String _filter = 'all'; // 'all', 'expense', 'income'
@@ -284,7 +293,7 @@ class _FinancialTrackerState extends ConsumerState<FinancialTracker> {
                                 ),
                               ),
                               title: Text(entry.description, style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.bold)),
-                              subtitle: Text(entry.date, style: AppTypography.caption.copyWith(fontSize: 10)),
+                              subtitle: Text(_formatDate(entry.date), style: AppTypography.caption.copyWith(fontSize: 10)),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
