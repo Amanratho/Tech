@@ -18,7 +18,11 @@ class _MachineMaintenanceScreenState extends ConsumerState<MachineMaintenanceScr
   void initState() {
     super.initState();
     // Use Future.microtask to avoid modifying provider during build
-    Future.microtask(() => ref.read(machineMaintenanceProvider.notifier).fetchMachineSummary());
+    Future.microtask(() {
+      if (mounted) {
+        ref.read(machineMaintenanceProvider.notifier).fetchMachineSummary();
+      }
+    });
   }
 
   @override

@@ -74,12 +74,13 @@ class _EditReminderModalState extends ConsumerState<EditReminderModal> {
     
     final success = await ref.read(remindersProvider.notifier).updateReminderDate(id, formattedDate);
     
+    if (!mounted) return;
     setState(() => _isSaving = false);
     
-    if (success && mounted) {
+    if (success) {
       Fluttertoast.showToast(msg: tr('reminderUpdatedSuccess'), backgroundColor: AppColors.successDark);
       Navigator.pop(context);
-    } else if (mounted) {
+    } else {
       Fluttertoast.showToast(msg: tr('reminderUpdateFailed'), backgroundColor: AppColors.danger);
     }
   }
@@ -153,7 +154,7 @@ class _EditReminderModalState extends ConsumerState<EditReminderModal> {
                       Text(mobileNumber, style: AppTypography.caption.copyWith(color: AppColors.textMuted, fontSize: 10)),
                       const SizedBox(height: 6),
                       Text(
-                        'Due: ₹$pendingAmount',
+                        '${tr('statusDue')}: ₹$pendingAmount',
                         style: AppTypography.bodyMain.copyWith(color: AppColors.successDark, fontWeight: FontWeight.w800),
                       ),
                     ],

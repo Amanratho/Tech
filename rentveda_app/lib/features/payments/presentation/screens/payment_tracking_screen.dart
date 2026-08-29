@@ -26,7 +26,9 @@ class _PaymentTrackingScreenState extends ConsumerState<PaymentTrackingScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      ref.read(paymentTrackingProvider.notifier).loadPayments();
+      if (mounted) {
+        ref.read(paymentTrackingProvider.notifier).loadPayments();
+      }
     });
   }
 

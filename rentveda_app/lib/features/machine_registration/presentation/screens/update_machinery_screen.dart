@@ -19,7 +19,11 @@ class _UpdateMachineryScreenState extends ConsumerState<UpdateMachineryScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(updateMachineryProvider.notifier).fetchMachines());
+    Future.microtask(() {
+      if (mounted) {
+        ref.read(updateMachineryProvider.notifier).fetchMachines();
+      }
+    });
   }
 
   void _showArchiveConfirm(String machineId) {

@@ -48,6 +48,7 @@ class _FinancialTrackerState extends ConsumerState<FinancialTracker> {
         type: type,
       ),
     );
+    if (!mounted) return;
     if (result == true) {
       setState(() {
         _loadData();
@@ -75,17 +76,14 @@ class _FinancialTrackerState extends ConsumerState<FinancialTracker> {
 
     if (confirmed == true) {
       final success = await ref.read(machineMaintenanceProvider.notifier).deleteMaintenance(id);
+      if (!mounted) return;
       if (success) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('entryDeletedSuccess'))));
-        }
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('entryDeletedSuccess'))));
         setState(() {
           _loadData();
         });
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('entryDeleteFailed')), backgroundColor: AppColors.danger));
-        }
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('entryDeleteFailed')), backgroundColor: AppColors.danger));
       }
     }
   }

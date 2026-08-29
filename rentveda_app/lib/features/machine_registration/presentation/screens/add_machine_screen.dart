@@ -66,12 +66,11 @@ class _AddMachineScreenState extends ConsumerState<AddMachineScreen> {
       imageFile: _image!,
     );
 
+    if (!mounted) return;
     final state = ref.read(addMachineProvider);
     if (state.isSuccess) {
       Fluttertoast.showToast(msg: tr('successMessage'), backgroundColor: AppColors.successDark);
-      if (mounted) {
-        context.pop();
-      }
+      context.pop();
     } else if (state.error != null) {
       Fluttertoast.showToast(msg: state.error!, backgroundColor: AppColors.danger);
     }

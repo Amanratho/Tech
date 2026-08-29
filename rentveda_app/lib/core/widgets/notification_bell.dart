@@ -18,7 +18,9 @@ class _NotificationBellState extends ConsumerState<NotificationBell> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      ref.read(remindersProvider.notifier).loadReminders();
+      if (mounted) {
+        ref.read(remindersProvider.notifier).loadReminders();
+      }
     });
   }
 

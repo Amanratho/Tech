@@ -21,7 +21,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     // Load dashboard data when screen opens
     Future.microtask(() {
-      ref.read(homeProvider.notifier).loadDashboardData();
+      if (mounted) {
+        ref.read(homeProvider.notifier).loadDashboardData();
+      }
     });
   }
 

@@ -24,12 +24,13 @@ class _DeleteBillDialogState extends ConsumerState<DeleteBillDialog> {
     
     final success = await ref.read(billingHistoryProvider.notifier).deleteBill(id);
     
+    if (!mounted) return;
     setState(() => _isDeleting = false);
     
-    if (success && mounted) {
+    if (success) {
       Fluttertoast.showToast(msg: tr('successUpdated'), backgroundColor: AppColors.successDark);
       Navigator.pop(context);
-    } else if (mounted) {
+    } else {
       Fluttertoast.showToast(msg: tr('errorFailed'), backgroundColor: AppColors.danger);
     }
   }

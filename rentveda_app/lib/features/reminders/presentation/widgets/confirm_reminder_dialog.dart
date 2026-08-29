@@ -29,16 +29,17 @@ class _ConfirmReminderDialogState extends ConsumerState<ConfirmReminderDialog> {
     
     final success = await ref.read(remindersProvider.notifier).performAction(id, widget.action);
     
+    if (!mounted) return;
     setState(() => _isLoading = false);
     
-    if (success && mounted) {
+    if (success) {
       if (widget.action == "COMPLETE") {
         Fluttertoast.showToast(msg: tr('reminderMarkedCompleted'), backgroundColor: AppColors.successDark);
       } else {
         Fluttertoast.showToast(msg: tr('reminderDeletedSuccess'), backgroundColor: AppColors.successDark);
       }
       Navigator.pop(context);
-    } else if (mounted) {
+    } else {
       Fluttertoast.showToast(msg: tr('reminderActionFailed'), backgroundColor: AppColors.danger);
     }
   }

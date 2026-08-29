@@ -305,6 +305,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
             }
             // Send OTP
             final success = await authNotifier.sendOtp(_emailController.text);
+            if (!mounted) return;
             if (success) {
               _showToast('OTP Sent to your email');
             }
@@ -413,6 +414,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               _emailController.text,
               _otpController.text,
             );
+            if (!mounted) return;
             if (success) {
               // After OTP verified, immediately create account (matching React flow)
               final created = await authNotifier.createAccount(
@@ -422,6 +424,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 mobileNo: _mobileController.text,
                 companyName: _companyController.text,
               );
+              if (!mounted) return;
               if (created) {
                 _showToast('Account Created Successfully!');
                 setState(() => _view = 'login');
@@ -603,6 +606,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               return;
             }
             final success = await authNotifier.forgotPassword(_emailController.text);
+            if (!mounted) return;
             if (success) {
               setState(() => _isEmailSent = true);
               _showToast(tr('linkSentSuccess'));

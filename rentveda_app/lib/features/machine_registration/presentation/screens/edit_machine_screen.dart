@@ -100,9 +100,10 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
       image: _imageFile,
     );
 
+    if (!mounted) return;
     if (success) {
       Fluttertoast.showToast(msg: tr('machineUpdateSuccess'), backgroundColor: AppColors.successDark);
-      if (mounted) context.pop();
+      context.pop();
     } else {
       Fluttertoast.showToast(msg: tr('machineUpdateFailed'), backgroundColor: AppColors.danger);
     }

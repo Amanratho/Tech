@@ -131,12 +131,13 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
 
     final success = await ref.read(billingHistoryProvider.notifier).editBill(formData);
     
+    if (!mounted) return;
     setState(() => _isSaving = false);
     
-    if (success && mounted) {
+    if (success) {
       Fluttertoast.showToast(msg: tr('successUpdated'), backgroundColor: AppColors.successDark);
       Navigator.pop(context);
-    } else if (mounted) {
+    } else {
       Fluttertoast.showToast(msg: tr('errorFailed'), backgroundColor: AppColors.danger);
     }
   }

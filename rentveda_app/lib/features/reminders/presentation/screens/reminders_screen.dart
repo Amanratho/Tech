@@ -25,7 +25,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(remindersProvider.notifier).loadReminders();
+      if (mounted) {
+        ref.read(remindersProvider.notifier).loadReminders();
+      }
     });
   }
 

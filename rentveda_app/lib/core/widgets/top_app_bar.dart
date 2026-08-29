@@ -13,8 +13,6 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isEn = context.locale.languageCode == 'en';
-
     return Container(
       height: 56 + MediaQuery.of(context).padding.top,
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),

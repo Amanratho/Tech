@@ -66,12 +66,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       qrImage: _qrImage,
     );
 
+    if (!mounted) return;
     final state = ref.read(profileProvider);
     if (state.isSuccess) {
       Fluttertoast.showToast(msg: tr('profileUpdateSuccess'), backgroundColor: AppColors.successDark);
-      if (mounted) {
-        context.pop();
-      }
+      context.pop();
     } else if (state.error != null) {
       Fluttertoast.showToast(msg: state.error!, backgroundColor: AppColors.danger);
     }
@@ -95,9 +94,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               onPressed: () async {
                 Navigator.pop(dialogContext);
                 final success = await ref.read(profileProvider.notifier).deleteAccount();
+                if (!mounted) return;
                 if (success) {
                   Fluttertoast.showToast(msg: tr('accountDeletedSuccess'), backgroundColor: AppColors.successDark);
-                  if (!mounted) return;
                   context.go('/login');
                 } else {
                   final error = ref.read(profileProvider).error ?? tr('accountDeleteFailed');

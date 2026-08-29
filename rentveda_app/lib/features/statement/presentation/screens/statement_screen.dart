@@ -22,9 +22,13 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
   @override
   void initState() {
     super.initState();
-    _setThisMonth();
+    final now = DateTime.now();
+    _startDate = DateTime(now.year, now.month, 1);
+    _endDate = now;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(statementProvider.notifier).loadRentals();
+      if (mounted) {
+        ref.read(statementProvider.notifier).loadRentals();
+      }
     });
   }
 
@@ -68,7 +72,7 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
       },
     );
 
-    if (picked != null) {
+    if (picked != null && mounted) {
       setState(() {
         if (isStart) {
           _startDate = picked;
@@ -95,11 +99,10 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
     // Simulate network delay
     await Future.delayed(const Duration(seconds: 2));
     
+    if (!mounted) return;
     setState(() => _isGenerating = false);
     
-    if (mounted) {
-      Fluttertoast.showToast(msg: tr('successStatementDownloaded'), backgroundColor: AppColors.successDark);
-    }
+    Fluttertoast.showToast(msg: tr('successStatementDownloaded'), backgroundColor: AppColors.successDark);
   }
 
   Map<String, double> _calculateLiveSummary(List<dynamic> allRentals) {

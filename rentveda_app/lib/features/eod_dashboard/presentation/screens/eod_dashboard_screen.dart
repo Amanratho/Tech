@@ -21,7 +21,9 @@ class _EodDashboardScreenState extends ConsumerState<EodDashboardScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchForFilter('today');
+      if (mounted) {
+        _fetchForFilter('today');
+      }
     });
   }
 
@@ -52,7 +54,7 @@ class _EodDashboardScreenState extends ConsumerState<EodDashboardScreen> {
       end = _formatDate(now);
     }
 
-    if (start.isNotEmpty && end.isNotEmpty) {
+    if (mounted && start.isNotEmpty && end.isNotEmpty) {
       ref.read(eodDashboardProvider.notifier).fetchSummary(start, end);
     }
   }

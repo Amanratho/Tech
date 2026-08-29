@@ -74,6 +74,7 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
 
   Future<void> _autoFillFromTracker() async {
     final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     
     final rentTypeLower = _rentType.toLowerCase();
     
@@ -211,6 +212,7 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     
     if (value.length == 10) {
       final customer = await ref.read(startEntryProvider.notifier).fetchCustomerByMobile(value);
+      if (!mounted) return;
       if (customer != null) {
         setState(() {
           _isCustomerFound = true;
