@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import '../../features/reminders/providers/reminders_provider.dart';
+import '../../features/reminders/utils/reminder_whatsapp_helper.dart';
 
 class NotificationBell extends ConsumerStatefulWidget {
   const NotificationBell({super.key});
@@ -129,10 +130,49 @@ class _NotificationBellState extends ConsumerState<NotificationBell> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      mobile,
-                      style: AppTypography.caption.copyWith(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w600),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          mobile,
+                          style: AppTypography.caption.copyWith(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w600),
+                        ),
+                        // Quick WhatsApp Send Button
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            ReminderWhatsAppHelper.sendReminder(
+                              context: context,
+                              ref: ref,
+                              reminder: rem,
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFDCF8C6),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.4)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.chat, size: 12, color: Color(0xFF25D366)),
+                                const SizedBox(width: 4),
+                                Text(
+                                  tr('whatsappBtn'),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1E7E34),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../providers/reminders_provider.dart';
+import '../../utils/reminder_whatsapp_helper.dart';
 import '../widgets/edit_reminder_modal.dart';
 import '../widgets/confirm_reminder_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -263,14 +264,34 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                                                           onTap: () => _makePhoneCall(mobile),
                                                           borderRadius: BorderRadius.circular(20),
                                                           child: Container(
-                                                            width: 40,
-                                                            height: 40,
+                                                            width: 38,
+                                                            height: 38,
                                                             decoration: BoxDecoration(
                                                               color: AppColors.successBg,
                                                               border: Border.all(color: AppColors.successBorder),
                                                               shape: BoxShape.circle,
                                                             ),
-                                                            child: const Icon(Icons.phone, size: 20, color: AppColors.success),
+                                                            child: const Icon(Icons.phone, size: 19, color: AppColors.success),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(width: 8),
+                                                        // WhatsApp Reminder Button
+                                                        InkWell(
+                                                          onTap: () => ReminderWhatsAppHelper.sendReminder(
+                                                            context: context,
+                                                            ref: ref,
+                                                            reminder: rem,
+                                                          ),
+                                                          borderRadius: BorderRadius.circular(20),
+                                                          child: Container(
+                                                            width: 38,
+                                                            height: 38,
+                                                            decoration: BoxDecoration(
+                                                              color: const Color(0xFFDCF8C6),
+                                                              border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.4)),
+                                                              shape: BoxShape.circle,
+                                                            ),
+                                                            child: const Icon(Icons.chat, size: 19, color: Color(0xFF25D366)),
                                                           ),
                                                         ),
                                                         const SizedBox(width: 12),
