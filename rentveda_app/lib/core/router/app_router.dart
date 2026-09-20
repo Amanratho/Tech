@@ -131,16 +131,32 @@ class AppRouter {
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) {
           int currentIndex = 0;
-          if (state.uri.toString().startsWith('/home')) currentIndex = 0;
-          if (state.uri.toString().startsWith('/summary')) currentIndex = 1;
-          if (state.uri.toString().startsWith('/reminders')) currentIndex = 2;
-          if (state.uri.toString().startsWith('/statement')) currentIndex = 3;
-          if (state.uri.toString().startsWith('/profile')) currentIndex = 4;
+          if (state.uri.path.startsWith('/home')) currentIndex = 0;
+          if (state.uri.path.startsWith('/summary')) currentIndex = 1;
+          if (state.uri.path.startsWith('/reminders')) currentIndex = 2;
+          if (state.uri.path.startsWith('/statement')) currentIndex = 3;
+          if (state.uri.path.startsWith('/profile')) currentIndex = 4;
 
-          return Scaffold(
-            appBar: const RentVedaAppBar(),
-            body: child,
-            bottomNavigationBar: BottomNavBar(currentIndex: currentIndex),
+          final isHome = state.uri.path == '/home';
+          final canShellPop = _shellNavigatorKey.currentState?.canPop() ?? false;
+
+          return PopScope(
+            canPop: isHome && !canShellPop,
+            onPopInvokedWithResult: (didPop, result) {
+              if (didPop) return;
+              if (_shellNavigatorKey.currentState?.canPop() ?? false) {
+                _shellNavigatorKey.currentState?.pop();
+                return;
+              }
+              if (!isHome) {
+                context.go('/home');
+              }
+            },
+            child: Scaffold(
+              appBar: const RentVedaAppBar(),
+              body: child,
+              bottomNavigationBar: BottomNavBar(currentIndex: currentIndex),
+            ),
           );
         },
         routes: [

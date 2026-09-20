@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
@@ -162,9 +163,84 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
     await prefs.setInt('rentveda_pausedTime', state.time);
   }
 
-  void doneTime() async {
+  Future<void> _recordHistory({
+    required String type,
+    required String value,
+    required String rawValue,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final historyList = prefs.getStringList('rentveda_tracker_history') ?? [];
+      final newItem = jsonEncode({
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'type': type,
+        'value': value,
+        'rawValue': rawValue,
+        'timestamp': DateTime.now().toIso8601String(),
+      });
+      final updatedList = [newItem, ...historyList];
+      if (updatedList.length > 50) {
+        updatedList.removeRange(50, updatedList.length);
+      }
+      await prefs.setStringList('rentveda_tracker_history', updatedList);
+    } catch (_) {}
+  }
+
+  Future<List<Map<String, dynamic>>> getHistory() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final historyList = prefs.getStringList('rentveda_tracker_history') ?? [];
+      return historyList.map((item) => jsonDecode(item) as Map<String, dynamic>).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> clearHistory() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('rentveda_pending_time_entry', state.time);
+    await prefs.remove('rentveda_tracker_history');
+  }
+
+  void resetCurrent() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (state.activeTab == TrackerTab.time) {
+      _timer?.cancel();
+      await prefs.remove('rentveda_timer_status');
+      await prefs.remove('rentveda_startTime');
+      await prefs.remove('rentveda_pausedTime');
+      state = state.copyWith(
+        timerStatus: TimerStatus.idle,
+        time: 0,
+        startTime: null,
+      );
+    } else if (state.activeTab == TrackerTab.count) {
+      await prefs.remove('rentveda_count');
+      state = state.copyWith(count: 0);
+    } else if (state.activeTab == TrackerTab.distance) {
+      _timer?.cancel();
+      _stopLocationTracking();
+      await prefs.remove('rentveda_distance');
+      await prefs.remove('rentveda_timer_status');
+      await prefs.remove('rentveda_startTime');
+      await prefs.remove('rentveda_pausedTime');
+      state = state.copyWith(
+        timerStatus: TimerStatus.idle,
+        distance: 0.0,
+        time: 0,
+        startTime: null,
+      );
+    }
+  }
+
+  void doneTime() async {
+    final timeVal = state.time;
+    final hrs = (timeVal ~/ 3600);
+    final mins = ((timeVal % 3600) ~/ 60);
+    final secs = (timeVal % 60);
+    final formattedTime = '${hrs.toString().padLeft(2, '0')}:${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('rentveda_pending_time_entry', timeVal);
     await prefs.remove('rentveda_timer_status');
     await prefs.remove('rentveda_startTime');
     await prefs.remove('rentveda_pausedTime');
@@ -176,30 +252,47 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
       time: 0,
       startTime: null,
     );
+
+    if (timeVal > 0) {
+      await _recordHistory(
+        type: 'TIME',
+        value: formattedTime,
+        rawValue: timeVal.toString(),
+      );
+    }
   }
 
   // --- COUNT LOGIC ---
 
-  void incrementCount() async {
-    final newCount = state.count + 1;
+  void incrementCount([int step = 1]) async {
+    final newCount = state.count + step;
     state = state.copyWith(count: newCount);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('rentveda_count', newCount);
   }
 
-  void decrementCount() async {
-    final newCount = state.count > 0 ? state.count - 1 : 0;
+  void decrementCount([int step = 1]) async {
+    final newCount = (state.count - step) >= 0 ? (state.count - step) : 0;
     state = state.copyWith(count: newCount);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('rentveda_count', newCount);
   }
 
   void doneCount() async {
+    final countVal = state.count;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('rentveda_pending_count_entry', state.count);
+    await prefs.setInt('rentveda_pending_count_entry', countVal);
     await prefs.remove('rentveda_count');
 
     state = state.copyWith(count: 0);
+
+    if (countVal > 0) {
+      await _recordHistory(
+        type: 'COUNT',
+        value: '$countVal units',
+        rawValue: countVal.toString(),
+      );
+    }
   }
 
   // --- DISTANCE LOGIC ---
@@ -276,8 +369,9 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
   }
 
   void doneDistance() async {
+    final distVal = state.distance;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('rentveda_pending_km_entry', state.distance);
+    await prefs.setDouble('rentveda_pending_km_entry', distVal);
     await prefs.remove('rentveda_distance');
     
     _timer?.cancel();
@@ -293,6 +387,14 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
       time: 0,
       startTime: null,
     );
+
+    if (distVal > 0) {
+      await _recordHistory(
+        type: 'DISTANCE',
+        value: '${distVal.toStringAsFixed(2)} KM',
+        rawValue: distVal.toStringAsFixed(2),
+      );
+    }
   }
 
   @override

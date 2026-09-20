@@ -39,6 +39,9 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
   bool _setReminder = false;
   DateTime? _reminderDate;
   final _smsMobileController = TextEditingController();
+  final _reminderDateController = TextEditingController();
+
+  bool _isUpdatingPayment = false;
 
   late String _machineId;
   late String _machineName;
@@ -115,7 +118,23 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     _paidController.dispose();
     _pendingController.dispose();
     _smsMobileController.dispose();
+    _reminderDateController.dispose();
     super.dispose();
+  }
+
+  void _resetReminder() {
+    _setReminder = false;
+    _reminderDate = null;
+    _reminderDateController.clear();
+  }
+
+  void _syncReminderWithPendingAmount() {
+    final pending = double.tryParse(_pendingController.text) ?? 0.0;
+    if (pending <= 0) {
+      if (_setReminder || _reminderDate != null) {
+        _resetReminder();
+      }
+    }
   }
 
   void _calculateTotal() {
@@ -135,38 +154,82 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     setState(() {
       _totalAmount = double.parse(total.toStringAsFixed(2));
       
-      // Only reset paid/pending if user isn't actively typing in them.
-      // For simplicity, we just set pending to total and paid to 0 on rate/qty change.
-      _pendingController.text = _totalAmount.toString();
-      _paidController.text = '0';
+      _isUpdatingPayment = true;
+      try {
+        _pendingController.text = _totalAmount % 1 == 0 ? _totalAmount.toInt().toString() : _totalAmount.toString();
+        _paidController.text = '0';
+        if (_totalAmount <= 0) {
+          _resetReminder();
+        }
+      } finally {
+        _isUpdatingPayment = false;
+      }
     });
   }
 
   void _handlePaidChange() {
-    if (_paidController.text.isEmpty) return;
-    final paid = double.tryParse(_paidController.text) ?? 0.0;
-    if (paid > _totalAmount) {
-      _paidController.text = _totalAmount.toString();
-      _pendingController.text = '0';
-      return;
-    }
-    final pending = _totalAmount - paid;
-    if (_pendingController.text != pending.toStringAsFixed(0) && _pendingController.text != pending.toString()) {
-        _pendingController.text = pending % 1 == 0 ? pending.toInt().toString() : pending.toStringAsFixed(2);
+    if (_isUpdatingPayment) return;
+    _isUpdatingPayment = true;
+    try {
+      if (_paidController.text.isEmpty) {
+        final pending = _totalAmount;
+        final pendingStr = pending % 1 == 0 ? pending.toInt().toString() : pending.toStringAsFixed(2);
+        if (_pendingController.text != pendingStr) {
+          _pendingController.text = pendingStr;
+        }
+      } else {
+        final paid = double.tryParse(_paidController.text) ?? 0.0;
+        if (paid >= _totalAmount) {
+          if (paid > _totalAmount) {
+            final totalStr = _totalAmount % 1 == 0 ? _totalAmount.toInt().toString() : _totalAmount.toString();
+            _paidController.text = totalStr;
+          }
+          _pendingController.text = '0';
+        } else {
+          final pending = _totalAmount - paid;
+          final pendingStr = pending % 1 == 0 ? pending.toInt().toString() : pending.toStringAsFixed(2);
+          if (_pendingController.text != pendingStr) {
+            _pendingController.text = pendingStr;
+          }
+        }
+      }
+      _syncReminderWithPendingAmount();
+      if (mounted) setState(() {});
+    } finally {
+      _isUpdatingPayment = false;
     }
   }
 
   void _handlePendingChange() {
-    if (_pendingController.text.isEmpty) return;
-    final pending = double.tryParse(_pendingController.text) ?? 0.0;
-    if (pending > _totalAmount) {
-      _pendingController.text = _totalAmount.toString();
-      _paidController.text = '0';
-      return;
-    }
-    final paid = _totalAmount - pending;
-    if (_paidController.text != paid.toStringAsFixed(0) && _paidController.text != paid.toString()) {
-        _paidController.text = paid % 1 == 0 ? paid.toInt().toString() : paid.toStringAsFixed(2);
+    if (_isUpdatingPayment) return;
+    _isUpdatingPayment = true;
+    try {
+      if (_pendingController.text.isEmpty) {
+        final paid = _totalAmount;
+        final paidStr = paid % 1 == 0 ? paid.toInt().toString() : paid.toStringAsFixed(2);
+        if (_paidController.text != paidStr) {
+          _paidController.text = paidStr;
+        }
+      } else {
+        final pending = double.tryParse(_pendingController.text) ?? 0.0;
+        if (pending >= _totalAmount) {
+          if (pending > _totalAmount) {
+            final totalStr = _totalAmount % 1 == 0 ? _totalAmount.toInt().toString() : _totalAmount.toString();
+            _pendingController.text = totalStr;
+          }
+          _paidController.text = '0';
+        } else {
+          final paid = _totalAmount - pending;
+          final paidStr = paid % 1 == 0 ? paid.toInt().toString() : paid.toStringAsFixed(2);
+          if (_paidController.text != paidStr) {
+            _paidController.text = paidStr;
+          }
+        }
+      }
+      _syncReminderWithPendingAmount();
+      if (mounted) setState(() {});
+    } finally {
+      _isUpdatingPayment = false;
     }
   }
 
@@ -244,7 +307,10 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
       },
     );
     if (picked != null) {
-      setState(() => _reminderDate = picked);
+      setState(() {
+        _reminderDate = picked;
+        _reminderDateController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
     }
   }
 
@@ -257,7 +323,15 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
       return;
     }
 
-    if (_setReminder && _reminderDate == null) {
+    final pendingAmount = double.tryParse(_pendingController.text) ?? 0.0;
+
+    // If there is no pending amount, reminder is not needed
+    if (pendingAmount <= 0) {
+      _resetReminder();
+    }
+
+    // Reminder date is only validated if there is pending amount and reminder is active
+    if (pendingAmount > 0 && _setReminder && _reminderDate == null) {
       Fluttertoast.showToast(msg: tr('selectReminderDate'), backgroundColor: AppColors.warningDark);
       return;
     }
@@ -270,13 +344,13 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
       'price': double.tryParse(_priceController.text) ?? 0,
       'quantity': double.tryParse(_qtyController.text) ?? 0,
       'paidAmount': double.tryParse(_paidController.text) ?? 0,
-      'pendingAmount': double.tryParse(_pendingController.text) ?? 0,
+      'pendingAmount': pendingAmount,
       'rentType': _rentType,
       'machineId': _machineId,
       'jobWork': _jobWorkController.text,
     };
 
-    if (_setReminder) {
+    if (pendingAmount > 0 && _setReminder && _reminderDate != null) {
       entryData['reminderDate'] = DateFormat('yyyy-MM-dd').format(_reminderDate!);
       entryData['reminderStatus'] = 'PENDING';
       entryData['customerMobile'] = _smsMobileController.text.isNotEmpty ? _smsMobileController.text : _mobileController.text;
@@ -469,6 +543,10 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
                                             if (val && _smsMobileController.text.isEmpty) {
                                               _smsMobileController.text = _mobileController.text;
                                             }
+                                            if (!val) {
+                                              _reminderDate = null;
+                                              _reminderDateController.clear();
+                                            }
                                           });
                                         },
                                         activeThumbColor: AppColors.primaryGold,
@@ -483,7 +561,7 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
                                           child: GestureDetector(
                                             onTap: _selectReminderDate,
                                             child: _buildInput(
-                                              controller: TextEditingController(text: _reminderDate != null ? DateFormat('yyyy-MM-dd').format(_reminderDate!) : ''),
+                                              controller: _reminderDateController,
                                               icon: Icons.calendar_today,
                                               hint: tr('reminderModalDateLabel'),
                                               enabled: false,

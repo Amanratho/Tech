@@ -16,6 +16,56 @@ class TrackerCard extends ConsumerWidget {
     return '${hrs.toString().padLeft(2, '0')}:${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
+  void _showHistoryModal(BuildContext context, WidgetRef ref) async {
+    final notifier = ref.read(trackerProvider.notifier);
+    final history = await notifier.getHistory();
+
+    if (!context.mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _TrackerHistorySheet(
+        initialHistory: history,
+        onClear: () async {
+          await notifier.clearHistory();
+          Fluttertoast.showToast(msg: tr('trackerHistoryCleared'));
+        },
+      ),
+    );
+  }
+
+  void _confirmReset(BuildContext context, TrackerNotifier notifier) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(tr('resetTrackerTitle'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        content: Text(tr('resetTrackerMsg')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(tr('cancelButton')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.danger,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Navigator.pop(ctx);
+              notifier.resetCurrent();
+              Fluttertoast.showToast(msg: tr('trackerResetSuccess'));
+            },
+            child: Text(tr('reset')),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final trackerState = ref.watch(trackerProvider);
@@ -28,39 +78,47 @@ class TrackerCard extends ConsumerWidget {
       }
     });
 
+    final isRunning = trackerState.timerStatus == TimerStatus.running;
+    final isPaused = trackerState.timerStatus == TimerStatus.paused;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.bgSurface,
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: isRunning ? AppColors.primary : AppColors.border, width: isRunning ? 1.5 : 1),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: isRunning
+                ? AppColors.primary.withValues(alpha: 0.12)
+                : Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 3),
           )
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Header: Tabs & History
+          // Header: Segmented Tabs & Live/History controls
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Tabs
+              // Segmented Tab Selector
               Container(
-                padding: const EdgeInsets.all(4),
+                height: 34,
+                padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
                   color: AppColors.bgMain,
                   border: Border.all(color: AppColors.border),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   children: [
-                    _TabButton(
+                    _CompactTab(
                       label: tr('time'),
+                      icon: Icons.timer_outlined,
                       isActive: trackerState.activeTab == TrackerTab.time,
                       onTap: () {
                         if (trackerState.timerStatus == TimerStatus.idle) {
@@ -68,8 +126,9 @@ class TrackerCard extends ConsumerWidget {
                         }
                       },
                     ),
-                    _TabButton(
+                    _CompactTab(
                       label: tr('count'),
+                      icon: Icons.tag_rounded,
                       isActive: trackerState.activeTab == TrackerTab.count,
                       onTap: () {
                         if (trackerState.timerStatus == TimerStatus.idle) {
@@ -77,8 +136,9 @@ class TrackerCard extends ConsumerWidget {
                         }
                       },
                     ),
-                    _TabButton(
+                    _CompactTab(
                       label: 'KM',
+                      icon: Icons.navigation_outlined,
                       isActive: trackerState.activeTab == TrackerTab.distance,
                       onTap: () {
                         if (trackerState.timerStatus == TimerStatus.idle) {
@@ -89,135 +149,203 @@ class TrackerCard extends ConsumerWidget {
                   ],
                 ),
               ),
-              // History Button
-              InkWell(
-                onTap: () {}, // Can route to history if needed
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: AppColors.bgMain,
-                    border: Border.all(color: AppColors.border),
-                    borderRadius: BorderRadius.circular(10),
+
+              // Status badge & History Button
+              Row(
+                children: [
+                  if (isRunning) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.successBg,
+                        border: Border.all(color: AppColors.successBorder),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: AppColors.successDark,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            tr('trackerLive'),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.successDark,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ] else if (isPaused) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF3C7),
+                        border: Border.all(color: const Color(0xFFFDE68A)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        tr('trackerPaused'),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFFB45309),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+
+                  // History Button
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => _showHistoryModal(context, ref),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: AppColors.bgMain,
+                          border: Border.all(color: AppColors.border),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.history_rounded,
+                          size: 18,
+                          color: AppColors.textMain,
+                        ),
+                      ),
+                    ),
                   ),
-                  child: const Icon(Icons.history, size: 16, color: AppColors.textMuted),
-                ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          
-          // Body based on Active Tab
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: _buildBody(trackerState, notifier, context),
-          ),
+
+          const SizedBox(height: 14),
+
+          // Body Display: Compact Metrics
+          _buildCompactBody(trackerState, notifier, context),
+
+          const SizedBox(height: 14),
+
+          // Actions Row
+          _buildActionControls(trackerState, notifier, context),
         ],
       ),
     );
   }
 
-  Widget _buildBody(TrackerState state, TrackerNotifier notifier, BuildContext context) {
+  Widget _buildCompactBody(TrackerState state, TrackerNotifier notifier, BuildContext context) {
     if (state.activeTab == TrackerTab.time) {
       return Column(
-        key: const ValueKey('TIME'),
+        key: const ValueKey('TIME_COMPACT'),
         children: [
           Text(
             _formatTime(state.time),
             style: const TextStyle(
-              fontSize: 40,
+              fontSize: 32,
               fontWeight: FontWeight.w900,
               color: AppColors.textMain,
-              letterSpacing: 2,
+              letterSpacing: 1.5,
               fontFamily: 'monospace',
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
-            tr('liveSession').toUpperCase(),
+            tr('trackerHoursMinsSecs'),
             style: AppTypography.caption.copyWith(
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
+              letterSpacing: 1.2,
               color: AppColors.textMuted,
             ),
           ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              if (state.timerStatus == TimerStatus.idle)
-                Expanded(child: _ActionBtn(label: tr('start'), icon: Icons.play_arrow, color: AppColors.textMain, bgColor: AppColors.bgSurface, borderColor: AppColors.textMain, onTap: () {
-                   notifier.startTimer();
-                })),
-              if (state.timerStatus == TimerStatus.running)
-                Expanded(child: _ActionBtn(label: tr('pause'), icon: Icons.pause, color: Colors.orange.shade700, bgColor: Colors.orange.shade50, borderColor: Colors.orange.shade200, onTap: notifier.pauseTimer)),
-              if (state.timerStatus == TimerStatus.paused)
-                Expanded(child: _ActionBtn(label: tr('resume'), icon: Icons.play_arrow, color: AppColors.textMain, bgColor: AppColors.primary, borderColor: AppColors.primary, onTap: notifier.startTimer)),
-              if (state.timerStatus != TimerStatus.idle) ...[
-                const SizedBox(width: 12),
-                Expanded(child: _ActionBtn(label: tr('doneAndSave'), icon: Icons.check, color: AppColors.textMain, bgColor: AppColors.success, borderColor: AppColors.success, onTap: () {
-                  notifier.doneTime();
-                  Fluttertoast.showToast(msg: tr('timeSavedSuccess'));
-                })),
-              ]
-            ],
-          )
         ],
       );
     } else if (state.activeTab == TrackerTab.count) {
       return Column(
-        key: const ValueKey('COUNT'),
+        key: const ValueKey('COUNT_COMPACT'),
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _CountBtn(icon: Icons.remove, isPrimary: false, onTap: notifier.decrementCount),
-              const SizedBox(width: 24),
-              SizedBox(
-                width: 80,
+              _RoundStepBtn(
+                icon: Icons.remove_rounded,
+                onTap: () => notifier.decrementCount(1),
+              ),
+              const SizedBox(width: 16),
+              Container(
+                constraints: const BoxConstraints(minWidth: 70),
+                alignment: Alignment.center,
                 child: Text(
                   state.count.toString(),
-                  textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 48,
+                    fontSize: 34,
                     fontWeight: FontWeight.w900,
-                    color: AppColors.primary,
+                    color: AppColors.primaryGold,
+                    letterSpacing: -0.5,
                   ),
                 ),
               ),
-              const SizedBox(width: 24),
-              _CountBtn(icon: Icons.add, isPrimary: true, onTap: notifier.incrementCount),
+              const SizedBox(width: 16),
+              _RoundStepBtn(
+                icon: Icons.add_rounded,
+                isPrimary: true,
+                onTap: () => notifier.incrementCount(1),
+              ),
+              const SizedBox(width: 12),
+              // Quick +5 button
+              InkWell(
+                onTap: () => notifier.incrementCount(5),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGoldBg,
+                    border: Border.all(color: AppColors.borderDarkGold.withValues(alpha: 0.3)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    '+5',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primaryGold,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 2),
           Text(
-            tr('manualCount').toUpperCase(),
+            tr('trackerTotalCount'),
             style: AppTypography.caption.copyWith(
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
+              letterSpacing: 1.2,
               color: AppColors.textMuted,
             ),
-          ),
-          const SizedBox(height: 24),
-          _ActionBtn(
-            label: tr('saveCount'),
-            icon: Icons.check,
-            color: state.count > 0 ? AppColors.textMain : AppColors.textMuted,
-            bgColor: state.count > 0 ? AppColors.success : AppColors.bgMain,
-            borderColor: state.count > 0 ? AppColors.success : AppColors.border,
-            onTap: state.count > 0 ? () {
-              notifier.doneCount();
-              Fluttertoast.showToast(msg: tr('countSavedSuccess'));
-            } : null,
           ),
         ],
       );
     } else {
-      // Distance
+      // Distance (KM)
       return Column(
-        key: const ValueKey('DISTANCE'),
+        key: const ValueKey('DISTANCE_COMPACT'),
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -227,89 +355,343 @@ class TrackerCard extends ConsumerWidget {
               Text(
                 state.distance.toStringAsFixed(2),
                 style: const TextStyle(
-                  fontSize: 40,
+                  fontSize: 32,
                   fontWeight: FontWeight.w900,
                   color: AppColors.textMain,
                   letterSpacing: 1,
                   fontFamily: 'monospace',
                 ),
               ),
-              const SizedBox(width: 8),
-              const Text(
-                'KM',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textMuted,
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGoldBg,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: AppColors.borderDarkGold.withValues(alpha: 0.3)),
+                ),
+                child: const Text(
+                  'KM',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryGold,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
-            tr('liveGpsTracking').toUpperCase(),
+            tr('trackerGpsDistance'),
             style: AppTypography.caption.copyWith(
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
+              letterSpacing: 1.2,
               color: AppColors.textMuted,
             ),
           ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              if (state.timerStatus == TimerStatus.idle)
-                Expanded(child: _ActionBtn(label: tr('start'), icon: Icons.play_arrow, color: AppColors.textMain, bgColor: AppColors.bgSurface, borderColor: AppColors.textMain, onTap: () {
-                   notifier.startTimer();
-                   Fluttertoast.showToast(msg: tr('gpsTrackingStarted'));
-                })),
-              if (state.timerStatus == TimerStatus.running)
-                Expanded(child: _ActionBtn(label: tr('pause'), icon: Icons.pause, color: Colors.orange.shade700, bgColor: Colors.orange.shade50, borderColor: Colors.orange.shade200, onTap: notifier.pauseTimer)),
-              if (state.timerStatus == TimerStatus.paused)
-                Expanded(child: _ActionBtn(label: tr('resume'), icon: Icons.play_arrow, color: AppColors.textMain, bgColor: AppColors.primary, borderColor: AppColors.primary, onTap: notifier.startTimer)),
-              if (state.timerStatus != TimerStatus.idle) ...[
-                const SizedBox(width: 12),
-                Expanded(child: _ActionBtn(label: tr('doneAndSave'), icon: Icons.check, color: AppColors.textMain, bgColor: AppColors.success, borderColor: AppColors.success, onTap: () {
-                  final finalKm = state.distance.toStringAsFixed(2);
-                  notifier.doneDistance();
-                  Fluttertoast.showToast(msg: tr('kmSavedSuccess', namedArgs: {'km': finalKm}));
-                })),
-              ]
-            ],
-          )
         ],
       );
     }
   }
+
+  Widget _buildActionControls(TrackerState state, TrackerNotifier notifier, BuildContext context) {
+    final status = state.timerStatus;
+
+    if (state.activeTab == TrackerTab.time) {
+      if (status == TimerStatus.idle) {
+        return _CompactBtn(
+          label: tr('startTimeTracker'),
+          icon: Icons.play_arrow_rounded,
+          bgColor: AppColors.primary,
+          textColor: AppColors.textMain,
+          borderColor: AppColors.primary,
+          onTap: () => notifier.startTimer(),
+        );
+      } else if (status == TimerStatus.running) {
+        return Row(
+          children: [
+            _ResetIconBtn(onTap: () => _confirmReset(context, notifier)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CompactBtn(
+                label: tr('pause'),
+                icon: Icons.pause_rounded,
+                bgColor: const Color(0xFFFEF3C7),
+                textColor: const Color(0xFFB45309),
+                borderColor: const Color(0xFFFDE68A),
+                onTap: notifier.pauseTimer,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CompactBtn(
+                label: tr('doneAndSave'),
+                icon: Icons.check_circle_rounded,
+                bgColor: AppColors.successBg,
+                textColor: AppColors.successDark,
+                borderColor: AppColors.successBorder,
+                onTap: () {
+                  notifier.doneTime();
+                  Fluttertoast.showToast(msg: tr('timeSavedSuccess'));
+                },
+              ),
+            ),
+          ],
+        );
+      } else {
+        // Paused
+        return Row(
+          children: [
+            _ResetIconBtn(onTap: () => _confirmReset(context, notifier)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CompactBtn(
+                label: tr('resume'),
+                icon: Icons.play_arrow_rounded,
+                bgColor: AppColors.primary,
+                textColor: AppColors.textMain,
+                borderColor: AppColors.primary,
+                onTap: notifier.startTimer,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CompactBtn(
+                label: tr('doneAndSave'),
+                icon: Icons.check_circle_rounded,
+                bgColor: AppColors.successBg,
+                textColor: AppColors.successDark,
+                borderColor: AppColors.successBorder,
+                onTap: () {
+                  notifier.doneTime();
+                  Fluttertoast.showToast(msg: tr('timeSavedSuccess'));
+                },
+              ),
+            ),
+          ],
+        );
+      }
+    } else if (state.activeTab == TrackerTab.count) {
+      if (state.count == 0) {
+        return Container(
+          height: 38,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AppColors.bgMain,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Text(
+            tr('tapToAddCount'),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textMuted),
+          ),
+        );
+      }
+
+      return Row(
+        children: [
+          _ResetIconBtn(onTap: () => _confirmReset(context, notifier)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _CompactBtn(
+              label: tr('saveCountWithVal', namedArgs: {'count': state.count.toString()}),
+              icon: Icons.check_circle_rounded,
+              bgColor: AppColors.successBg,
+              textColor: AppColors.successDark,
+              borderColor: AppColors.successBorder,
+              onTap: () {
+                notifier.doneCount();
+                Fluttertoast.showToast(msg: tr('countSavedSuccess'));
+              },
+            ),
+          ),
+        ],
+      );
+    } else {
+      // Distance
+      if (status == TimerStatus.idle) {
+        return _CompactBtn(
+          label: tr('startGpsTracking'),
+          icon: Icons.navigation_rounded,
+          bgColor: AppColors.primary,
+          textColor: AppColors.textMain,
+          borderColor: AppColors.primary,
+          onTap: () {
+            notifier.startTimer();
+            Fluttertoast.showToast(msg: tr('gpsTrackingStarted'));
+          },
+        );
+      } else if (status == TimerStatus.running) {
+        return Row(
+          children: [
+            _ResetIconBtn(onTap: () => _confirmReset(context, notifier)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CompactBtn(
+                label: tr('pause'),
+                icon: Icons.pause_rounded,
+                bgColor: const Color(0xFFFEF3C7),
+                textColor: const Color(0xFFB45309),
+                borderColor: const Color(0xFFFDE68A),
+                onTap: notifier.pauseTimer,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CompactBtn(
+                label: tr('doneAndSave'),
+                icon: Icons.check_circle_rounded,
+                bgColor: AppColors.successBg,
+                textColor: AppColors.successDark,
+                borderColor: AppColors.successBorder,
+                onTap: () {
+                  final finalKm = state.distance.toStringAsFixed(2);
+                  notifier.doneDistance();
+                  Fluttertoast.showToast(msg: tr('kmSavedSuccess', namedArgs: {'km': finalKm}));
+                },
+              ),
+            ),
+          ],
+        );
+      } else {
+        // Paused
+        return Row(
+          children: [
+            _ResetIconBtn(onTap: () => _confirmReset(context, notifier)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CompactBtn(
+                label: tr('resume'),
+                icon: Icons.play_arrow_rounded,
+                bgColor: AppColors.primary,
+                textColor: AppColors.textMain,
+                borderColor: AppColors.primary,
+                onTap: notifier.startTimer,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CompactBtn(
+                label: tr('doneAndSave'),
+                icon: Icons.check_circle_rounded,
+                bgColor: AppColors.successBg,
+                textColor: AppColors.successDark,
+                borderColor: AppColors.successBorder,
+                onTap: () {
+                  final finalKm = state.distance.toStringAsFixed(2);
+                  notifier.doneDistance();
+                  Fluttertoast.showToast(msg: tr('kmSavedSuccess', namedArgs: {'km': finalKm}));
+                },
+              ),
+            ),
+          ],
+        );
+      }
+    }
+  }
 }
 
-class _TabButton extends StatelessWidget {
+class _CompactTab extends StatelessWidget {
   final String label;
+  final IconData icon;
   final bool isActive;
   final VoidCallback onTap;
 
-  const _TabButton({required this.label, required this.isActive, required this.onTap});
+  const _CompactTab({
+    required this.label,
+    required this.icon,
+    required this.isActive,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
           color: isActive ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: isActive ? [
-            BoxShadow(color: AppColors.primary.withValues(alpha: 0.2), blurRadius: 4, offset: const Offset(0, 2))
-          ] : null,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.25),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  )
+                ]
+              : null,
         ),
-        child: Text(
-          label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-            color: isActive ? AppColors.textMain : AppColors.textMuted,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 13,
+              color: isActive ? AppColors.textMain : AppColors.textMuted,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label.toUpperCase(),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                color: isActive ? AppColors.textMain : AppColors.textMuted,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RoundStepBtn extends StatelessWidget {
+  final IconData icon;
+  final bool isPrimary;
+  final VoidCallback onTap;
+
+  const _RoundStepBtn({
+    required this.icon,
+    this.isPrimary = false,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: isPrimary ? AppColors.primary : AppColors.bgMain,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isPrimary ? AppColors.primary : AppColors.border,
+            ),
+            boxShadow: isPrimary
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: AppColors.textMain,
           ),
         ),
       ),
@@ -317,95 +699,361 @@ class _TabButton extends StatelessWidget {
   }
 }
 
-class _ActionBtn extends StatelessWidget {
+class _ResetIconBtn extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _ResetIconBtn({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: AppColors.bgMain,
+            border: Border.all(color: AppColors.border),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(
+            Icons.replay_rounded,
+            size: 18,
+            color: AppColors.textMuted,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CompactBtn extends StatelessWidget {
   final String label;
   final IconData icon;
-  final Color color;
   final Color bgColor;
+  final Color textColor;
   final Color borderColor;
   final VoidCallback? onTap;
 
-  const _ActionBtn({
+  const _CompactBtn({
     required this.label,
     required this.icon,
-    required this.color,
     required this.bgColor,
+    required this.textColor,
     required this.borderColor,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: bgColor,
-          border: Border.all(color: borderColor),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            if (bgColor != AppColors.bgSurface && bgColor != AppColors.bgMain)
-              BoxShadow(
-                color: bgColor.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          height: 38,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: bgColor,
+            border: Border.all(color: borderColor),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: textColor),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: textColor,
+                    letterSpacing: 0.3,
+                  ),
+                ),
               ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 14, color: color),
-            const SizedBox(width: 8),
-            Text(
-              label.toUpperCase(),
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _CountBtn extends StatelessWidget {
-  final IconData icon;
-  final bool isPrimary;
-  final VoidCallback onTap;
+class _TrackerHistorySheet extends StatefulWidget {
+  final List<Map<String, dynamic>> initialHistory;
+  final Future<void> Function() onClear;
 
-  const _CountBtn({required this.icon, required this.isPrimary, required this.onTap});
+  const _TrackerHistorySheet({
+    required this.initialHistory,
+    required this.onClear,
+  });
+
+  @override
+  State<_TrackerHistorySheet> createState() => _TrackerHistorySheetState();
+}
+
+class _TrackerHistorySheetState extends State<_TrackerHistorySheet> {
+  late List<Map<String, dynamic>> _history;
+
+  @override
+  void initState() {
+    super.initState();
+    _history = List.from(widget.initialHistory);
+  }
+
+  void _confirmClear() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(tr('clearTrackerHistoryTitle'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        content: Text(tr('clearTrackerHistoryMsg')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(tr('cancelButton')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.danger,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await widget.onClear();
+              setState(() => _history.clear());
+            },
+            child: Text(tr('clearAll')),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: isPrimary ? AppColors.primary : AppColors.bgMain,
-          border: Border.all(color: isPrimary ? AppColors.primary : AppColors.border),
-          shape: BoxShape.circle,
-          boxShadow: isPrimary ? [
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.65,
+      decoration: const BoxDecoration(
+        color: AppColors.bgSurface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        children: [
+          // Drag handle
+          Container(
+            margin: const EdgeInsets.only(top: 12, bottom: 8),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.border,
+              borderRadius: BorderRadius.circular(2),
             ),
-          ] : null,
-        ),
-        child: Icon(
-          icon,
-          size: 20,
-          color: isPrimary ? AppColors.textMain : AppColors.textMain,
-        ),
+          ),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.history_rounded, size: 20, color: AppColors.primaryGold),
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          tr('trackerHistory'),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textMain),
+                        ),
+                        Text(
+                          tr('savedSessionsCount', namedArgs: {'count': _history.length.toString()}),
+                          style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                if (_history.isNotEmpty)
+                  TextButton.icon(
+                    onPressed: _confirmClear,
+                    icon: const Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.danger),
+                    label: Text(
+                      tr('clear'),
+                      style: const TextStyle(color: AppColors.danger, fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: AppColors.border),
+
+          // Content
+          Expanded(
+            child: _history.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: const BoxDecoration(
+                              color: AppColors.bgMain,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.history_toggle_off_rounded, size: 40, color: AppColors.textSubtle),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            tr('noTrackerSessions'),
+                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textMain),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            tr('noTrackerSessionsDesc'),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _history.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 10),
+                    itemBuilder: (ctx, index) {
+                      final item = _history[index];
+                      final type = item['type'] ?? 'TIME';
+                      final value = item['value'] ?? '';
+                      final timestampStr = item['timestamp'] ?? '';
+                      String dateDisplay = '';
+                      if (timestampStr.isNotEmpty) {
+                        try {
+                          final dt = DateTime.parse(timestampStr);
+                          dateDisplay = DateFormat('dd MMM yyyy, hh:mm a').format(dt);
+                        } catch (_) {
+                          dateDisplay = timestampStr;
+                        }
+                      }
+
+                      IconData iconData = Icons.timer_outlined;
+                      Color iconColor = Colors.blue.shade600;
+                      Color iconBg = Colors.blue.shade50;
+                      String typeLabel = tr('timeSession');
+
+                      if (type == 'COUNT') {
+                        iconData = Icons.tag_rounded;
+                        iconColor = Colors.amber.shade800;
+                        iconBg = Colors.amber.shade50;
+                        typeLabel = tr('countSession');
+                      } else if (type == 'DISTANCE') {
+                        iconData = Icons.navigation_outlined;
+                        iconColor = Colors.teal.shade600;
+                        iconBg = Colors.teal.shade50;
+                        typeLabel = tr('distanceSession');
+                      }
+
+                      return Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.bgMain,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: iconBg,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(iconData, size: 20, color: iconColor),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        typeLabel,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
+                                      Text(
+                                        dateDisplay,
+                                        style: const TextStyle(fontSize: 10, color: AppColors.textSubtle),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        value,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w800,
+                                          color: AppColors.textMain,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.successBg,
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          tr('savedBadge'),
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.successDark,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }
