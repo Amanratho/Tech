@@ -685,5 +685,12 @@
   "countSession": "ಟ್ರಿಪ್ / ಎಣಿಕೆ",
   "distanceSession": "GPS ದೂರ",
   "savedBadge": "ಉಳಿಸಲಾಗಿದೆ",
-  "reset": "ಮರುಹೊಂದಿಸಿ"
+  "reset": "ಮರುಹೊಂದಿಸಿ",
+  "recentTrackerSessions": "ಇತ್ತೀಚಿನ ಟ್ರ್ಯಾಕರ್ ಸೆಷನ್‌ಗಳು",
+  "selectTrackerSession": "ಟ್ರ್ಯಾಕರ್ ರೀಡಿಂಗ್ ಆಯ್ಕೆಮಾಡಿ",
+  "sessionSelectedToast": "ಟ್ರ್ಯಾಕರ್ ರೀಡಿಂಗ್ ಲೋಡ್ ಆಗಿದೆ!",
+  "noUnbilledSessions": "ಬಿಲ್ ಮಾಡದ ಟ್ರ್ಯಾಕರ್ ಸೆಷನ್‌ಗಳಿಲ್ಲ",
+  "deleteSessionTitle": "ಸೆಷನ್ ಅಳಿಸಬೇಕೇ?",
+  "deleteSessionMsg": "ನೀವು ಖಚಿತವಾಗಿ ಈ ಟ್ರ್ಯಾಕರ್ ಸೆಷನ್ ಅಳಿಸಲು ಬಯಸುವಿರಾ?",
+  "sessionDeleted": "ಟ್ರ್ಯಾಕರ್ ಸೆಷನ್ ಅಳಿಸಲಾಗಿದೆ"
 }

@@ -685,5 +685,12 @@
   "countSession": "ট্রিপ / গণনা",
   "distanceSession": "GPS দূরত্ব",
   "savedBadge": "সংরক্ষিত",
-  "reset": "রিসেট"
+  "reset": "রিসেট",
+  "recentTrackerSessions": "সাম্প্রতিক ট্র্যাকার সেশন",
+  "selectTrackerSession": "ট্র্যাকার রিডিং নির্বাচন করুন",
+  "sessionSelectedToast": "ট্র্যাকার রিডিং লোড হয়েছে!",
+  "noUnbilledSessions": "কোনও অবিলকৃত ট্র্যাকার সেশন নেই",
+  "deleteSessionTitle": "সেশন মুছবেন?",
+  "deleteSessionMsg": "আপনি কি নিশ্চিত যে আপনি এই ট্র্যাকার সেশনটি মুছতে চান?",
+  "sessionDeleted": "ট্র্যাকার সেশন মুছে ফেলা হয়েছে"
 }

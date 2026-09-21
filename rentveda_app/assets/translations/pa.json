@@ -685,5 +685,12 @@
   "countSession": "ਗੇੜਾ / ਗਿਣਤੀ",
   "distanceSession": "GPS ਦੂਰੀ",
   "savedBadge": "ਸੰਭਾਲਿਆ ਗਿਆ",
-  "reset": "ਰੀਸੈਟ"
+  "reset": "ਰੀਸੈਟ",
+  "recentTrackerSessions": "ਹਾਲੀਆ ਟਰੈਕਰ ਸੈਸ਼ਨ",
+  "selectTrackerSession": "ਟਰੈਕਰ ਰੀਡਿੰਗ ਚੁਣੋ",
+  "sessionSelectedToast": "ਟਰੈਕਰ ਰੀਡਿੰਗ ਲੋਡ ਹੋ ਗਈ!",
+  "noUnbilledSessions": "ਕੋਈ ਅਣ-ਬਿੱਲ ਕੀਤਾ ਟਰੈਕਰ ਸੈਸ਼ਨ ਨਹੀਂ ਹੈ",
+  "deleteSessionTitle": "ਸੈਸ਼ਨ ਹਟਾਓ?",
+  "deleteSessionMsg": "ਕੀ ਤੁਸੀਂ ਸੱਚਮੁੱਚ ਇਸ ਟਰੈਕਰ ਸੈਸ਼ਨ ਨੂੰ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
+  "sessionDeleted": "ਟਰੈਕਰ ਸੈਸ਼ਨ ਹਟਾ ਦਿੱਤਾ ਗਿਆ"
 }

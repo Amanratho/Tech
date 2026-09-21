@@ -688,5 +688,12 @@
   "countSession": "ट्रिप / काउंट",
   "distanceSession": "GPS दूरी",
   "savedBadge": "सेव हुआ",
-  "reset": "रीसेट"
+  "reset": "रीसेट",
+  "recentTrackerSessions": "हाल के ट्रैकर सेशन",
+  "selectTrackerSession": "ट्रैकर रीडिंग चुनें",
+  "sessionSelectedToast": "ट्रैकर रीडिंग लोड हो गई!",
+  "noUnbilledSessions": "कोई बिना बिल वाला ट्रैकर सेशन नहीं है",
+  "deleteSessionTitle": "सेशन हटाएं?",
+  "deleteSessionMsg": "क्या आप इस ट्रैकर सेशन को हटाना चाहते हैं?",
+  "sessionDeleted": "ट्रैकर सेशन हटा दिया गया"
 }

@@ -841,6 +841,40 @@ class _TrackerHistorySheetState extends State<_TrackerHistorySheet> {
     );
   }
 
+  void _confirmDeleteSingle(int index, Map<String, dynamic> item) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(tr('deleteSessionTitle'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        content: Text(tr('deleteSessionMsg')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(tr('cancelButton')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.danger,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final id = item['id']?.toString() ?? '';
+              await TrackerNotifier.deleteSession(id);
+              if (mounted) {
+                setState(() => _history.removeAt(index));
+                Fluttertoast.showToast(msg: tr('sessionDeleted'));
+              }
+            },
+            child: Text(tr('deleteButton')),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1027,20 +1061,42 @@ class _TrackerHistorySheetState extends State<_TrackerHistorySheet> {
                                           color: AppColors.textMain,
                                         ),
                                       ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.successBg,
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          tr('savedBadge'),
-                                          style: const TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.successDark,
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.successBg,
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              tr('savedBadge'),
+                                              style: const TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.successDark,
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                          const SizedBox(width: 8),
+                                          GestureDetector(
+                                            onTap: () => _confirmDeleteSingle(index, item),
+                                            behavior: HitTestBehavior.opaque,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.dangerBg,
+                                                borderRadius: BorderRadius.circular(6),
+                                              ),
+                                              child: const Icon(
+                                                Icons.delete_outline_rounded,
+                                                size: 16,
+                                                color: AppColors.danger,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),

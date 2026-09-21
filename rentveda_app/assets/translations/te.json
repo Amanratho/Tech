@@ -685,5 +685,12 @@
   "countSession": "ట్రిప్ / కౌంట్",
   "distanceSession": "GPS దూరం",
   "savedBadge": "సేవ్ చేయబడింది",
-  "reset": "రీసెట్"
+  "reset": "రీసెట్",
+  "recentTrackerSessions": "ఇటీవలి ట్రాకర్ సెషన్‌లు",
+  "selectTrackerSession": "ట్రాకర్ రీడింగ్‌ని ఎంచుకోండి",
+  "sessionSelectedToast": "ట్రాకర్ రీడింగ్ లోడ్ చేయబడింది!",
+  "noUnbilledSessions": "బిల్ చేయని ట్రాకర్ సెషన్‌లు లేవు",
+  "deleteSessionTitle": "సెషన్‌ను తొలగించాలా?",
+  "deleteSessionMsg": "మీరు ఖచ్చితంగా ఈ ట్రాకర్ సెషన్‌ను తొలగించాలనుకుంటున్నారా?",
+  "sessionDeleted": "ట్రాకర్ సెషన్ తొలగించబడింది"
 }

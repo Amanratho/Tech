@@ -685,5 +685,12 @@
   "countSession": "ટ્રીપ / કાઉન્ટ",
   "distanceSession": "GPS અંતર",
   "savedBadge": "સાચવેલ",
-  "reset": "રીસેટ"
+  "reset": "રીસેટ",
+  "recentTrackerSessions": "તાજેતરના ટ્રેકર સત્રો",
+  "selectTrackerSession": "ટ્રેકર રીડિંગ પસંદ કરો",
+  "sessionSelectedToast": "ટ્રેકર રીડિંગ લોડ થઈ ગઈ!",
+  "noUnbilledSessions": "કોઈ અનબિલ્ડ ટ્રેકર સત્ર નથી",
+  "deleteSessionTitle": "સત્ર કાઢી નાખો?",
+  "deleteSessionMsg": "શું તમે ખરેખર આ ટ્રેકર સત્ર કાઢી નાખવા માંગો છો?",
+  "sessionDeleted": "ટ્રેકર સત્ર કાઢી નાખવામાં આવ્યું"
 }

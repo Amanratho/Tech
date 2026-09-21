@@ -685,5 +685,12 @@
   "countSession": "फेरी / मोजणी",
   "distanceSession": "GPS अंतर",
   "savedBadge": "सेव्ह झाले",
-  "reset": "रीसेट"
+  "reset": "रीसेट",
+  "recentTrackerSessions": "अलीकडील ट्रॅकर सत्र",
+  "selectTrackerSession": "ट्रॅकर रीडिंग निवडा",
+  "sessionSelectedToast": "ट्रॅकर रीडिंग लोड झाली!",
+  "noUnbilledSessions": "बिल न केलेले कोणतेही ट्रॅकर सत्र नाही",
+  "deleteSessionTitle": "सेशन हटवा?",
+  "deleteSessionMsg": "तुम्हाला खात्री आहे की तुम्ही हा ट्रॅकर सेशन हटवू इच्छिता?",
+  "sessionDeleted": "ट्रॅकर सेशन हटवले"
 }

@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/top_app_bar.dart';
 import '../../providers/start_entry_provider.dart';
+import '../../../tracker/providers/tracker_provider.dart';
 
 class StartEntryScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> extra;
@@ -43,6 +44,10 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
 
   bool _isUpdatingPayment = false;
 
+  // Tracker History Sessions
+  List<Map<String, dynamic>> _unbilledTrackerSessions = [];
+  String? _selectedTrackerSessionId;
+
   late String _machineId;
   late String _machineName;
   late String _rentType;
@@ -75,33 +80,110 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     }
   }
 
+  String? _getTrackerTypeForRentType() {
+    final lower = _rentType.toLowerCase();
+    if (lower == 'hour') return 'TIME';
+    if (['count', 'trip', 'load'].contains(lower)) return 'COUNT';
+    if (lower == 'km' || lower == 'distance') return 'DISTANCE';
+    return null;
+  }
+
+  String _formatSessionToQtyText(Map<String, dynamic> session, String? trackerType) {
+    final type = session['type']?.toString().toUpperCase() ?? trackerType ?? '';
+    final rawValue = session['rawValue']?.toString() ?? '';
+    final value = session['value']?.toString() ?? '';
+    final rawQty = session['qty'];
+
+    if (type == 'TIME') {
+      int totalSeconds = 0;
+      final parsedSecs = int.tryParse(rawValue);
+      if (parsedSecs != null && parsedSecs > 0) {
+        totalSeconds = parsedSecs;
+      } else {
+        final timeStr = value.contains(':') ? value : rawValue;
+        if (timeStr.contains(':')) {
+          final parts = timeStr.split(':');
+          if (parts.length >= 2) {
+            final h = int.tryParse(parts[0]) ?? 0;
+            final m = int.tryParse(parts[1]) ?? 0;
+            final s = parts.length > 2 ? (int.tryParse(parts[2]) ?? 0) : 0;
+            totalSeconds = (h * 3600) + (m * 60) + s;
+          }
+        }
+      }
+
+      if (totalSeconds > 0) {
+        final hrs = totalSeconds ~/ 3600;
+        final mins = (totalSeconds % 3600) ~/ 60;
+        return '$hrs.${mins.toString().padLeft(2, '0')}';
+      }
+
+      final q = double.tryParse(rawQty?.toString() ?? '');
+      if (q != null && q > 0) {
+        return q.toStringAsFixed(2);
+      }
+      return '0.00';
+    } else if (type == 'COUNT') {
+      final count = int.tryParse(rawValue.isNotEmpty ? rawValue : value) ??
+          (double.tryParse(rawQty?.toString() ?? '')?.toInt());
+      return (count ?? 0).toString();
+    } else if (type == 'DISTANCE') {
+      final cleaned = (rawValue.isNotEmpty ? rawValue : value).replaceAll(RegExp(r'[^0-9.]'), '');
+      final dist = double.tryParse(cleaned) ?? double.tryParse(rawQty?.toString() ?? '') ?? 0.0;
+      return dist.toStringAsFixed(2);
+    }
+    return '0';
+  }
+
   Future<void> _autoFillFromTracker() async {
-    final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
-    
-    final rentTypeLower = _rentType.toLowerCase();
-    
-    if (rentTypeLower == 'hour') {
-      final time = prefs.getInt('rentveda_pending_time_entry');
-      if (time != null) {
-        final double hours = time / 3600;
-        _qtyController.text = hours.toStringAsFixed(2);
-        prefs.remove('rentveda_pending_time_entry');
+    final trackerType = _getTrackerTypeForRentType();
+    if (trackerType == null) return;
+
+    final sessions = await TrackerNotifier.getUnbilledSessionsByType(trackerType, limit: 5);
+    if (!mounted) return;
+
+    setState(() {
+      _unbilledTrackerSessions = sessions;
+    });
+
+    if (sessions.isNotEmpty) {
+      final latest = sessions.first;
+      final qtyText = _formatSessionToQtyText(latest, trackerType);
+      if (qtyText != '0' && qtyText != '0.00' && (_qtyController.text.isEmpty || _qtyController.text == '0' || _qtyController.text == '0.00')) {
+        setState(() {
+          _selectedTrackerSessionId = latest['id']?.toString();
+          _qtyController.text = qtyText;
+        });
+        _calculateTotal();
         Fluttertoast.showToast(msg: tr('autofilledFromTracker'), backgroundColor: AppColors.primaryGold);
       }
-    } else if (['count', 'trip', 'load'].contains(rentTypeLower)) {
-      final count = prefs.getInt('rentveda_pending_count_entry');
-      if (count != null) {
-        _qtyController.text = count.toString();
-        prefs.remove('rentveda_pending_count_entry');
-        Fluttertoast.showToast(msg: tr('autofilledFromTracker'), backgroundColor: AppColors.primaryGold);
-      }
-    } else if (rentTypeLower == 'km' || rentTypeLower == 'distance') {
-      final km = prefs.getDouble('rentveda_pending_km_entry');
-      if (km != null) {
-        _qtyController.text = km.toStringAsFixed(2);
-        prefs.remove('rentveda_pending_km_entry');
-        Fluttertoast.showToast(msg: tr('autofilledFromTracker'), backgroundColor: AppColors.primaryGold);
+    } else {
+      // Legacy fallback (without deleting on screen open)
+      final prefs = await SharedPreferences.getInstance();
+      if (trackerType == 'TIME') {
+        final time = prefs.getInt('rentveda_pending_time_entry');
+        if (time != null && (_qtyController.text.isEmpty || _qtyController.text == '0')) {
+          final hrs = time ~/ 3600;
+          final mins = (time % 3600) ~/ 60;
+          _qtyController.text = '$hrs.${mins.toString().padLeft(2, '0')}';
+          _calculateTotal();
+          Fluttertoast.showToast(msg: tr('autofilledFromTracker'), backgroundColor: AppColors.primaryGold);
+        }
+      } else if (trackerType == 'COUNT') {
+        final count = prefs.getInt('rentveda_pending_count_entry');
+        if (count != null && (_qtyController.text.isEmpty || _qtyController.text == '0')) {
+          _qtyController.text = count.toString();
+          _calculateTotal();
+          Fluttertoast.showToast(msg: tr('autofilledFromTracker'), backgroundColor: AppColors.primaryGold);
+        }
+      } else if (trackerType == 'DISTANCE') {
+        final km = prefs.getDouble('rentveda_pending_km_entry');
+        if (km != null && (_qtyController.text.isEmpty || _qtyController.text == '0')) {
+          _qtyController.text = km.toStringAsFixed(2);
+          _calculateTotal();
+          Fluttertoast.showToast(msg: tr('autofilledFromTracker'), backgroundColor: AppColors.primaryGold);
+        }
       }
     }
   }
@@ -359,8 +441,14 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     final success = await ref.read(startEntryProvider.notifier).saveEntry(entryData);
 
     if (success && mounted) {
+      if (_selectedTrackerSessionId != null) {
+        await TrackerNotifier.markSessionBilled(_selectedTrackerSessionId!);
+      }
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('last_rate_$_machineId', _priceController.text);
+      await prefs.remove('rentveda_pending_time_entry');
+      await prefs.remove('rentveda_pending_count_entry');
+      await prefs.remove('rentveda_pending_km_entry');
       if (!mounted) return;
 
       Fluttertoast.showToast(msg: tr('entrySaved'), backgroundColor: AppColors.successDark);
@@ -477,6 +565,7 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
                               child: _buildCalcInput(
                                 label: '${tr('qtyLabel')} ($_rentType)',
                                 controller: _qtyController,
+                                suffixWidget: _buildTrackerDropdown(),
                               ),
                             ),
                           ],
@@ -665,10 +754,154 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     );
   }
 
+  Widget? _buildTrackerDropdown() {
+    if (_unbilledTrackerSessions.isEmpty) return null;
+    final trackerType = _getTrackerTypeForRentType();
+    return Theme(
+      data: Theme.of(context).copyWith(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+      ),
+      child: PopupMenuButton<Map<String, dynamic>>(
+        tooltip: tr('recentTrackerSessions'),
+        padding: EdgeInsets.zero,
+        offset: const Offset(0, 44),
+        icon: Container(
+          margin: const EdgeInsets.only(right: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          decoration: BoxDecoration(
+            color: AppColors.primaryGold.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.4), width: 1),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                trackerType == 'TIME'
+                    ? Icons.timer_outlined
+                    : trackerType == 'COUNT'
+                        ? Icons.tag_rounded
+                        : Icons.navigation_outlined,
+                size: 14,
+                color: AppColors.primaryGold,
+              ),
+              const SizedBox(width: 2),
+              const Icon(Icons.arrow_drop_down_rounded, size: 16, color: AppColors.primaryGold),
+            ],
+          ),
+        ),
+        color: AppColors.bgSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: AppColors.border),
+        ),
+        itemBuilder: (context) {
+          return _unbilledTrackerSessions.map((session) {
+            final isCurrentSelected = session['id']?.toString() == _selectedTrackerSessionId;
+            final value = session['value'] ?? '${session['qty']}';
+            String timeFormatted = '';
+            if (session['timestamp'] != null) {
+              final dt = DateTime.tryParse(session['timestamp']);
+              if (dt != null) {
+                timeFormatted = DateFormat('dd MMM, hh:mm a').format(dt);
+              }
+            }
+
+            return PopupMenuItem<Map<String, dynamic>>(
+              value: session,
+              height: 48,
+              child: Row(
+                children: [
+                  Icon(
+                    trackerType == 'TIME'
+                        ? Icons.timer_outlined
+                        : trackerType == 'COUNT'
+                            ? Icons.tag_rounded
+                            : Icons.navigation_outlined,
+                    size: 18,
+                    color: isCurrentSelected ? AppColors.primaryGold : AppColors.textMuted,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          value,
+                          style: AppTypography.bodyMain.copyWith(
+                            fontWeight: isCurrentSelected ? FontWeight.bold : FontWeight.w600,
+                            color: isCurrentSelected ? AppColors.primaryGold : AppColors.textMain,
+                            fontSize: 13,
+                          ),
+                        ),
+                        if (timeFormatted.isNotEmpty)
+                          Text(
+                            timeFormatted,
+                            style: AppTypography.caption.copyWith(fontSize: 10),
+                          ),
+                      ],
+                    ),
+                  ),
+                  if (isCurrentSelected) ...[
+                    const SizedBox(width: 6),
+                    const Icon(Icons.check_circle_rounded, size: 16, color: AppColors.primaryGold),
+                  ],
+                  const SizedBox(width: 6),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () async {
+                      Navigator.pop(context);
+                      final id = session['id']?.toString() ?? '';
+                      await TrackerNotifier.deleteSession(id);
+                      if (!mounted) return;
+                      setState(() {
+                        _unbilledTrackerSessions.removeWhere((s) => s['id']?.toString() == id);
+                        if (_selectedTrackerSessionId == id) {
+                          _selectedTrackerSessionId = null;
+                          _qtyController.text = '';
+                          _calculateTotal();
+                        }
+                      });
+                      Fluttertoast.showToast(msg: tr('sessionDeleted'), backgroundColor: AppColors.danger);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppColors.dangerBg,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.delete_outline_rounded,
+                        size: 16,
+                        color: AppColors.danger,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList();
+        },
+        onSelected: (session) {
+          final qtyText = _formatSessionToQtyText(session, trackerType);
+          setState(() {
+            _selectedTrackerSessionId = session['id']?.toString();
+            _qtyController.text = qtyText;
+          });
+          _calculateTotal();
+          Fluttertoast.showToast(msg: tr('sessionSelectedToast'), backgroundColor: AppColors.primaryGold);
+        },
+      ),
+    );
+  }
+
   Widget _buildCalcInput({
     required String label,
     required TextEditingController controller,
     Color? color,
+    Widget? suffixWidget,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -684,6 +917,8 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
             hintStyle: AppTypography.bodyMain.copyWith(color: (color ?? AppColors.textMain).withValues(alpha: 0.3), fontSize: 18, fontWeight: FontWeight.bold),
             prefixText: color != null ? '₹ ' : '',
             prefixStyle: AppTypography.bodyMain.copyWith(fontSize: 18, fontWeight: FontWeight.bold, color: color),
+            suffixIcon: suffixWidget,
+            suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
             filled: true,
             fillColor: AppColors.bgMain,
             contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),

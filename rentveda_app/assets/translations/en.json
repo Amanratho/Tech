@@ -685,5 +685,12 @@
   "countSession": "Trip / Count",
   "distanceSession": "GPS Distance",
   "savedBadge": "Saved",
-  "reset": "Reset"
+  "reset": "Reset",
+  "recentTrackerSessions": "Recent Tracker Sessions",
+  "selectTrackerSession": "Select Tracker Reading",
+  "sessionSelectedToast": "Tracker reading loaded!",
+  "noUnbilledSessions": "No unbilled tracker sessions",
+  "deleteSessionTitle": "Delete Session?",
+  "deleteSessionMsg": "Are you sure you want to delete this tracker session?",
+  "sessionDeleted": "Tracker session deleted"
 }

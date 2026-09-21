@@ -167,6 +167,7 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
     required String type,
     required String value,
     required String rawValue,
+    required double qty,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -176,13 +177,51 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
         'type': type,
         'value': value,
         'rawValue': rawValue,
+        'qty': qty,
         'timestamp': DateTime.now().toIso8601String(),
+        'isBilled': false,
       });
       final updatedList = [newItem, ...historyList];
-      if (updatedList.length > 50) {
-        updatedList.removeRange(50, updatedList.length);
+      if (updatedList.length > 30) {
+        updatedList.removeRange(30, updatedList.length);
       }
       await prefs.setStringList('rentveda_tracker_history', updatedList);
+    } catch (_) {}
+  }
+
+  static Future<List<Map<String, dynamic>>> getUnbilledSessionsByType(String type, {int limit = 5}) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final historyList = prefs.getStringList('rentveda_tracker_history') ?? [];
+      final List<Map<String, dynamic>> result = [];
+      for (final item in historyList) {
+        final map = jsonDecode(item) as Map<String, dynamic>;
+        if (map['type'] == type && map['isBilled'] != true) {
+          result.add(map);
+          if (result.length >= limit) break;
+        }
+      }
+      return result;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<void> markSessionBilled(String sessionId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final historyList = prefs.getStringList('rentveda_tracker_history') ?? [];
+      final List<String> updated = [];
+      for (final item in historyList) {
+        final map = jsonDecode(item) as Map<String, dynamic>;
+        if (map['id'] == sessionId) {
+          map['isBilled'] = true;
+          updated.add(jsonEncode(map));
+        } else {
+          updated.add(item);
+        }
+      }
+      await prefs.setStringList('rentveda_tracker_history', updated);
     } catch (_) {}
   }
 
@@ -194,6 +233,25 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
     } catch (_) {
       return [];
     }
+  }
+
+  static Future<void> deleteSession(String sessionId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final historyList = prefs.getStringList('rentveda_tracker_history') ?? [];
+      final List<String> updated = [];
+      for (final item in historyList) {
+        final map = jsonDecode(item) as Map<String, dynamic>;
+        if (map['id']?.toString() != sessionId) {
+          updated.add(item);
+        }
+      }
+      await prefs.setStringList('rentveda_tracker_history', updated);
+    } catch (_) {}
+  }
+
+  Future<void> deleteHistoryItem(String sessionId) async {
+    await deleteSession(sessionId);
   }
 
   Future<void> clearHistory() async {
@@ -254,10 +312,13 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
     );
 
     if (timeVal > 0) {
+      final double hours = timeVal / 3600;
+      final double qty = double.parse(hours.toStringAsFixed(2));
       await _recordHistory(
         type: 'TIME',
         value: formattedTime,
         rawValue: timeVal.toString(),
+        qty: qty,
       );
     }
   }
@@ -291,6 +352,7 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
         type: 'COUNT',
         value: '$countVal units',
         rawValue: countVal.toString(),
+        qty: countVal.toDouble(),
       );
     }
   }
@@ -389,10 +451,12 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
     );
 
     if (distVal > 0) {
+      final double qty = double.parse(distVal.toStringAsFixed(2));
       await _recordHistory(
         type: 'DISTANCE',
         value: '${distVal.toStringAsFixed(2)} KM',
         rawValue: distVal.toStringAsFixed(2),
+        qty: qty,
       );
     }
   }

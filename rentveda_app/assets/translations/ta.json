@@ -685,5 +685,12 @@
   "countSession": "பயணம் / எண்ணிக்கை",
   "distanceSession": "GPS தொலைவு",
   "savedBadge": "சேமிக்கப்பட்டது",
-  "reset": "மீட்டமை"
+  "reset": "மீட்டமை",
+  "recentTrackerSessions": "சமீபத்திய டிராக்கர் அமர்வுகள்",
+  "selectTrackerSession": "டிராக்கர் அளவீட்டைத் தேர்ந்தெடுக்கவும்",
+  "sessionSelectedToast": "டிராக்கர் அளவீடு ஏற்றப்பட்டது!",
+  "noUnbilledSessions": "பில் செய்யப்படாத டிராக்கர் அமர்வுகள் எதுவும் இல்லை",
+  "deleteSessionTitle": "அமர்வை நீக்கவா?",
+  "deleteSessionMsg": "இந்த டிராக்கர் அமர்வை நிச்சயமாக நீக்க விரும்புகிறீர்களா?",
+  "sessionDeleted": "டிராக்கர் அமர்வு நீக்கப்பட்டது"
 }
