@@ -692,5 +692,9 @@
   "noUnbilledSessions": "કોઈ અનબિલ્ડ ટ્રેકર સત્ર નથી",
   "deleteSessionTitle": "સત્ર કાઢી નાખો?",
   "deleteSessionMsg": "શું તમે ખરેખર આ ટ્રેકર સત્ર કાઢી નાખવા માંગો છો?",
-  "sessionDeleted": "ટ્રેકર સત્ર કાઢી નાખવામાં આવ્યું"
+  "sessionDeleted": "ટ્રેકર સત્ર કાઢી નાખવામાં આવ્યું",
+  "selectMachine": "મશીન પસંદ કરો",
+  "allMachines": "બધી મશીનો",
+  "allMachinesDesc": "બધી નોંધાયેલ મશીનોનું સંયુક્ત સ્ટેટમેન્ટ",
+  "filterByMachine": "મશીન મુજબ ફિલ્ટર"
 }

@@ -692,5 +692,9 @@
   "noUnbilledSessions": "ਕੋਈ ਅਣ-ਬਿੱਲ ਕੀਤਾ ਟਰੈਕਰ ਸੈਸ਼ਨ ਨਹੀਂ ਹੈ",
   "deleteSessionTitle": "ਸੈਸ਼ਨ ਹਟਾਓ?",
   "deleteSessionMsg": "ਕੀ ਤੁਸੀਂ ਸੱਚਮੁੱਚ ਇਸ ਟਰੈਕਰ ਸੈਸ਼ਨ ਨੂੰ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
-  "sessionDeleted": "ਟਰੈਕਰ ਸੈਸ਼ਨ ਹਟਾ ਦਿੱਤਾ ਗਿਆ"
+  "sessionDeleted": "ਟਰੈਕਰ ਸੈਸ਼ਨ ਹਟਾ ਦਿੱਤਾ ਗਿਆ",
+  "selectMachine": "ਮਸ਼ੀਨ ਚੁਣੋ",
+  "allMachines": "ਸਾਰੀਆਂ ਮਸ਼ੀਨਾਂ",
+  "allMachinesDesc": "ਸਾਰੀਆਂ ਰਜਿਸਟਰਡ ਮਸ਼ੀਨਾਂ ਦਾ ਸਾਂਝਾ ਸਟੇਟਮੈਂਟ",
+  "filterByMachine": "ਮਸ਼ੀਨ ਅਨੁਸਾਰ ਫਿਲਟਰ"
 }

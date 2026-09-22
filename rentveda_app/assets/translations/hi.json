@@ -695,5 +695,9 @@
   "noUnbilledSessions": "कोई बिना बिल वाला ट्रैकर सेशन नहीं है",
   "deleteSessionTitle": "सेशन हटाएं?",
   "deleteSessionMsg": "क्या आप इस ट्रैकर सेशन को हटाना चाहते हैं?",
-  "sessionDeleted": "ट्रैकर सेशन हटा दिया गया"
+  "sessionDeleted": "ट्रैकर सेशन हटा दिया गया",
+  "selectMachine": "मशीन चुनें",
+  "allMachines": "सभी मशीनें",
+  "allMachinesDesc": "सभी पंजीकृत मशीनों का संयुक्त स्टेटमेंट",
+  "filterByMachine": "मशीन अनुसार फ़िल्टर"
 }

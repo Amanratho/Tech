@@ -692,5 +692,9 @@
   "noUnbilledSessions": "No unbilled tracker sessions",
   "deleteSessionTitle": "Delete Session?",
   "deleteSessionMsg": "Are you sure you want to delete this tracker session?",
-  "sessionDeleted": "Tracker session deleted"
+  "sessionDeleted": "Tracker session deleted",
+  "selectMachine": "Select Machine",
+  "allMachines": "All Machines",
+  "allMachinesDesc": "Combined statement for all registered machines",
+  "filterByMachine": "Filter by Machine"
 }

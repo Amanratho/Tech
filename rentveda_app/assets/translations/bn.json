@@ -692,5 +692,9 @@
   "noUnbilledSessions": "কোনও অবিলকৃত ট্র্যাকার সেশন নেই",
   "deleteSessionTitle": "সেশন মুছবেন?",
   "deleteSessionMsg": "আপনি কি নিশ্চিত যে আপনি এই ট্র্যাকার সেশনটি মুছতে চান?",
-  "sessionDeleted": "ট্র্যাকার সেশন মুছে ফেলা হয়েছে"
+  "sessionDeleted": "ট্র্যাকার সেশন মুছে ফেলা হয়েছে",
+  "selectMachine": "মেশিন নির্বাচন করুন",
+  "allMachines": "সব মেশিন",
+  "allMachinesDesc": "সমস্ত নিবন্ধিত মেশিনের সম্মিলিত স্টেটমেন্ট",
+  "filterByMachine": "মেশিন অনুযায়ী ফিল্টার"
 }

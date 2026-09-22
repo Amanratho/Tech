@@ -692,5 +692,9 @@
   "noUnbilledSessions": "ಬಿಲ್ ಮಾಡದ ಟ್ರ್ಯಾಕರ್ ಸೆಷನ್‌ಗಳಿಲ್ಲ",
   "deleteSessionTitle": "ಸೆಷನ್ ಅಳಿಸಬೇಕೇ?",
   "deleteSessionMsg": "ನೀವು ಖಚಿತವಾಗಿ ಈ ಟ್ರ್ಯಾಕರ್ ಸೆಷನ್ ಅಳಿಸಲು ಬಯಸುವಿರಾ?",
-  "sessionDeleted": "ಟ್ರ್ಯಾಕರ್ ಸೆಷನ್ ಅಳಿಸಲಾಗಿದೆ"
+  "sessionDeleted": "ಟ್ರ್ಯಾಕರ್ ಸೆಷನ್ ಅಳಿಸಲಾಗಿದೆ",
+  "selectMachine": "ಯಂತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+  "allMachines": "ಎಲ್ಲಾ ಯಂತ್ರಗಳು",
+  "allMachinesDesc": "ಎಲ್ಲಾ ನೋಂದಾಯಿತ ಯಂತ್ರಗಳ ಒಟ್ಟು ಸ್ಟೇಟ್‌ಮೆಂಟ್",
+  "filterByMachine": "ಯಂತ್ರದ ಪ್ರಕಾರ ಫಿಲ್ಟರ್"
 }

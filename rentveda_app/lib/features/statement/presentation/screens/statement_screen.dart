@@ -17,7 +17,131 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
   DateTime? _startDate;
   DateTime? _endDate;
   String _filterType = "All"; // All, Paid, Pending
+  String _selectedMachineId = "ALL";
   bool _isGenerating = false;
+
+  String _getSelectedMachineName(List<dynamic> machines) {
+    if (_selectedMachineId == "ALL") {
+      return tr('allMachines');
+    }
+    for (final m in machines) {
+      final id = (m['_id'] ?? m['Machine_id'] ?? '').toString();
+      if (id == _selectedMachineId) {
+        return (m['Machine_name'] ?? 'Machine').toString();
+      }
+    }
+    return tr('allMachines');
+  }
+
+  void _showMachinePicker(BuildContext context, List<dynamic> machines) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
+          ),
+          decoration: const BoxDecoration(
+            color: AppColors.bgSurface,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Drag handle
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryGold.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.precision_manufacturing_rounded, size: 20, color: AppColors.primaryGold),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          tr('selectMachine'),
+                          style: AppTypography.cardHeader.copyWith(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 20, color: AppColors.textMuted),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1, color: AppColors.border),
+
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  children: [
+                    // Option: All Machines
+                    _MachinePickerTile(
+                      title: tr('allMachines'),
+                      subtitle: tr('allMachinesDesc'),
+                      icon: Icons.apps_rounded,
+                      isSelected: _selectedMachineId == "ALL",
+                      badge: '${machines.length}',
+                      onTap: () {
+                        setState(() => _selectedMachineId = "ALL");
+                        Navigator.pop(ctx);
+                      },
+                    ),
+                    if (machines.isNotEmpty) ...[
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 6),
+                        child: Divider(height: 1, color: AppColors.border),
+                      ),
+                      ...machines.map((m) {
+                        final id = (m['_id'] ?? m['Machine_id'] ?? '').toString();
+                        final name = (m['Machine_name'] ?? 'Machine').toString();
+                        final rentType = (m['RentType'] ?? '').toString();
+                        final isSelected = _selectedMachineId == id;
+                        return _MachinePickerTile(
+                          title: name,
+                          subtitle: rentType.isNotEmpty ? 'Rent: $rentType' : null,
+                          icon: Icons.agriculture_rounded,
+                          badge: rentType.isNotEmpty ? rentType : null,
+                          isSelected: isSelected,
+                          onTap: () {
+                            setState(() => _selectedMachineId = id);
+                            Navigator.pop(ctx);
+                          },
+                        );
+                      }),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -126,6 +250,14 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
 
       if (!isWithinDate) return false;
 
+      // Machine Filter
+      if (_selectedMachineId != "ALL") {
+        final itemMachineId = (item['machineId'] ?? '').toString();
+        if (itemMachineId != _selectedMachineId) {
+          return false;
+        }
+      }
+
       final pendingAmt = (item['pendingAmount'] ?? 0).toDouble();
       
       if (_filterType == "Paid") return pendingAmt == 0;
@@ -215,6 +347,20 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
                           ),
                         ],
                       ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Machine Selector
+                    Text(
+                      tr('selectMachine').toUpperCase(),
+                      style: AppTypography.caption.copyWith(color: AppColors.textDarkBrown, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                    ),
+                    const SizedBox(height: 8),
+                    _MachineSelectorCard(
+                      selectedName: _getSelectedMachineName(state.machines),
+                      isAll: _selectedMachineId == "ALL",
+                      totalMachines: state.machines.length,
+                      onTap: () => _showMachinePicker(context, state.machines),
                     ),
                     const SizedBox(height: 24),
 
@@ -559,6 +705,212 @@ class _StatCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _MachineSelectorCard extends StatelessWidget {
+  final String selectedName;
+  final bool isAll;
+  final int totalMachines;
+  final VoidCallback onTap;
+
+  const _MachineSelectorCard({
+    required this.selectedName,
+    required this.isAll,
+    required this.totalMachines,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: AppColors.bgSurface,
+          border: Border.all(
+            color: !isAll ? AppColors.primaryGold : AppColors.border,
+            width: !isAll ? 1.5 : 1,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isAll
+                    ? AppColors.primaryGold.withValues(alpha: 0.1)
+                    : AppColors.primary.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                isAll ? Icons.apps_rounded : Icons.agriculture_rounded,
+                size: 20,
+                color: AppColors.primaryGold,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tr('filterByMachine').toUpperCase(),
+                    style: AppTypography.caption.copyWith(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textMuted,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    selectedName,
+                    style: AppTypography.bodyMain.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textMain,
+                      fontSize: 14,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.bgMain,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    isAll ? '$totalMachines' : '1',
+                    style: AppTypography.caption.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textMain,
+                      fontSize: 11,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.primaryGold),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MachinePickerTile extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final IconData icon;
+  final bool isSelected;
+  final String? badge;
+  final VoidCallback onTap;
+
+  const _MachinePickerTile({
+    required this.title,
+    this.subtitle,
+    required this.icon,
+    required this.isSelected,
+    this.badge,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: isSelected ? AppColors.primaryGold.withValues(alpha: 0.08) : AppColors.bgMain,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isSelected ? AppColors.primaryGold : AppColors.border,
+          width: isSelected ? 1.5 : 1,
+        ),
+      ),
+      child: ListTile(
+        onTap: onTap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? AppColors.primaryGold.withValues(alpha: 0.15)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: isSelected ? AppColors.primaryGold : AppColors.textMuted,
+          ),
+        ),
+        title: Text(
+          title,
+          style: AppTypography.bodyMain.copyWith(
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+            color: isSelected ? AppColors.primaryGold : AppColors.textMain,
+            fontSize: 14,
+          ),
+        ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle!,
+                style: AppTypography.caption.copyWith(fontSize: 11, color: AppColors.textMuted),
+              )
+            : null,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (badge != null) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primaryGold : AppColors.bgSurface,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: isSelected ? AppColors.primaryGold : AppColors.border,
+                  ),
+                ),
+                child: Text(
+                  badge!,
+                  style: AppTypography.caption.copyWith(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected ? Colors.white : AppColors.textDarkBrown,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
+            Icon(
+              isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+              size: 20,
+              color: isSelected ? AppColors.primaryGold : AppColors.textSubtle,
+            ),
+          ],
+        ),
       ),
     );
   }

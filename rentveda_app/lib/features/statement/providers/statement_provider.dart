@@ -7,22 +7,26 @@ class StatementState {
   final bool isLoading;
   final String? error;
   final List<dynamic> allRentals;
+  final List<dynamic> machines;
 
   StatementState({
     this.isLoading = false,
     this.error,
     this.allRentals = const [],
+    this.machines = const [],
   });
 
   StatementState copyWith({
     bool? isLoading,
     String? error,
     List<dynamic>? allRentals,
+    List<dynamic>? machines,
   }) {
     return StatementState(
       isLoading: isLoading ?? this.isLoading,
       error: error,
       allRentals: allRentals ?? this.allRentals,
+      machines: machines ?? this.machines,
     );
   }
 }
@@ -42,13 +46,18 @@ class StatementNotifier extends StateNotifier<StatementState> {
         return;
       }
 
-      final response = await apiClient.dio.post('/rentals', data: {'uid': uid});
+      final results = await Future.wait([
+        apiClient.dio.post('/rentals', data: {'uid': uid}),
+        apiClient.dio.post('/machines', data: {'uid': uid}),
+      ]);
       
-      final rentals = response.data is List ? response.data as List<dynamic> : [];
+      final rentals = results[0].data is List ? results[0].data as List<dynamic> : [];
+      final machines = results[1].data is List ? results[1].data as List<dynamic> : [];
 
       state = state.copyWith(
         isLoading: false,
         allRentals: rentals,
+        machines: machines,
       );
     } catch (e) {
       debugPrint('❌ [STATEMENT] Fetch error: $e');

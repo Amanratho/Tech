@@ -692,5 +692,9 @@
   "noUnbilledSessions": "బిల్ చేయని ట్రాకర్ సెషన్‌లు లేవు",
   "deleteSessionTitle": "సెషన్‌ను తొలగించాలా?",
   "deleteSessionMsg": "మీరు ఖచ్చితంగా ఈ ట్రాకర్ సెషన్‌ను తొలగించాలనుకుంటున్నారా?",
-  "sessionDeleted": "ట్రాకర్ సెషన్ తొలగించబడింది"
+  "sessionDeleted": "ట్రాకర్ సెషన్ తొలగించబడింది",
+  "selectMachine": "యంత్రాన్ని ఎంచుకోండి",
+  "allMachines": "అన్ని యంత్రాలు",
+  "allMachinesDesc": "నమోదిత అన్ని యంత్రాల ఉమ్మడి స్టేట్‌మెంట్",
+  "filterByMachine": "యంత్రం వారీగా ఫిల్టర్"
 }
