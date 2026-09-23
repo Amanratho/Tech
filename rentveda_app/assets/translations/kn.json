@@ -729,5 +729,20 @@
   "modePerimeterWalk": "ಸುತ್ತಿ ಅಳೆಯಿರಿ",
   "modeCornerPin": "ಮೂಲೆಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ",
   "calculatedAreaLabel": "ಒಟ್ಟು ವಿಸ್ತೀರ್ಣ",
-  "pointsCount": "ಬಿಂದುಗಳು"
+  "pointsCount": "ಬಿಂದುಗಳು",
+  "fetchingLocationAddress": "ಸ್ಥಳವನ್ನು ಪಡೆಯಲಾಗುತ್ತಿದೆ...",
+  "currentLocationLabel": "ಪ್ರಸ್ತುತ ಸ್ಥಳ",
+  "addGpsPointBtn": "ನನ್ನ ಸ್ಥಳವನ್ನು ಸೇರಿಸಿ",
+  "tapMapToAddHint": "ಮೂಲೆಗಳನ್ನು ಸೇರಿಸಲು ನಕ್ಷೆಯ ಮೇಲೆ ಟ್ಯಾಪ್ ಮಾಡಿ ಅಥವಾ ಬಟನ್ ಒತ್ತಿ",
+  "walkTrackingActiveHint": "ಜಮೀನಿನ ಗಡಿಯುದ್ದಕ್ಕೂ ನಡೆಯಿರಿ ಅಥವಾ ಚಲಾಯಿಸಿ — ಮಾರ್ಗ ರೆಕಾರ್ಡ್ ಆಗುತ್ತಿದೆ",
+  "startWalkTrackingHint": "ಪ್ರಾರಂಭಿಸಿ ಒತ್ತಿ ಮತ್ತು ಜಮೀನಿನ ಗಡಿಯುದ್ದಕ್ಕೂ ನಡೆಯಿರಿ",
+  "pointAddedMsg": "ಬಿಂದು #{num} ಸೇರಿಸಲಾಗಿದೆ",
+  "clearAllPointsBtn": "ಎಲ್ಲಾ ಬಿಂದುಗಳನ್ನು ತೆರವುಗೊಳಿಸಿ",
+  "bighaRegionCentralMp": "ಮಧ್ಯಪ್ರದೇಶ / ಕೇಂದ್ರ (0.625 ಎಕರೆ)",
+  "bighaRegionUpBihar": "ಯುಪಿ / ಬಿಹಾರ ಪಕ್ಕಾ ಬಿಘಾ",
+  "bighaRegionRajasthan": "ರಾಜಸ್ಥಾನ (1618 ಚ.ಮೀ)",
+  "bighaRegionGujarat": "ಗುಜರಾತ್ ವಿಘಾ",
+  "bighaRegionPunjabHaryana": "ಪಂಜಾಬ್ / ಹರಿಯಾಣ ಕಿಲ್ಲಾ",
+  "gpsSphericalBadge": "ಜಿಪಿಎಸ್ ನಿಖರ ಅಳತೆ",
+  "cancel": "ರದ್ದುಮಾಡಿ"
 }

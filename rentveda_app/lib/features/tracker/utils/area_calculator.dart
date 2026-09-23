@@ -3,15 +3,16 @@ import 'package:latlong2/latlong.dart' as ll;
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 
 enum BighaRegion {
-  standard('Central / MP (0.625 Acre)', 2529.285),
-  upPakka('UP / Bihar Pakka', 2529.285),
-  rajasthan('Rajasthan (1618 m²)', 1618.74),
-  gujarat('Gujarat Vigha', 1936.0),
-  punjabHaryana('Punjab / Haryana Killa', 4046.856);
+  standard('bighaRegionCentralMp', 'Central / MP (0.625 Acre)', 2529.285),
+  upPakka('bighaRegionUpBihar', 'UP / Bihar Pakka', 2529.285),
+  rajasthan('bighaRegionRajasthan', 'Rajasthan (1618 m²)', 1618.74),
+  gujarat('bighaRegionGujarat', 'Gujarat Vigha', 1936.0),
+  punjabHaryana('bighaRegionPunjabHaryana', 'Punjab / Haryana Killa', 4046.856);
 
+  final String translationKey;
   final String label;
   final double sqMetersPerUnit;
-  const BighaRegion(this.label, this.sqMetersPerUnit);
+  const BighaRegion(this.translationKey, this.label, this.sqMetersPerUnit);
 }
 
 class AreaCalculationResult {

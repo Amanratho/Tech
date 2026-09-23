@@ -729,5 +729,20 @@
   "modePerimeterWalk": "ঘুরে মাপুন",
   "modeCornerPin": "কোণ নির্বাচন",
   "calculatedAreaLabel": "মোট আয়তন",
-  "pointsCount": "বিন্দু"
-}
+  "pointsCount": "বিন্দু",
+  "fetchingLocationAddress": "অবস্থান খোঁজা হচ্ছে...",
+  "currentLocationLabel": "বর্তমান অবস্থান",
+  "addGpsPointBtn": "আমার অবস্থান যোগ করুন",
+  "tapMapToAddHint": "কোণ যোগ করতে মানচিত্রে আলতো চাপুন বা বোতাম টিপুন",
+  "walkTrackingActiveHint": "জমির সীমানা ধরে হাঁটুন বা গাড়ি চালান — পথ রেকর্ড হচ্ছে",
+  "startWalkTrackingHint": "শুরু করুন টিপুন এবং জমির সীমানা ধরে হাঁটুন/চালান",
+  "pointAddedMsg": "বিন্দু #{num} যোগ করা হয়েছে",
+  "clearAllPointsBtn": "সমস্ত বিন্দু মুছুন",
+  "bighaRegionCentralMp": "মধ্যপ্রদেশ / মধ্য ভারত (0.625 একর)",
+  "bighaRegionUpBihar": "ইউপি / বিহার পাক্কা বিঘা",
+  "bighaRegionRajasthan": "রাজস্থান (1618 বর্গ মিটার)",
+  "bighaRegionGujarat": "গুজরাট বিঘা",
+  "bighaRegionPunjabHaryana": "পাঞ্জাব / হরিয়ানা কিল্লা",
+  "gpsSphericalBadge": "জিপিএস সঠিক পরিমাপ",
+  "cancel": "বাতিল করুন"
+}

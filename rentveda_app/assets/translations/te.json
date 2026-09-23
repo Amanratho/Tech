@@ -729,5 +729,20 @@
   "modePerimeterWalk": "తిరిగి కొలవండి",
   "modeCornerPin": "మూలలు ఎంచుకోండి",
   "calculatedAreaLabel": "మొత్తం వైశాల్యం",
-  "pointsCount": "బిందువులు"
+  "pointsCount": "బిందువులు",
+  "fetchingLocationAddress": "స్థానాన్ని పొందుతోంది...",
+  "currentLocationLabel": "ప్రస్తుత స్థానం",
+  "addGpsPointBtn": "నా స్థానాన్ని జోడించండి",
+  "tapMapToAddHint": "మూలలను జోడించడానికి మ్యాప్‌పై నొక్కండి లేదా బటన్‌ను క్లిక్ చేయండి",
+  "walkTrackingActiveHint": "పొలం సరిహద్దు వెంట నడవండి లేదా నడపండి — మార్గం రికార్డ్ అవుతోంది",
+  "startWalkTrackingHint": "ప్రారంభించు నొక్కి పొలం సరిహద్దు వెంట నడవండి",
+  "pointAddedMsg": "బిందువు #{num} జోడించబడింది",
+  "clearAllPointsBtn": "అన్ని బిందువులను తొలగించండి",
+  "bighaRegionCentralMp": "మధ్యప్రదేశ్ / సెంట్రల్ (0.625 ఎకరం)",
+  "bighaRegionUpBihar": "యూపీ / బీహార్ పక్కా బీఘా",
+  "bighaRegionRajasthan": "రాజస్థాన్ (1618 చ.మీ)",
+  "bighaRegionGujarat": "గుజరాత్ వీఘా",
+  "bighaRegionPunjabHaryana": "పంజాబ్ / హర్యానా కిల్లా",
+  "gpsSphericalBadge": "జీపీఎస్ ఖచ్చితమైన కొలత",
+  "cancel": "రద్దు చేయి"
 }

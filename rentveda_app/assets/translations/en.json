@@ -729,5 +729,20 @@
   "modePerimeterWalk": "Walk / Drive",
   "modeCornerPin": "Corner Pins",
   "calculatedAreaLabel": "Calculated Area",
-  "pointsCount": "points"
-}
+  "pointsCount": "points",
+  "fetchingLocationAddress": "Fetching location...",
+  "currentLocationLabel": "CURRENT LOCATION",
+  "addGpsPointBtn": "Add Point at Current GPS",
+  "tapMapToAddHint": "Tap anywhere on the map or click button to add corners",
+  "walkTrackingActiveHint": "Walk or drive along field edge — path is recording",
+  "startWalkTrackingHint": "Press Start and walk/drive along field boundary",
+  "pointAddedMsg": "Point #{num} added",
+  "clearAllPointsBtn": "Clear All Points",
+  "bighaRegionCentralMp": "Central / MP (0.625 Acre)",
+  "bighaRegionUpBihar": "UP / Bihar Pakka",
+  "bighaRegionRajasthan": "Rajasthan (1618 m²)",
+  "bighaRegionGujarat": "Gujarat Vigha",
+  "bighaRegionPunjabHaryana": "Punjab / Haryana Killa",
+  "gpsSphericalBadge": "GPS Spherical",
+  "cancel": "Cancel"
+}

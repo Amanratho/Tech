@@ -729,5 +729,20 @@
   "modePerimeterWalk": "ਘੁੰਮ ਕੇ ਮਿਣੋ",
   "modeCornerPin": "ਨੁੱਕਰਾਂ ਚੁਣੋ",
   "calculatedAreaLabel": "ਕੁੱਲ ਖੇਤਰਫਲ",
-  "pointsCount": "ਬਿੰਦੂ"
-}
+  "pointsCount": "ਬਿੰਦੂ",
+  "fetchingLocationAddress": "ਸਥਾਨ ਲੱਭਿਆ ਜਾ ਰਿਹਾ ਹੈ...",
+  "currentLocationLabel": "ਮੌਜੂਦਾ ਸਥਾਨ",
+  "addGpsPointBtn": "ਮੇਰਾ ਸਥਾਨ ਜੋੜੋ",
+  "tapMapToAddHint": "ਨੁੱਕਰਾਂ ਜੋੜਨ ਲਈ ਨਕਸ਼ੇ 'ਤੇ ਟੈਪ ਕਰੋ ਜਾਂ ਬਟਨ ਦਬਾਓ",
+  "walkTrackingActiveHint": "ਖੇਤ ਦੀ ਹੱਦ 'ਤੇ ਚੱਲੋ ਜਾਂ ਚਲਾਓ — ਰਸਤਾ ਰਿਕਾਰਡ ਹੋ ਰਿਹਾ ਹੈ",
+  "startWalkTrackingHint": "ਸ਼ੁਰੂ ਕਰੋ ਦਬਾਓ ਅਤੇ ਖੇਤ ਦੀ ਹੱਦ 'ਤੇ ਚੱਲੋ/ਚਲਾਓ",
+  "pointAddedMsg": "ਬਿੰਦੂ #{num} ਜੋੜਿਆ ਗਿਆ",
+  "clearAllPointsBtn": "ਸਾਰੇ ਬਿੰਦੂ ਹਟਾਓ",
+  "bighaRegionCentralMp": "ਮੱਧ ਪ੍ਰਦੇਸ਼ / ਕੇਂਦਰੀ (0.625 ਏਕੜ)",
+  "bighaRegionUpBihar": "ਯੂਪੀ / ਬਿਹਾਰ ਪੱਕਾ ਵਿੱਘਾ",
+  "bighaRegionRajasthan": "ਰਾਜਸਥਾਨ (1618 ਵਰਗ ਮੀਟਰ)",
+  "bighaRegionGujarat": "ਗੁਜਰਾਤ ਵਿੱਘਾ",
+  "bighaRegionPunjabHaryana": "ਪੰਜਾਬ / ਹਰਿਆਣਾ ਕਿੱਲਾ",
+  "gpsSphericalBadge": "ਜੀਪੀਐਸ ਸਹੀ ਮਿਣਤੀ",
+  "cancel": "ਰੱਦ ਕਰੋ"
+}

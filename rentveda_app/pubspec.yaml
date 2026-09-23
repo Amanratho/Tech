@@ -60,6 +60,7 @@ dependencies:
   flutter_map: ^8.3.2
   latlong2: ^0.10.1
   maps_toolkit: ^3.1.0
+  geocoding: ^5.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

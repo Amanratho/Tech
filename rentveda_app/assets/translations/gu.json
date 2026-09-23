@@ -729,5 +729,20 @@
   "modePerimeterWalk": "ફરીને માપો",
   "modeCornerPin": "ખૂણા પસંદ કરો",
   "calculatedAreaLabel": "કુલ ક્ષેત્રફળ",
-  "pointsCount": "બિંદુઓ"
-}
+  "pointsCount": "બિંદુઓ",
+  "fetchingLocationAddress": "સ્થાન શોધી રહ્યું છે...",
+  "currentLocationLabel": "હાલનું સ્થાન",
+  "addGpsPointBtn": "મારું સ્થાન ઉમેરો",
+  "tapMapToAddHint": "ખૂણા ઉમેરવા માટે નકશા પર ટેપ કરો અથવા બટન દબાવો",
+  "walkTrackingActiveHint": "ખેતરની સીમા પર ચાલો અથવા ચલાવો — રસ્તો રેકોર્ડ થઈ રહ્યો છે",
+  "startWalkTrackingHint": "શરૂ કરો દબાવો અને ખેતરની સીમા પર ચાલો/ચલાવો",
+  "pointAddedMsg": "બિંદુ #{num} ઉમેર્યું",
+  "clearAllPointsBtn": "બધા બિંદુઓ કાઢો",
+  "bighaRegionCentralMp": "મધ્ય પ્રદેશ / મધ્ય ભારત (0.625 એકર)",
+  "bighaRegionUpBihar": "યુપી / બિહાર પાકા વીઘા",
+  "bighaRegionRajasthan": "રાજસ્થાન (1618 ચો. મીટર)",
+  "bighaRegionGujarat": "ગુજરાત વીઘા",
+  "bighaRegionPunjabHaryana": "પંજાબ / હરિયાણા કિલ્લા",
+  "gpsSphericalBadge": "જીપીએસ સચોટ માપ",
+  "cancel": "રદ કરો"
+}

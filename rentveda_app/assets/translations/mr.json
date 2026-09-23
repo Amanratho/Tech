@@ -729,5 +729,20 @@
   "modePerimeterWalk": "फिरून मोजा",
   "modeCornerPin": "कोपरे निवडा",
   "calculatedAreaLabel": "एकूण क्षेत्रफळ",
-  "pointsCount": "बिंदू"
-}
+  "pointsCount": "बिंदू",
+  "fetchingLocationAddress": "स्थान शोधत आहे...",
+  "currentLocationLabel": "सध्याचे स्थान",
+  "addGpsPointBtn": "माझे स्थान जोडा",
+  "tapMapToAddHint": "कोपरे जोडण्यासाठी नकाशावर टॅप करा किंवा बटण दाबा",
+  "walkTrackingActiveHint": "शेताच्या सीमेवर चाला किंवा वाहन चालवा — मार्ग रेकॉर्ड होत आहे",
+  "startWalkTrackingHint": "सुरू करा दाबा आणि शेताच्या सीमेवर चाला/चालवा",
+  "pointAddedMsg": "बिंदू #{num} जोडला",
+  "clearAllPointsBtn": "सर्व बिंदू काढा",
+  "bighaRegionCentralMp": "मध्य प्रदेश / मध्य भारत (0.625 एकर)",
+  "bighaRegionUpBihar": "यूपी / बिहार पक्का बीघा",
+  "bighaRegionRajasthan": "राजस्थान (1618 चौ. मीटर)",
+  "bighaRegionGujarat": "गुजरात वीघा",
+  "bighaRegionPunjabHaryana": "पंजाब / हरियाणा किल्ला",
+  "gpsSphericalBadge": "जीपीएस अचूक मोजणी",
+  "cancel": "रद्द करा"
+}

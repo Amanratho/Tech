@@ -729,5 +729,20 @@
   "modePerimeterWalk": "சுற்றி அளவிடவும்",
   "modeCornerPin": "மூலைகளைத் தேர்ந்தெடுக்கவும்",
   "calculatedAreaLabel": "மொத்த பரப்பளவு",
-  "pointsCount": "புள்ளிகள்"
+  "pointsCount": "புள்ளிகள்",
+  "fetchingLocationAddress": "இருப்பிடத்தைப் பெறுகிறது...",
+  "currentLocationLabel": "தற்போதைய இருப்பிடம்",
+  "addGpsPointBtn": "எனது இருப்பிடத்தைச் சேர்க்கவும்",
+  "tapMapToAddHint": "மூலைகளைச் சேர்க்க வரைபடத்தில் தட்டவும் அல்லது பொத்தானை அழுத்தவும்",
+  "walkTrackingActiveHint": "நிலத்தின் எல்லை வழியாக நடக்கவும் அல்லது இயக்கவும் — பதிவு செய்யப்படுகிறது",
+  "startWalkTrackingHint": "தொடங்கு என்பதை அழுத்தி நில எல்லை வழியாக செல்லவும்",
+  "pointAddedMsg": "புள்ளி #{num} சேர்க்கப்பட்டது",
+  "clearAllPointsBtn": "அனைத்து புள்ளிகளையும் அழிக்கவும்",
+  "bighaRegionCentralMp": "மத்திய பிரதேசம் / மத்தி (0.625 ஏக்கர்)",
+  "bighaRegionUpBihar": "உபி / பீகார் பக்கா பீகா",
+  "bighaRegionRajasthan": "ராஜஸ்தான் (1618 ச.மீ)",
+  "bighaRegionGujarat": "குஜராத் பீகா",
+  "bighaRegionPunjabHaryana": "பஞ்சாப் / ஹரியானா கில்லா",
+  "gpsSphericalBadge": "ஜிபிஎஸ் துல்லிய அளவு",
+  "cancel": "ரத்து செய்"
 }

@@ -153,12 +153,12 @@ class _AreaResultModalState extends State<AreaResultModal> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
-                        children: const [
-                          Icon(Icons.verified, color: Colors.amberAccent, size: 14),
-                          SizedBox(width: 4),
+                        children: [
+                          const Icon(Icons.verified, color: Colors.amberAccent, size: 14),
+                          const SizedBox(width: 4),
                           Text(
-                            'GPS Spherical',
-                            style: TextStyle(
+                            tr('gpsSphericalBadge'),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -210,7 +210,7 @@ class _AreaResultModalState extends State<AreaResultModal> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          _result.formattedBigha,
+                          '${_result.bigha.toStringAsFixed(2)} ${tr('unitBigha')}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -281,7 +281,7 @@ class _AreaResultModalState extends State<AreaResultModal> {
                             return DropdownMenuItem<BighaRegion>(
                               value: region,
                               child: Text(
-                                region.label,
+                                tr(region.translationKey),
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
@@ -313,13 +313,13 @@ class _AreaResultModalState extends State<AreaResultModal> {
             children: [
               _buildMiniMetric(
                 label: tr('unitHectare'),
-                value: _result.formattedHectares,
+                value: '${_result.hectares.toStringAsFixed(2)} ${tr('unitHectare')}',
                 icon: Icons.grid_view_rounded,
               ),
               const SizedBox(width: 10),
               _buildMiniMetric(
                 label: tr('unitSqMeters'),
-                value: _result.formattedSqMeters,
+                value: '${_result.sqMeters.toStringAsFixed(1)} ${tr('unitSqMeters')}',
                 icon: Icons.square_foot_rounded,
               ),
               if (widget.perimeterMeters > 0) ...[
