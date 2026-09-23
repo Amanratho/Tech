@@ -85,6 +85,7 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     if (lower == 'hour') return 'TIME';
     if (['count', 'trip', 'load'].contains(lower)) return 'COUNT';
     if (lower == 'km' || lower == 'distance') return 'DISTANCE';
+    if (lower == 'acre' || lower == 'byacre' || lower == 'by_acre') return 'AREA';
     return null;
   }
 
@@ -131,6 +132,10 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
       final cleaned = (rawValue.isNotEmpty ? rawValue : value).replaceAll(RegExp(r'[^0-9.]'), '');
       final dist = double.tryParse(cleaned) ?? double.tryParse(rawQty?.toString() ?? '') ?? 0.0;
       return dist.toStringAsFixed(2);
+    } else if (type == 'AREA') {
+      final cleaned = (rawValue.isNotEmpty ? rawValue : value).replaceAll(RegExp(r'[^0-9.]'), '');
+      final acres = double.tryParse(cleaned) ?? double.tryParse(rawQty?.toString() ?? '') ?? 0.0;
+      return acres.toStringAsFixed(2);
     }
     return '0';
   }
@@ -181,6 +186,13 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
         final km = prefs.getDouble('rentveda_pending_km_entry');
         if (km != null && (_qtyController.text.isEmpty || _qtyController.text == '0')) {
           _qtyController.text = km.toStringAsFixed(2);
+          _calculateTotal();
+          Fluttertoast.showToast(msg: tr('autofilledFromTracker'), backgroundColor: AppColors.primaryGold);
+        }
+      } else if (trackerType == 'AREA') {
+        final acres = prefs.getDouble('rentveda_pending_acre_entry');
+        if (acres != null && (_qtyController.text.isEmpty || _qtyController.text == '0')) {
+          _qtyController.text = acres.toStringAsFixed(2);
           _calculateTotal();
           Fluttertoast.showToast(msg: tr('autofilledFromTracker'), backgroundColor: AppColors.primaryGold);
         }
@@ -782,7 +794,9 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
                     ? Icons.timer_outlined
                     : trackerType == 'COUNT'
                         ? Icons.tag_rounded
-                        : Icons.navigation_outlined,
+                        : trackerType == 'AREA'
+                            ? Icons.landscape_outlined
+                            : Icons.navigation_outlined,
                 size: 14,
                 color: AppColors.primaryGold,
               ),
@@ -818,7 +832,9 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
                         ? Icons.timer_outlined
                         : trackerType == 'COUNT'
                             ? Icons.tag_rounded
-                            : Icons.navigation_outlined,
+                            : trackerType == 'AREA'
+                                ? Icons.landscape_outlined
+                                : Icons.navigation_outlined,
                     size: 18,
                     color: isCurrentSelected ? AppColors.primaryGold : AppColors.textMuted,
                   ),

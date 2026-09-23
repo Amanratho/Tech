@@ -57,6 +57,9 @@ dependencies:
   uuid: ^4.6.0
   dotted_border: ^3.1.0
   geolocator: ^14.0.2
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
+  maps_toolkit: ^3.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

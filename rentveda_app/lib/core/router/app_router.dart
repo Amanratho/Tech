@@ -24,6 +24,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
+import '../../features/tracker/presentation/screens/area_tracker_map_screen.dart';
 
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -126,6 +127,11 @@ class AppRouter {
           final extra = state.extra as Map<String, dynamic>?;
           return EditMachineScreen(machineId: id, extraMachineData: extra);
         },
+      ),
+      GoRoute(
+        path: '/area-tracker',
+        name: 'area-tracker',
+        builder: (context, state) => const AreaTrackerMapScreen(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../providers/tracker_provider.dart';
@@ -143,6 +144,16 @@ class TrackerCard extends ConsumerWidget {
                       onTap: () {
                         if (trackerState.timerStatus == TimerStatus.idle) {
                           notifier.setActiveTab(TrackerTab.distance);
+                        }
+                      },
+                    ),
+                    _CompactTab(
+                      label: tr('acreTab'),
+                      icon: Icons.landscape_outlined,
+                      isActive: trackerState.activeTab == TrackerTab.area,
+                      onTap: () {
+                        if (trackerState.timerStatus == TimerStatus.idle) {
+                          notifier.setActiveTab(TrackerTab.area);
                         }
                       },
                     ),
@@ -342,7 +353,7 @@ class TrackerCard extends ConsumerWidget {
           ),
         ],
       );
-    } else {
+    } else if (state.activeTab == TrackerTab.distance) {
       // Distance (KM)
       return Column(
         key: const ValueKey('DISTANCE_COMPACT'),
@@ -390,6 +401,47 @@ class TrackerCard extends ConsumerWidget {
               letterSpacing: 1.2,
               color: AppColors.textMuted,
             ),
+          ),
+        ],
+      );
+    } else {
+      // Area (Acre)
+      return Column(
+        key: const ValueKey('AREA_COMPACT'),
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.successBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.landscape_rounded, color: AppColors.successDark, size: 22),
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tr('measureFieldArea'),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textMain,
+                    ),
+                  ),
+                  Text(
+                    tr('measureFieldAreaSubtitle'),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       );
@@ -509,7 +561,7 @@ class TrackerCard extends ConsumerWidget {
           ),
         ],
       );
-    } else {
+    } else if (state.activeTab == TrackerTab.distance) {
       // Distance
       if (status == TimerStatus.idle) {
         return _CompactBtn(
@@ -589,6 +641,18 @@ class TrackerCard extends ConsumerWidget {
           ],
         );
       }
+    } else {
+      // Area tab action
+      return _CompactBtn(
+        label: tr('openFieldMapBtn'),
+        icon: Icons.map_outlined,
+        bgColor: AppColors.primary,
+        textColor: AppColors.textDarkBrown,
+        borderColor: AppColors.primary,
+        onTap: () {
+          context.push('/area-tracker');
+        },
+      );
     }
   }
 }
@@ -1008,6 +1072,11 @@ class _TrackerHistorySheetState extends State<_TrackerHistorySheet> {
                         iconColor = Colors.teal.shade600;
                         iconBg = Colors.teal.shade50;
                         typeLabel = tr('distanceSession');
+                      } else if (type == 'AREA') {
+                        iconData = Icons.landscape_rounded;
+                        iconColor = Colors.green.shade700;
+                        iconBg = Colors.green.shade50;
+                        typeLabel = tr('areaSession');
                       }
 
                       return Container(

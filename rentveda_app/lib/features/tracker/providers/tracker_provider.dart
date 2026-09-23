@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:math' show cos, sqrt, asin;
 
-enum TrackerTab { time, count, distance }
+enum TrackerTab { time, count, distance, area }
 enum TimerStatus { idle, running, paused }
 
 class TrackerState {
@@ -69,6 +69,7 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
     TrackerTab tab = TrackerTab.time;
     if (savedTab == 'COUNT') tab = TrackerTab.count;
     if (savedTab == 'DISTANCE') tab = TrackerTab.distance;
+    if (savedTab == 'AREA') tab = TrackerTab.area;
 
     int currentCount = savedCount ?? 0;
     double currentDistance = savedDistance ?? 0.0;
@@ -113,6 +114,7 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
     String tabStr = 'TIME';
     if (tab == TrackerTab.count) tabStr = 'COUNT';
     if (tab == TrackerTab.distance) tabStr = 'DISTANCE';
+    if (tab == TrackerTab.area) tabStr = 'AREA';
     
     await prefs.setString('rentveda_activeTab', tabStr);
   }
@@ -459,6 +461,20 @@ class TrackerNotifier extends StateNotifier<TrackerState> {
         qty: qty,
       );
     }
+  }
+
+  void doneArea(double acres) async {
+    if (acres <= 0) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('rentveda_pending_acre_entry', acres);
+
+    final double qty = double.parse(acres.toStringAsFixed(2));
+    await _recordHistory(
+      type: 'AREA',
+      value: '${acres.toStringAsFixed(2)} Acre',
+      rawValue: acres.toStringAsFixed(2),
+      qty: qty,
+    );
   }
 
   @override
