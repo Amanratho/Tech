@@ -54,10 +54,16 @@ class _EditMachineScreenState extends ConsumerState<EditMachineScreen> {
     } else {
       // If no extra data, find from provider state
       final machines = ref.read(updateMachineryProvider).machines;
-      final existingMachine = machines.cast<Map<String, dynamic>>().firstWhere(
-        (m) => m['Machine_id'].toString() == widget.machineId, 
-        orElse: () => {},
-      );
+      Map<String, dynamic> existingMachine = {};
+      for (final m in machines) {
+        if (m is Map) {
+          final id = (m['Machine_id'] ?? m['_id'] ?? '').toString();
+          if (id == widget.machineId) {
+            existingMachine = Map<String, dynamic>.from(m);
+            break;
+          }
+        }
+      }
       
       _machineNameController.text = existingMachine['Machine_name'] ?? '';
       _rentType = existingMachine['RentType'] ?? '';

@@ -55,7 +55,9 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       double eval = exp.evaluate(EvaluationType.REAL, cm);
 
       String formattedResult;
-      if (eval % 1 == 0) {
+      if (eval.isInfinite || eval.isNaN) {
+        formattedResult = "Error";
+      } else if (eval % 1 == 0) {
         formattedResult = eval.toInt().toString();
       } else {
         formattedResult = eval.toStringAsFixed(4).replaceAll(RegExp(r'0*$'), '').replaceAll(RegExp(r'\.$'), '');

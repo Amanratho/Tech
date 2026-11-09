@@ -747,5 +747,8 @@
   "bighaRegionGujarat": "गुजरात वीघा",
   "bighaRegionPunjabHaryana": "पंजाब / हरियाणा किल्‍ला",
   "gpsSphericalBadge": "जीपीएस सटीक माप",
-  "cancel": "रद्द करें"
+  "cancel": "रद्द करें",
+  "archivedBadge": "संग्रहीत (आर्काइव)",
+  "unknownCustomer": "अज्ञात ग्राहक",
+  "Unknown": "ग्राहक"
 }

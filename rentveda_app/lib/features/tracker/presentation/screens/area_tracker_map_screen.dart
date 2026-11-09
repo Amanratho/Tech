@@ -39,7 +39,11 @@ class _AreaTrackerMapScreenState extends ConsumerState<AreaTrackerMapScreen> {
     if (!_hasInitialCentered && state.currentLocation != null) {
       _hasInitialCentered = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _mapController.move(state.currentLocation!, 17.5);
+        if (mounted) {
+          try {
+            _mapController.move(state.currentLocation!, 17.5);
+          } catch (_) {}
+        }
       });
     }
 

@@ -744,5 +744,8 @@
   "bighaRegionGujarat": "Gujarat Vigha",
   "bighaRegionPunjabHaryana": "Punjab / Haryana Killa",
   "gpsSphericalBadge": "GPS Spherical",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "archivedBadge": "Archived",
+  "unknownCustomer": "Customer",
+  "Unknown": "Customer"
 }
