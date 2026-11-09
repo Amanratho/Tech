@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../network/api_client.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/eod_dashboard/presentation/screens/eod_dashboard_screen.dart';
@@ -31,6 +32,12 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
+  static void initialize() {
+    ApiClient.onAuthExpired = () {
+      router.go('/welcome');
+    };
+  }
+
   static final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/splash',
@@ -136,14 +143,15 @@ class AppRouter {
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) {
-          int currentIndex = 0;
-          if (state.uri.path.startsWith('/home')) currentIndex = 0;
-          if (state.uri.path.startsWith('/summary')) currentIndex = 1;
-          if (state.uri.path.startsWith('/reminders')) currentIndex = 2;
-          if (state.uri.path.startsWith('/statement')) currentIndex = 3;
-          if (state.uri.path.startsWith('/profile')) currentIndex = 4;
+          int currentIndex = -1;
+          if (state.uri.path == '/home') currentIndex = 0;
+          if (state.uri.path == '/summary') currentIndex = 1;
+          if (state.uri.path == '/reminders') currentIndex = 2;
+          if (state.uri.path == '/statement') currentIndex = 3;
+          if (state.uri.path == '/profile') currentIndex = 4;
 
           final isHome = state.uri.path == '/home';
+          final isTopLevelTab = currentIndex != -1;
           final canShellPop = _shellNavigatorKey.currentState?.canPop() ?? false;
 
           return PopScope(
@@ -159,7 +167,16 @@ class AppRouter {
               }
             },
             child: Scaffold(
-              appBar: const RentVedaAppBar(),
+              appBar: RentVedaAppBar(
+                showBackButton: !isTopLevelTab,
+                onBackTap: () {
+                  if (_shellNavigatorKey.currentState?.canPop() ?? false) {
+                    _shellNavigatorKey.currentState?.pop();
+                  } else {
+                    context.go('/home');
+                  }
+                },
+              ),
               body: child,
               bottomNavigationBar: BottomNavBar(currentIndex: currentIndex),
             ),

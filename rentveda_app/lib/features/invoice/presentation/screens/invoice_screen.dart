@@ -87,15 +87,19 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
       try {
         Directory? downloadDir;
         if (Platform.isAndroid) {
-          downloadDir = Directory('/storage/emulated/0/Download');
-          if (!await downloadDir.exists()) {
-            downloadDir = await getExternalStorageDirectory();
-          }
+          try {
+            final publicDownload = Directory('/storage/emulated/0/Download');
+            if (await publicDownload.exists()) {
+              downloadDir = publicDownload;
+            }
+          } catch (_) {}
+          downloadDir ??= await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
         } else {
           downloadDir = await getApplicationDocumentsDirectory();
         }
         
-        final finalPath = '${downloadDir!.path}/${file.path.split('/').last}';
+        final fileName = file.path.split(RegExp(r'[/\\]')).last;
+        final finalPath = '${downloadDir.path}/$fileName';
         await file.copy(finalPath);
         
         Fluttertoast.showToast(

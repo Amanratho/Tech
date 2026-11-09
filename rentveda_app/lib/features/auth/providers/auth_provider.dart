@@ -209,8 +209,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
         'email': email,
       });
       if (response.data['exists'] == true) {
-        // In React, this calls Firebase's sendPasswordResetEmail.
-        // For Flutter, we'll handle this via backend later.
+        try {
+          await FirebaseAuth.instance.sendPasswordResetEmail(email: email.trim());
+        } catch (firebaseErr) {
+          debugPrint('Firebase sendPasswordResetEmail error: $firebaseErr');
+        }
         state = state.copyWith(isLoading: false);
         return true;
       }

@@ -30,8 +30,10 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
     _nameController = TextEditingController(text: widget.entry['customerName'] ?? '');
     _mobileController = TextEditingController(text: widget.entry['mobileNumber']?.toString() ?? '');
     
-    pendingAmount = (widget.entry['pendingAmount'] ?? 0).toDouble();
-    _amountController = TextEditingController(text: pendingAmount.toInt().toString());
+    pendingAmount = double.tryParse(widget.entry['pendingAmount']?.toString() ?? '') ?? 0.0;
+    _amountController = TextEditingController(
+      text: pendingAmount % 1 == 0 ? pendingAmount.toInt().toString() : pendingAmount.toStringAsFixed(2),
+    );
   }
 
   @override
@@ -94,7 +96,7 @@ class _CollectPaymentDialogState extends State<CollectPaymentDialog> {
             Text(tr('pendingAmount'), style: AppTypography.bodySecondary),
             const SizedBox(height: 4),
             Text(
-              '₹${pendingAmount.toInt()}',
+              '₹${pendingAmount % 1 == 0 ? pendingAmount.toInt() : pendingAmount.toStringAsFixed(2)}',
               style: AppTypography.screenHeader.copyWith(
                 fontSize: 20,
                 color: AppColors.danger,

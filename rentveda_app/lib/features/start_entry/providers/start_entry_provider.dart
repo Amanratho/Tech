@@ -44,7 +44,7 @@ class StartEntryNotifier extends StateNotifier<bool> {
       );
       
       state = false;
-      return response.statusCode == 201;
+      return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
       debugPrint('Error saving entry: $e');
       state = false;

@@ -58,16 +58,33 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
     return pending <= 0 && paid > 0;
   }
 
+  double _computeTotal(double price, double qty, String qtyStr) {
+    final rentType = widget.bill['rentType']?.toString().toLowerCase() ?? '';
+    if (rentType.contains('hour')) {
+      final trimmed = qtyStr.trim();
+      if (trimmed.contains('.')) {
+        final parts = trimmed.split('.');
+        final hours = double.tryParse(parts[0]) ?? 0.0;
+        final minPart = parts[1].padRight(2, '0').substring(0, 2);
+        final mins = double.tryParse(minPart) ?? 0.0;
+        final totalHours = hours + (mins / 60.0);
+        return price * totalHours;
+      }
+    }
+    return price * qty;
+  }
+
   void _recalculateAmounts() {
     final price = double.tryParse(_priceController.text) ?? 0;
     final qty = double.tryParse(_quantityController.text) ?? 0;
-    final total = price * qty;
+    final total = _computeTotal(price, qty, _quantityController.text);
     final currentPaid = double.tryParse(_paidController.text) ?? 0;
     
     final newPending = total - currentPaid;
     final displayPending = newPending < 0 ? 0.0 : newPending;
-    if (displayPending.toStringAsFixed(0) != _pendingController.text) {
-      _pendingController.text = displayPending.toStringAsFixed(0);
+    final pendingStr = displayPending % 1 == 0 ? displayPending.toInt().toString() : displayPending.toStringAsFixed(2);
+    if (pendingStr != _pendingController.text) {
+      _pendingController.text = pendingStr;
     }
     setState(() {}); // Trigger rebuild for total text and validation
   }
@@ -75,13 +92,14 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
   void _recalculatePending() {
     final price = double.tryParse(_priceController.text) ?? 0;
     final qty = double.tryParse(_quantityController.text) ?? 0;
-    final total = price * qty;
+    final total = _computeTotal(price, qty, _quantityController.text);
     final currentPaid = double.tryParse(_paidController.text) ?? 0;
     
     final newPending = total - currentPaid;
     final displayPending = newPending < 0 ? 0.0 : newPending;
-    if (displayPending.toStringAsFixed(0) != _pendingController.text) {
-      _pendingController.text = displayPending.toStringAsFixed(0);
+    final pendingStr = displayPending % 1 == 0 ? displayPending.toInt().toString() : displayPending.toStringAsFixed(2);
+    if (pendingStr != _pendingController.text) {
+      _pendingController.text = pendingStr;
     }
     setState(() {});
   }
@@ -89,7 +107,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
   bool get _hasError {
     final price = double.tryParse(_priceController.text) ?? 0;
     final qty = double.tryParse(_quantityController.text) ?? 0;
-    final total = price * qty;
+    final total = _computeTotal(price, qty, _quantityController.text);
     final currentPaid = double.tryParse(_paidController.text) ?? 0;
     return currentPaid > total;
   }

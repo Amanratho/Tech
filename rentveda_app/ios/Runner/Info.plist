@@ -7,7 +7,25 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>Rentveda App</string>
+		<string>RentVeda</string>
+		<key>NSCameraUsageDescription</key>
+		<string>RentVeda requires access to the camera to take machine photos and upload QR codes.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>RentVeda requires access to the photo library to pick machinery photos and payment QR codes.</string>
+		<key>NSContactsUsageDescription</key>
+		<string>RentVeda needs contact access to select customer phone numbers for rental invoicing.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>RentVeda needs your location to track rental area and measure acreage on the map.</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>RentVeda needs your location in the background to track machine operation distance and area.</string>
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>whatsapp</string>
+			<string>https</string>
+			<string>http</string>
+			<string>tel</string>
+			<string>mailto</string>
+		</array>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>

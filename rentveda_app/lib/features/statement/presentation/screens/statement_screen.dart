@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../providers/statement_provider.dart';
@@ -211,8 +214,8 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
     }
   }
 
-  // Generate mock PDF for now
-  void _generatePDF() async {
+  // Generate Statement Export (CSV)
+  Future<void> _generatePDF() async {
     if (_startDate == null || _endDate == null) {
       Fluttertoast.showToast(msg: tr('errorSelectDates'), backgroundColor: AppColors.danger);
       return;
@@ -220,13 +223,91 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
 
     setState(() => _isGenerating = true);
     
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 2));
-    
-    if (!mounted) return;
-    setState(() => _isGenerating = false);
-    
-    Fluttertoast.showToast(msg: tr('successStatementDownloaded'), backgroundColor: AppColors.successDark);
+    try {
+      final state = ref.read(statementProvider);
+      final rentals = state.allRentals;
+      
+      final end = DateTime(_endDate!.year, _endDate!.month, _endDate!.day, 23, 59, 59, 999);
+      final start = DateTime(_startDate!.year, _startDate!.month, _startDate!.day);
+
+      final filteredData = rentals.where((item) {
+        final dateStr = item['createdAt']?.toString();
+        if (dateStr == null || dateStr.isEmpty) return false;
+        final itemDate = DateTime.tryParse(dateStr);
+        if (itemDate == null) return false;
+        final isWithinDate = itemDate.isAfter(start.subtract(const Duration(milliseconds: 1))) && 
+                             itemDate.isBefore(end.add(const Duration(milliseconds: 1)));
+        if (!isWithinDate) return false;
+        if (_selectedMachineId != "ALL") {
+          final itemMachineId = (item['machineId'] ?? '').toString();
+          if (itemMachineId != _selectedMachineId) return false;
+        }
+        final pendingAmt = double.tryParse(item['pendingAmount']?.toString() ?? '') ?? 0.0;
+        if (_filterType == "Paid") return pendingAmt == 0;
+        if (_filterType == "Pending") return pendingAmt > 0;
+        return true;
+      }).toList();
+
+      final buffer = StringBuffer();
+      buffer.writeln('RentVeda - Statement Report');
+      buffer.writeln('Period: ${DateFormat('dd-MM-yyyy').format(start)} to ${DateFormat('dd-MM-yyyy').format(end)}');
+      buffer.writeln('Machine: ${_getSelectedMachineName(state.machines)}');
+      buffer.writeln('Filter: $_filterType');
+      buffer.writeln('');
+      buffer.writeln('Date,Customer Name,Mobile,Work,Rent Type,Rate,Qty,Total Amount,Paid Amount,Pending Amount');
+
+      double sumTotal = 0;
+      double sumPaid = 0;
+      double sumPending = 0;
+
+      for (final r in filteredData) {
+        final dStr = r['createdAt']?.toString() ?? '';
+        final d = DateTime.tryParse(dStr);
+        final dateFormatted = d != null ? DateFormat('dd-MM-yyyy').format(d) : dStr;
+        final name = (r['customerName']?.toString() ?? 'N/A').replaceAll(',', ' ');
+        final mobile = r['mobileNumber']?.toString() ?? '';
+        final job = (r['jobWork']?.toString() ?? 'N/A').replaceAll(',', ' ');
+        final rType = r['rentType']?.toString() ?? '';
+        final price = double.tryParse(r['price']?.toString() ?? '') ?? 0.0;
+        final qty = double.tryParse(r['quantity']?.toString() ?? '') ?? 0.0;
+        final total = double.tryParse(r['totalAmount']?.toString() ?? '') ?? (price * qty);
+        final paid = double.tryParse(r['paidAmount']?.toString() ?? '') ?? 0.0;
+        final pending = double.tryParse(r['pendingAmount']?.toString() ?? '') ?? 0.0;
+
+        sumTotal += total;
+        sumPaid += paid;
+        sumPending += pending;
+
+        buffer.writeln('$dateFormatted,$name,$mobile,$job,$rType,$price,$qty,$total,$paid,$pending');
+      }
+
+      buffer.writeln('');
+      buffer.writeln('TOTAL,,,,,,,${sumTotal.toStringAsFixed(2)},${sumPaid.toStringAsFixed(2)},${sumPending.toStringAsFixed(2)}');
+
+      Directory? dir;
+      if (Platform.isAndroid) {
+        dir = await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
+      } else {
+        dir = await getApplicationDocumentsDirectory();
+      }
+
+      final fileName = 'Statement_${DateFormat('yyyyMMdd').format(start)}_${DateFormat('yyyyMMdd').format(end)}.csv';
+      final file = File('${dir.path}/$fileName');
+      await file.writeAsString(buffer.toString());
+
+      if (!mounted) return;
+      setState(() => _isGenerating = false);
+
+      Fluttertoast.showToast(msg: tr('successStatementDownloaded'), backgroundColor: AppColors.successDark);
+
+      // ignore: deprecated_member_use
+      await Share.shareXFiles([XFile(file.path)], text: 'RentVeda Statement (${DateFormat('dd MMM').format(start)} - ${DateFormat('dd MMM').format(end)})');
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isGenerating = false);
+        Fluttertoast.showToast(msg: 'Failed to generate statement: $e', backgroundColor: AppColors.danger);
+      }
+    }
   }
 
   Map<String, double> _calculateLiveSummary(List<dynamic> allRentals) {
@@ -258,7 +339,7 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
         }
       }
 
-      final pendingAmt = (item['pendingAmount'] ?? 0).toDouble();
+      final pendingAmt = double.tryParse(item['pendingAmount']?.toString() ?? '') ?? 0.0;
       
       if (_filterType == "Paid") return pendingAmt == 0;
       if (_filterType == "Pending") return pendingAmt > 0;
@@ -270,9 +351,9 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
     double totalPending = 0;
 
     for (var item in filteredData) {
-      totalBilled += (item['totalAmount'] ?? 0).toDouble();
-      totalPaid += (item['paidAmount'] ?? 0).toDouble();
-      totalPending += (item['pendingAmount'] ?? 0).toDouble();
+      totalBilled += double.tryParse(item['totalAmount']?.toString() ?? '') ?? 0.0;
+      totalPaid += double.tryParse(item['paidAmount']?.toString() ?? '') ?? 0.0;
+      totalPending += double.tryParse(item['pendingAmount']?.toString() ?? '') ?? 0.0;
     }
 
     return {

@@ -41,12 +41,12 @@ class MachineSummary {
       image: json['image'] ?? '',
       rentType: json['RentType'] ?? 'Units',
       isArchived: json['isArchived'] == true || json['status'] == 'archived' || json['isActive'] == false,
-      totalPaidAmount: (json['totalPaidAmount'] ?? 0).toDouble(),
-      totalPendingAmount: (json['totalPendingAmount'] ?? 0).toDouble(),
-      calculatedTotalAmount: (json['calculatedTotalAmount'] ?? 0).toDouble(),
-      calculatedTotalWork: (json['calculatedTotalWork'] ?? 0).toDouble(),
-      totalExpense: (json['totalExpense'] ?? 0).toDouble(),
-      totalIncome: (json['totalIncome'] ?? 0).toDouble(),
+      totalPaidAmount: double.tryParse(json['totalPaidAmount']?.toString() ?? '') ?? 0.0,
+      totalPendingAmount: double.tryParse(json['totalPendingAmount']?.toString() ?? '') ?? 0.0,
+      calculatedTotalAmount: double.tryParse(json['calculatedTotalAmount']?.toString() ?? '') ?? 0.0,
+      calculatedTotalWork: double.tryParse(json['calculatedTotalWork']?.toString() ?? '') ?? 0.0,
+      totalExpense: double.tryParse(json['totalExpense']?.toString() ?? '') ?? 0.0,
+      totalIncome: double.tryParse(json['totalIncome']?.toString() ?? '') ?? 0.0,
     );
   }
 }
@@ -70,7 +70,7 @@ class MaintenanceEntry {
     return MaintenanceEntry(
       id: json['_id'] ?? '',
       type: json['type'] ?? 'expense',
-      amount: (json['amount'] ?? 0).toDouble(),
+      amount: double.tryParse(json['amount']?.toString() ?? '') ?? 0.0,
       description: json['description'] ?? '',
       date: json['date'] ?? '',
     );

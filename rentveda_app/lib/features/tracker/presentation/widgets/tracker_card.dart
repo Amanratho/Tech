@@ -104,69 +104,81 @@ class TrackerCard extends ConsumerWidget {
         children: [
           // Header: Segmented Tabs & Live/History controls
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Segmented Tab Selector
-              Container(
-                height: 34,
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: AppColors.bgMain,
-                  border: Border.all(color: AppColors.border),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    _CompactTab(
-                      label: tr('time'),
-                      icon: Icons.timer_outlined,
-                      isActive: trackerState.activeTab == TrackerTab.time,
-                      onTap: () {
-                        if (trackerState.timerStatus == TimerStatus.idle) {
-                          notifier.setActiveTab(TrackerTab.time);
-                        }
-                      },
-                    ),
-                    _CompactTab(
-                      label: tr('count'),
-                      icon: Icons.tag_rounded,
-                      isActive: trackerState.activeTab == TrackerTab.count,
-                      onTap: () {
-                        if (trackerState.timerStatus == TimerStatus.idle) {
-                          notifier.setActiveTab(TrackerTab.count);
-                        }
-                      },
-                    ),
-                    _CompactTab(
-                      label: 'KM',
-                      icon: Icons.navigation_outlined,
-                      isActive: trackerState.activeTab == TrackerTab.distance,
-                      onTap: () {
-                        if (trackerState.timerStatus == TimerStatus.idle) {
-                          notifier.setActiveTab(TrackerTab.distance);
-                        }
-                      },
-                    ),
-                    _CompactTab(
-                      label: tr('acreTab'),
-                      icon: Icons.landscape_outlined,
-                      isActive: trackerState.activeTab == TrackerTab.area,
-                      onTap: () {
-                        if (trackerState.timerStatus == TimerStatus.idle) {
-                          notifier.setActiveTab(TrackerTab.area);
-                        }
-                      },
-                    ),
-                  ],
+              Expanded(
+                child: Container(
+                  height: 34,
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: AppColors.bgMain,
+                    border: Border.all(color: AppColors.border),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _CompactTab(
+                          label: tr('time'),
+                          icon: Icons.timer_outlined,
+                          isActive: trackerState.activeTab == TrackerTab.time,
+                          onTap: () {
+                            if (trackerState.timerStatus == TimerStatus.idle) {
+                              notifier.setActiveTab(TrackerTab.time);
+                            }
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: _CompactTab(
+                          label: tr('count'),
+                          icon: Icons.tag_rounded,
+                          isActive: trackerState.activeTab == TrackerTab.count,
+                          onTap: () {
+                            if (trackerState.timerStatus == TimerStatus.idle) {
+                              notifier.setActiveTab(TrackerTab.count);
+                            }
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: _CompactTab(
+                          label: 'KM',
+                          icon: Icons.navigation_outlined,
+                          isActive: trackerState.activeTab == TrackerTab.distance,
+                          onTap: () {
+                            if (trackerState.timerStatus == TimerStatus.idle) {
+                              notifier.setActiveTab(TrackerTab.distance);
+                            }
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: _CompactTab(
+                          label: tr('acreTab'),
+                          icon: Icons.landscape_outlined,
+                          isActive: trackerState.activeTab == TrackerTab.area,
+                          onTap: () {
+                            if (trackerState.timerStatus == TimerStatus.idle) {
+                              notifier.setActiveTab(TrackerTab.area);
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
+              const SizedBox(width: 6),
+
               // Status badge & History Button
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   if (isRunning) ...[
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
                       decoration: BoxDecoration(
                         color: AppColors.successBg,
                         border: Border.all(color: AppColors.successBorder),
@@ -183,7 +195,7 @@ class TrackerCard extends ConsumerWidget {
                               shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 5),
+                          const SizedBox(width: 4),
                           Text(
                             tr('trackerLive'),
                             style: const TextStyle(
@@ -196,10 +208,10 @@ class TrackerCard extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                   ] else if (isPaused) ...[
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFEF3C7),
                         border: Border.all(color: const Color(0xFFFDE68A)),
@@ -215,7 +227,7 @@ class TrackerCard extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                   ],
 
                   // History Button
@@ -225,8 +237,8 @@ class TrackerCard extends ConsumerWidget {
                       onTap: () => _showHistoryModal(context, ref),
                       borderRadius: BorderRadius.circular(8),
                       child: Container(
-                        width: 34,
-                        height: 34,
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
                           color: AppColors.bgMain,
                           border: Border.all(color: AppColors.border),
@@ -234,7 +246,7 @@ class TrackerCard extends ConsumerWidget {
                         ),
                         child: const Icon(
                           Icons.history_rounded,
-                          size: 18,
+                          size: 17,
                           color: AppColors.textMain,
                         ),
                       ),
@@ -677,7 +689,8 @@ class _CompactTab extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isActive ? AppColors.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
@@ -693,19 +706,26 @@ class _CompactTab extends StatelessWidget {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              size: 13,
+              size: 12,
               color: isActive ? AppColors.textMain : AppColors.textMuted,
             ),
-            const SizedBox(width: 4),
-            Text(
-              label.toUpperCase(),
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-                color: isActive ? AppColors.textMain : AppColors.textMuted,
+            const SizedBox(width: 3),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label.toUpperCase(),
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                    color: isActive ? AppColors.textMain : AppColors.textMuted,
+                  ),
+                ),
               ),
             ),
           ],

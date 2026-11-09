@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiClient {
   static const String baseUrl = 'https://tech-2-z4n5.onrender.com/api';
+  static void Function()? onAuthExpired;
   final Dio dio;
   final FlutterSecureStorage secureStorage;
 
@@ -27,10 +28,12 @@ class ApiClient {
           }
           return handler.next(options);
         },
-        onError: (DioException e, handler) {
+        onError: (DioException e, handler) async {
           // Global error handling, e.g. for 401 Unauthorized
           if (e.response?.statusCode == 401) {
-            // Handle token expiry/logout
+            await secureStorage.delete(key: 'token');
+            await secureStorage.delete(key: 'uid');
+            onAuthExpired?.call();
           }
           return handler.next(e);
         },

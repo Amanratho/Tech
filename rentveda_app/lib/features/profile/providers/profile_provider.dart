@@ -5,6 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/network/api_client.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../home/providers/home_provider.dart';
+import '../../statement/providers/statement_provider.dart';
+import '../../summary/providers/billing_history_provider.dart';
+import '../../reminders/providers/reminders_provider.dart';
+import '../../payments/providers/payment_tracking_provider.dart';
+import '../../eod_dashboard/providers/eod_dashboard_provider.dart';
 
 class ProfileState {
   final bool isLoading;
@@ -36,8 +42,9 @@ class ProfileState {
 
 class ProfileNotifier extends StateNotifier<ProfileState> {
   final ApiClient apiClient;
+  final Ref ref;
 
-  ProfileNotifier(this.apiClient) : super(ProfileState());
+  ProfileNotifier(this.apiClient, this.ref) : super(ProfileState());
 
   Future<void> fetchProfile() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -134,10 +141,17 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     }
     await apiClient.secureStorage.delete(key: 'uid');
     await apiClient.secureStorage.delete(key: 'token');
+    ref.invalidate(homeProvider);
+    ref.invalidate(statementProvider);
+    ref.invalidate(billingHistoryProvider);
+    ref.invalidate(remindersProvider);
+    ref.invalidate(paymentTrackingProvider);
+    ref.invalidate(eodDashboardProvider);
+    state = ProfileState();
   }
 }
 
 final profileProvider = StateNotifierProvider<ProfileNotifier, ProfileState>((ref) {
   final apiClient = ref.watch(apiClientProvider);
-  return ProfileNotifier(apiClient);
+  return ProfileNotifier(apiClient, ref);
 });

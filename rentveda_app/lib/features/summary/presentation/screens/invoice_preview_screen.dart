@@ -69,15 +69,19 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
       try {
         Directory? downloadDir;
         if (Platform.isAndroid) {
-          downloadDir = Directory('/storage/emulated/0/Download');
-          if (!await downloadDir.exists()) {
-            downloadDir = await getExternalStorageDirectory();
-          }
+          try {
+            final publicDownload = Directory('/storage/emulated/0/Download');
+            if (await publicDownload.exists()) {
+              downloadDir = publicDownload;
+            }
+          } catch (_) {}
+          downloadDir ??= await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
         } else {
           downloadDir = await getApplicationDocumentsDirectory();
         }
         
-        final finalPath = '${downloadDir!.path}/${file.path.split('/').last}';
+        final fileName = file.path.split(RegExp(r'[/\\]')).last;
+        final finalPath = '${downloadDir.path}/$fileName';
         await file.copy(finalPath);
         
         Fluttertoast.showToast(
@@ -99,6 +103,7 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
     final file = await _generateImageFile();
 
     if (file != null) {
+      // ignore: deprecated_member_use
       await Share.shareXFiles(
         [XFile(file.path)],
         text: tr('invoiceShareText', namedArgs: {'customer': widget.bill['customerName'] ?? 'Customer'}),

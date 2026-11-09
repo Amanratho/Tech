@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import 'notification_bell.dart';
 class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton;
+  final VoidCallback? onBackTap;
   
-  const RentVedaAppBar({super.key, this.showBackButton = false});
+  const RentVedaAppBar({super.key, this.showBackButton = false, this.onBackTap});
 
   @override
   Size get preferredSize => const Size.fromHeight(56);
@@ -31,7 +33,15 @@ class RentVedaAppBar extends StatelessWidget implements PreferredSizeWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 12.0),
                     child: GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
+                      onTap: () {
+                        if (onBackTap != null) {
+                          onBackTap!();
+                        } else if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
+                        } else {
+                          context.go('/home');
+                        }
+                      },
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(

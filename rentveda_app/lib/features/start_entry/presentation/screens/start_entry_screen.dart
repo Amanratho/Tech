@@ -236,11 +236,18 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     final qty = double.tryParse(_qtyController.text) ?? 0.0;
     
     double total = 0.0;
-    if (_rentType == 'Hour') {
-      final hours = qty.floor();
-      final minutes = (qty - hours) * 100;
-      final totalHours = hours + (minutes / 60);
-      total = price * totalHours;
+    if (_rentType.toLowerCase().contains('hour')) {
+      final qtyStr = _qtyController.text.trim();
+      if (qtyStr.contains('.')) {
+        final parts = qtyStr.split('.');
+        final hours = double.tryParse(parts[0]) ?? 0.0;
+        final minPart = parts[1].padRight(2, '0').substring(0, 2);
+        final mins = double.tryParse(minPart) ?? 0.0;
+        final totalHours = hours + (mins / 60.0);
+        total = price * totalHours;
+      } else {
+        total = price * qty;
+      }
     } else {
       total = price * qty;
     }

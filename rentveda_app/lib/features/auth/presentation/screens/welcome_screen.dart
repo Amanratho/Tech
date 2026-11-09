@@ -554,12 +554,12 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
             text: TextSpan(
               style: GoogleFonts.inter(fontSize: 14, color: textMuted, height: 1.5),
               children: [
-                TextSpan(text: tr('emailSentMsg1') + '\n'),
+                TextSpan(text: '${tr('emailSentMsg1')}\n'),
                 TextSpan(
                   text: _emailController.text,
                   style: GoogleFonts.inter(fontWeight: FontWeight.w700, color: textMain),
                 ),
-                TextSpan(text: '\n' + tr('emailSentMsg2')),
+                TextSpan(text: '\n${tr('emailSentMsg2')}'),
               ],
             ),
           ),

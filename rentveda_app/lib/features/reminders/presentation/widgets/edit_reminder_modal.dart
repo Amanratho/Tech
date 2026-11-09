@@ -31,8 +31,11 @@ class _EditReminderModalState extends ConsumerState<EditReminderModal> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final today = DateTime.now();
-    final initialDate = _selectedDate != null && _selectedDate!.isAfter(today) ? _selectedDate! : today;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final initialDate = _selectedDate != null && !_selectedDate!.isBefore(today)
+        ? DateTime(_selectedDate!.year, _selectedDate!.month, _selectedDate!.day)
+        : today;
 
     final DateTime? picked = await showDatePicker(
       context: context,

@@ -95,7 +95,7 @@ class _NotificationBellState extends ConsumerState<NotificationBell> {
           ...actionableReminders.take(10).map((rem) {
             final name = rem['customerName']?.toString() ?? 'Unknown';
             final mobile = (rem['mobileNumber'] ?? rem['customerMobile'])?.toString() ?? '';
-            final amount = (rem['pendingAmount'] ?? 0).toDouble();
+            final amount = double.tryParse(rem['pendingAmount']?.toString() ?? '') ?? 0.0;
 
             return PopupMenuItem(
               padding: EdgeInsets.zero,
