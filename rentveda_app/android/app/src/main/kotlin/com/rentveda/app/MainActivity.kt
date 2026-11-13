@@ -1,5 +1,6 @@
-package com.example.rentveda_app
+package com.rentveda.app
 
 import io.flutter.embedding.android.FlutterActivity
 
 class MainActivity : FlutterActivity()
+

@@ -1,0 +1,9 @@
+# Google Play Release Keystore configuration
+# Copy this file to `android/key.properties` and replace with your actual keystore credentials.
+# NOTE: Never commit `key.properties` or your `.jks` file to Git!
+
+storePassword=your_keystore_password
+keyPassword=your_key_password
+keyAlias=upload
+storeFile=../upload-keystore.jks
+
