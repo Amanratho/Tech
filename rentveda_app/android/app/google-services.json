@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "786370433687",
+    "project_id": "tech-diary562",
+    "storage_bucket": "tech-diary562.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:786370433687:android:3f863ba1e21c74ad734fd2",
+        "android_client_info": {
+          "package_name": "com.example.rentveda_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxx-ReuoHyZpBXSot1u9cPCEE2pULBi1Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:786370433687:android:e2bbaec70fd94cb2734fd2",
+        "android_client_info": {
+          "package_name": "com.rentveda.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxx-ReuoHyZpBXSot1u9cPCEE2pULBi1Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

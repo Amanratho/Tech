@@ -44,6 +44,11 @@ const completeSignup = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Default 90-day (3 months) free trial
+    const trialDays = 90;
+    const trialEndDate = new Date();
+    trialEndDate.setDate(trialEndDate.getDate() + trialDays);
+
     // Save the user data to MongoDB
     const newUser = new User({
       username,
@@ -52,6 +57,17 @@ const completeSignup = async (req, res) => {
       companyName,
       // password: hashedPassword,
       uid: userRecord.uid, // Firebase uid
+      subscriptionStatus: "trial",
+      subscriptionPlan: "free_trial",
+      trialStartDate: new Date(),
+      subscriptionEndsAt: trialEndDate,
+      isBlocked: false,
+      blockReason: "",
+      paymentWhatsappNumber: process.env.SUPPORT_WHATSAPP || "",
+      upiId: process.env.SUPPORT_UPI || "",
+      renewalAmount: 0,
+      announcement: "Welcome to RentVeda! 90-day free trial active.",
+      showAnnouncementPopup: false,
     });
 
     await newUser.save();
@@ -89,6 +105,53 @@ const login = async (req, res) => {
         .json({ success: false, error: "User not found in database" });
     }
 
+    // Check if user is blocked
+    if (dbUser.isBlocked) {
+      return res.status(403).json({
+        success: false,
+        isBlocked: true,
+        error:
+          dbUser.blockReason ||
+          "Your account has been suspended. Please contact support.",
+      });
+    }
+
+    const now = new Date();
+
+    // Auto-migrate older user documents without subscription dates
+    if (!dbUser.subscriptionEndsAt) {
+      const trialDays = 90;
+      const trialEndDate = new Date(
+        dbUser.createdAt
+          ? dbUser.createdAt.getTime() + trialDays * 24 * 60 * 60 * 1000
+          : Date.now() + trialDays * 24 * 60 * 60 * 1000
+      );
+      dbUser.subscriptionStatus = dbUser.subscriptionStatus || "trial";
+      dbUser.subscriptionPlan = dbUser.subscriptionPlan || "free_trial";
+      dbUser.trialStartDate = dbUser.trialStartDate || dbUser.createdAt || now;
+      dbUser.subscriptionEndsAt = trialEndDate;
+      await dbUser.save();
+    }
+
+    // Auto-update expired status if trial has lapsed
+    if (
+      dbUser.subscriptionStatus === "trial" &&
+      dbUser.subscriptionEndsAt &&
+      new Date(dbUser.subscriptionEndsAt) < now
+    ) {
+      dbUser.subscriptionStatus = "expired";
+      await dbUser.save();
+    }
+
+    const userObj = dbUser.toObject();
+    if (dbUser.subscriptionEndsAt) {
+      const diffTime =
+        new Date(dbUser.subscriptionEndsAt).getTime() - now.getTime();
+      userObj.daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    } else {
+      userObj.daysLeft = 90;
+    }
+
     // Generate token (if using JWT for additional security)
     const token = createToken(dbUser._id);
 
@@ -96,7 +159,7 @@ const login = async (req, res) => {
       success: true,
       token,
       message: "Login successful",
-      user: dbUser, // Send user data back to frontend
+      user: userObj, // Send user data back to frontend
     });
   } catch (error) {
     console.error("Login error:", error.message);
