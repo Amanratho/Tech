@@ -1,9 +1,20 @@
 const express = require("express");
 const admin = require("../config/firebase");
-const {login, verifyUser, completeSignup, signup, deleteAccount,sendPasswordResetEmail} = require("../controllers/authController");
+const {
+  login,
+  phoneLogin,
+  phoneSignup,
+  verifyUser,
+  completeSignup,
+  signup,
+  deleteAccount,
+  sendPasswordResetEmail,
+} = require("../controllers/authController");
 
 const router = express.Router();
 
+router.post("/phone-login", phoneLogin);
+router.post("/phone-signup", phoneSignup);
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/verify", verifyUser);

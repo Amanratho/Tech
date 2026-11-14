@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
-import '../../auth/providers/auth_provider.dart';
 
 class UpdateMachineryState {
   final bool isLoading;

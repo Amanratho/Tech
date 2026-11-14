@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/network/api_client.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../../home/providers/home_provider.dart';
 import '../../statement/providers/statement_provider.dart';
 import '../../summary/providers/billing_history_provider.dart';
