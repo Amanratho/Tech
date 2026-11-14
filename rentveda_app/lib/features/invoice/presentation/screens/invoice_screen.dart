@@ -11,7 +11,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../auth/providers/auth_provider.dart';
+import '../../../../core/network/api_client.dart';
 import '../widgets/formal_invoice_template.dart';
 
 class InvoiceScreen extends ConsumerStatefulWidget {

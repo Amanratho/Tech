@@ -1,5 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+final apiClientProvider = Provider<ApiClient>((ref) {
+  return ApiClient();
+});
 
 class ApiClient {
   static const String baseUrl = 'https://tech-2-z4n5.onrender.com/api';
