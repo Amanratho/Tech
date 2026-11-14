@@ -44,12 +44,11 @@ android {
             val storePasswordProp = keystoreProperties["storePassword"] as String?
 
             if (storeFileProp != null) {
-                val resolvedStoreFile = if (file(storeFileProp).exists()) {
-                    file(storeFileProp)
-                } else if (rootProject.file(storeFileProp).exists()) {
-                    rootProject.file(storeFileProp)
-                } else {
-                    null
+                val resolvedStoreFile = when {
+                    file(storeFileProp).exists() -> file(storeFileProp)
+                    rootProject.file(storeFileProp).exists() -> rootProject.file(storeFileProp)
+                    rootProject.file("upload-keystore.jks").exists() -> rootProject.file("upload-keystore.jks")
+                    else -> null
                 }
 
                 if (resolvedStoreFile != null) {
