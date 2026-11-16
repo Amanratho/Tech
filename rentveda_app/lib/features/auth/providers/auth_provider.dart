@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/network/api_client.dart';
+import '../../../core/services/notification_service.dart';
 
 // State definition for Auth
 class AuthState {
@@ -68,6 +69,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         if (userData != null && userData['uid'] != null) {
           await apiClient.secureStorage.write(key: 'uid', value: userData['uid']);
         }
+        NotificationService().syncFcmToken();
         state = state.copyWith(isLoading: false);
         return true;
       }
@@ -119,6 +121,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         if (userData != null && userData['uid'] != null) {
           await apiClient.secureStorage.write(key: 'uid', value: userData['uid']);
         }
+
+        NotificationService().syncFcmToken();
 
         // Authenticate Firebase with custom token if available
         final customToken = response.data['customToken'];
@@ -178,6 +182,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         if (userData != null && userData['uid'] != null) {
           await apiClient.secureStorage.write(key: 'uid', value: userData['uid']);
         }
+
+        NotificationService().syncFcmToken();
 
         final customToken = response.data['customToken'];
         if (customToken != null) {

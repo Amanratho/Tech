@@ -53,11 +53,13 @@ app.use("/api", maintenanceRoutes);
 app.use("/api/otp", otpRoutes);
 app.use("/api/cron", cronRoutes);
 
+const { startReminderCron } = require("./services/reminderCron");
+
 // Connect to MongoDB and start the server
 connectDB();
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  // Reminders are now triggered externally via GET /api/cron/send-reminders
+  startReminderCron();
   // keepAlive();
 });

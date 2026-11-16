@@ -5,9 +5,14 @@ const {
   updateUserProfile,
   updateUserSubscription,
   deleteUserProfile,
+  updateFcmToken,
 } = require("../controllers/userController");
 
 const router = express.Router();
+
+// Update FCM Token for Push Notifications
+router.put("/fcm-token", updateFcmToken);
+router.put("/fcm-token/:uid", updateFcmToken);
 
 // Get user profile by UID
 router.get("/:uid", getUserProfile);

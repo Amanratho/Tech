@@ -292,10 +292,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
                     // USER DETAILS
                     _buildDetailRow(Icons.phone, tr('mobileLabel'), "+91 ${user['mobileNo'] ?? ''}"),
-                    const SizedBox(height: 24),
-                    _buildDetailRow(Icons.email, tr('email'), user['email'] ?? ''),
-                    const SizedBox(height: 24),
-                    _buildDetailRow(Icons.business, tr('companyNameLabel'), user['companyName'] ?? ''),
+                    if (user['email'] != null &&
+                        user['email'].toString().isNotEmpty &&
+                        !user['email'].toString().endsWith('@rentveda.app')) ...[
+                      const SizedBox(height: 24),
+                      _buildDetailRow(Icons.email, tr('email'), user['email'] ?? ''),
+                    ],
+                    if (user['companyName'] != null &&
+                        user['companyName'].toString().isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      _buildDetailRow(Icons.business, tr('companyNameLabel'), user['companyName'] ?? ''),
+                    ],
                     const SizedBox(height: 40),
 
                     // SETTINGS MENU
@@ -345,26 +352,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Row(
+                                        Wrap(
+                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                          spacing: 6,
+                                          runSpacing: 2,
                                           children: [
                                             Text(
                                               tr('paymentQrTitle'),
-                                              style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.bold, color: const Color(0xFF1A1C1C), fontSize: 14),
+                                              style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.bold, color: const Color(0xFF1A1C1C), fontSize: 13),
                                             ),
-                                            const SizedBox(width: 8),
                                             if (user['qrCodeUrl'] == null || user['qrCodeUrl'].isEmpty)
                                               Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                 decoration: BoxDecoration(
                                                   color: Colors.amber.shade100,
-                                                  borderRadius: BorderRadius.circular(12),
+                                                  borderRadius: BorderRadius.circular(8),
                                                   border: Border.all(color: Colors.amber.shade300),
                                                 ),
                                                 child: Text(
                                                   tr('missingQrBadge'),
                                                   style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: Colors.amber, height: 1.1),
                                                 ),
-                                              )
+                                              ),
                                           ],
                                         ),
                                         const SizedBox(height: 2),
