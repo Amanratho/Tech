@@ -1,9 +1,84 @@
 const Rental = require("../models/RentalModel");
 const ReminderLog = require("../models/ReminderLogModel");
+const User = require("../models/User");
+const admin = require("../config/firebase");
 
-// ─── Notification Placeholders ─────────────────────────────────────────────────
+// ─── Notification Handlers ───────────────────────────────────────────────────
 
-/** Placeholder: Send in-app notification to machinery owner */
+/** Send FCM Push Notification to machinery owner's phone */
+const sendPushNotification = async (rental) => {
+  try {
+    const ownerUid = rental.uid || rental.userId;
+    if (!ownerUid) return;
+
+    const user = await User.findOne({ uid: ownerUid });
+    if (!user) return;
+
+    // Collect all unique FCM tokens registered for this user
+    const tokens = [];
+    if (user.fcmToken) tokens.push(user.fcmToken);
+    if (Array.isArray(user.fcmTokens)) {
+      for (const t of user.fcmTokens) {
+        if (t && !tokens.includes(t)) tokens.push(t);
+      }
+    }
+
+    if (tokens.length === 0) {
+      console.log(`[Push Notification] Owner ${ownerUid} has no FCM token registered.`);
+      return;
+    }
+
+    const customerName = rental.customerName || "ग्राहक";
+    const pendingAmount = rental.pendingAmount || 0;
+
+    const payload = {
+      notification: {
+        title: "रेंटवेदा रिमाइंडर (RentVeda)",
+        body: `${customerName} का ₹${pendingAmount} का भुगतान आज देय है।`,
+      },
+      data: {
+        route: "/reminders",
+        rentalId: rental._id ? rental._id.toString() : "",
+        customerName: String(customerName),
+        pendingAmount: String(pendingAmount),
+      },
+      android: {
+        priority: "high",
+        notification: {
+          channelId: "rentveda_reminders",
+          sound: "default",
+          color: "#FFCC00",
+          clickAction: "FLUTTER_NOTIFICATION_CLICK",
+        },
+      },
+    };
+
+    for (const token of tokens) {
+      try {
+        await admin.messaging().send({
+          token,
+          ...payload,
+        });
+        console.log(`[Push Notification] Successfully sent reminder push to ${ownerUid}`);
+      } catch (sendErr) {
+        console.warn(`[Push Notification] Send error for token:`, sendErr.message);
+        if (
+          sendErr.code === "messaging/invalid-registration-token" ||
+          sendErr.code === "messaging/registration-token-not-registered"
+        ) {
+          await User.updateOne({ uid: ownerUid }, { $pull: { fcmTokens: token } });
+          if (user.fcmToken === token) {
+            await User.updateOne({ uid: ownerUid }, { $set: { fcmToken: null } });
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error("[Push Notification] Error:", err.message);
+  }
+};
+
+/** Send in-app notification to machinery owner (log) */
 const sendInAppNotification = (rental) => {
   console.log(
     `[Notification Service] Sending in-app notification to owner (UID: ${rental.uid}) ` +
@@ -11,7 +86,7 @@ const sendInAppNotification = (rental) => {
   );
 };
 
-/** Placeholder: Send SMS reminder to customer */
+/** Send SMS reminder to customer (placeholder) */
 const sendSMSReminder = (rental) => {
   const recipient = rental.customerMobile || rental.mobileNumber;
   console.log(
@@ -94,6 +169,7 @@ const processReminders = async () => {
 
     // 4. Send notifications
     try {
+      await sendPushNotification(rental);
       sendInAppNotification(rental);
       sendSMSReminder(rental);
 

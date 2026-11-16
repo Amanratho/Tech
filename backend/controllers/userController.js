@@ -168,9 +168,49 @@ const deleteUserProfile = async (req, res) => {
   }
 };
 
+// @desc    Update FCM Token for Push Notifications
+// @route   PUT /api/users/fcm-token
+// @access  Private
+const updateFcmToken = async (req, res) => {
+  try {
+    const { uid, fcmToken } = req.body;
+    const targetUid = uid || req.params.uid;
+
+    if (!targetUid || !fcmToken) {
+      return res.status(400).json({ success: false, message: "UID and fcmToken are required" });
+    }
+
+    const user = await User.findOne({ uid: targetUid });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.fcmToken = fcmToken;
+    if (!user.fcmTokens) user.fcmTokens = [];
+    if (!user.fcmTokens.includes(fcmToken)) {
+      user.fcmTokens.push(fcmToken);
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "FCM token updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating FCM token:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update FCM token",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getUserProfile,
   updateUserProfile,
   updateUserSubscription,
   deleteUserProfile,
+  updateFcmToken,
 };
