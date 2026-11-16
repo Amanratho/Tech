@@ -35,7 +35,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   static const Color primaryDark = Color(0xFFE6B800);
   static const Color bgMain = Color(0xFFF8F9FA);
   static const Color textMain = Color(0xFF1E1E1E);
-  static const Color textMuted = Color(0xFF9CA3AF);
+  static const Color textMuted = Color(0xFF6B7280); // higher contrast for readability
   static const Color borderColor = Color(0xFFE5E7EB);
 
   @override
@@ -59,50 +59,90 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     );
   }
 
-  // ─── Input field builder ───
-  Widget _buildInputField({
+  // ─── Labeled Input field builder with clear title above box ───
+  Widget _buildLabeledInput({
+    required String label,
     required TextEditingController controller,
     required String placeholder,
     required IconData icon,
+    bool isPhone = false,
     TextInputType keyboardType = TextInputType.text,
     bool obscureText = false,
-    Widget? prefix,
     Widget? suffixIcon,
     bool enabled = true,
     int? maxLength,
     bool centerText = false,
     double letterSpacing = 0,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: bgMain,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor),
-      ),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        enabled: enabled,
-        maxLength: maxLength,
-        textAlign: centerText ? TextAlign.center : TextAlign.start,
-        style: GoogleFonts.inter(
-          fontSize: 14,
-          color: textMain,
-          letterSpacing: letterSpacing,
-          fontWeight: letterSpacing > 0 ? FontWeight.bold : FontWeight.normal,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: textMain,
+          ),
         ),
-        decoration: InputDecoration(
-          hintText: placeholder,
-          hintStyle: GoogleFonts.inter(fontSize: 14, color: textMuted),
-          prefixIcon: Icon(icon, size: 18, color: textMuted),
-          prefix: prefix,
-          suffixIcon: suffixIcon,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-          counterText: '',
+        const SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            color: bgMain,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: borderColor),
+          ),
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            obscureText: obscureText,
+            enabled: enabled,
+            maxLength: maxLength,
+            textAlign: centerText ? TextAlign.center : TextAlign.start,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: textMain,
+              letterSpacing: letterSpacing,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: InputDecoration(
+              hintText: placeholder,
+              hintStyle: GoogleFonts.inter(
+                fontSize: 13,
+                color: textMuted.withValues(alpha: 0.7),
+                fontWeight: FontWeight.normal,
+              ),
+              prefixIcon: isPhone
+                  ? Container(
+                      padding: const EdgeInsets.only(left: 14, right: 10),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(icon, size: 18, color: textMuted),
+                          const SizedBox(width: 8),
+                          Text(
+                            '+91',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: textMain,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(height: 18, width: 1, color: borderColor),
+                        ],
+                      ),
+                    )
+                  : Icon(icon, size: 18, color: textMuted),
+              prefixIconConstraints: isPhone ? const BoxConstraints(minWidth: 0, minHeight: 0) : null,
+              suffixIcon: suffixIcon,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+              counterText: '',
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -260,30 +300,21 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         }),
 
         Text(
-          _loginWithOtp ? 'Login with Mobile Number & OTP' : 'Login with Mobile & Password',
+          _loginWithOtp ? tr('loginWithOtpTitle') : tr('loginWithPasswordTitle'),
           style: GoogleFonts.inter(fontSize: 13, color: textMuted),
         ),
         const SizedBox(height: 16),
 
-        // Mobile Number Field
-        _buildInputField(
+        // Mobile Number Field with clear label
+        _buildLabeledInput(
+          label: tr('mobileLabel'),
           controller: _mobileController,
-          placeholder: '10-digit mobile number',
+          placeholder: tr('mobilePlaceholder'),
           icon: Icons.phone_outlined,
+          isPhone: true,
           keyboardType: TextInputType.phone,
           maxLength: 10,
           enabled: !_otpSent,
-          prefix: Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: Text(
-              '+91 ',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: textMain,
-              ),
-            ),
-          ),
         ),
         const SizedBox(height: 16),
 
@@ -304,7 +335,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'OTP sent to +91 ${_mobileController.text.trim()} (Demo OTP: 1234)',
+                      '${tr('otpSentTo')} +91 ${_mobileController.text.trim()}',
                       style: GoogleFonts.inter(fontSize: 12, color: Colors.black87),
                     ),
                   ),
@@ -314,9 +345,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
             const SizedBox(height: 16),
 
             // OTP Input
-            _buildInputField(
+            _buildLabeledInput(
+              label: tr('verify_otp'),
               controller: _otpController,
-              placeholder: 'Enter 4-digit OTP',
+              placeholder: tr('enter4DigitOtp'),
               icon: Icons.lock_clock_outlined,
               keyboardType: TextInputType.number,
               maxLength: 6,
@@ -327,27 +359,27 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
             // Verify & Login Button
             _buildPrimaryButton(
-              text: 'Verify & Login',
+              text: tr('verifyAndLogin'),
               isLoading: authState.isLoading,
               onPressed: () async {
                 final otp = _otpController.text.trim();
                 final mobile = _mobileController.text.trim();
                 if (otp.isEmpty) {
-                  _showToast('Please enter the OTP', isError: true);
+                  _showToast(tr('pleaseEnterOtp'), isError: true);
                   return;
                 }
 
                 // Verify OTP first
                 final isOtpValid = await authNotifier.verifyOtp(mobile, otp);
                 if (!isOtpValid) {
-                  _showToast('Invalid OTP. Please check or use 1234 for demo.', isError: true);
+                  _showToast(tr('invalid_otp'), isError: true);
                   return;
                 }
 
                 // Perform Login
                 final success = await authNotifier.loginWithPhone(mobileNo: mobile, otp: otp);
                 if (success && mounted) {
-                  _showToast('Login Successful!');
+                  _showToast(tr('successMessage'));
                   context.go('/home');
                 }
               },
@@ -364,19 +396,19 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     _otpController.clear();
                   }),
                   child: Text(
-                    'Change Number',
-                    style: GoogleFonts.inter(fontSize: 12, color: primaryDark, fontWeight: FontWeight.w600),
+                    tr('changeNumber'),
+                    style: GoogleFonts.inter(fontSize: 12, color: primaryDark, fontWeight: FontWeight.w700),
                   ),
                 ),
                 GestureDetector(
                   onTap: () async {
                     final mobile = _mobileController.text.trim();
                     await authNotifier.sendOtp(mobile);
-                    _showToast('OTP resent successfully (Demo: 1234)');
+                    _showToast(tr('otpSentSuccess'));
                   },
                   child: Text(
-                    'Resend OTP',
-                    style: GoogleFonts.inter(fontSize: 12, color: textMuted),
+                    tr('resendOtp'),
+                    style: GoogleFonts.inter(fontSize: 12, color: textMuted, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -384,18 +416,18 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           ] else ...[
             // Get OTP Button
             _buildPrimaryButton(
-              text: 'Get OTP',
+              text: tr('getOtp'),
               isLoading: authState.isLoading,
               onPressed: () async {
                 final mobile = _mobileController.text.trim();
                 if (mobile.length != 10) {
-                  _showToast('Please enter a valid 10-digit mobile number', isError: true);
+                  _showToast(tr('pleaseEnterMobile'), isError: true);
                   return;
                 }
                 final success = await authNotifier.sendOtp(mobile);
                 if (success && mounted) {
                   setState(() => _otpSent = true);
-                  _showToast('OTP sent successfully (Demo: 1234)');
+                  _showToast(tr('otpSentSuccess'));
                 }
               },
             ),
@@ -407,16 +439,17 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
             child: GestureDetector(
               onTap: () => setState(() => _loginWithOtp = false),
               child: Text(
-                'Login with Password instead',
-                style: GoogleFonts.inter(fontSize: 13, color: primaryDark, fontWeight: FontWeight.w600),
+                tr('loginWithPasswordInstead'),
+                style: GoogleFonts.inter(fontSize: 13, color: primaryDark, fontWeight: FontWeight.w700),
               ),
             ),
           ),
         ] else ...[
           // Password Input Field
-          _buildInputField(
+          _buildLabeledInput(
+            label: tr('password'),
             controller: _passwordController,
-            placeholder: tr('password'),
+            placeholder: tr('passwordPlaceholder'),
             icon: Icons.lock_outline,
             obscureText: _obscurePassword,
             suffixIcon: GestureDetector(
@@ -438,11 +471,11 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               final mobile = _mobileController.text.trim();
               final password = _passwordController.text;
               if (mobile.length != 10) {
-                _showToast('Please enter a valid 10-digit mobile number', isError: true);
+                _showToast(tr('pleaseEnterMobile'), isError: true);
                 return;
               }
               if (password.isEmpty) {
-                _showToast('Please enter password', isError: true);
+                _showToast(tr('passwordPlaceholder'), isError: true);
                 return;
               }
               final success = await authNotifier.loginWithPhone(
@@ -450,7 +483,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 password: password,
               );
               if (success && mounted) {
-                _showToast('Login Successful!');
+                _showToast(tr('successMessage'));
                 context.go('/home');
               }
             },
@@ -462,8 +495,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
             child: GestureDetector(
               onTap: () => setState(() => _loginWithOtp = true),
               child: Text(
-                'Login with OTP instead',
-                style: GoogleFonts.inter(fontSize: 13, color: primaryDark, fontWeight: FontWeight.w600),
+                tr('loginWithOtpInstead'),
+                style: GoogleFonts.inter(fontSize: 13, color: primaryDark, fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -483,7 +516,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 _otpSent = false;
               }),
               child: Text(
-                'Login with Email',
+                tr('loginWithEmail'),
                 style: GoogleFonts.inter(fontSize: 12, color: textMuted),
               ),
             ),
@@ -493,8 +526,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 _otpSent = false;
               }),
               child: Text(
-                'Create New Account',
-                style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: primaryDark),
+                tr('dontHaveAccount'),
+                style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: primaryDark),
               ),
             ),
           ],
@@ -532,8 +565,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Includes 90-Day Free Trial upon registration!',
-                  style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.green[800]),
+                  tr('freeTrialBanner'),
+                  style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.green[800]),
                 ),
               ),
             ],
@@ -541,49 +574,43 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         ),
 
         // Name
-        _buildInputField(
+        _buildLabeledInput(
+          label: tr('nameLabel'),
           controller: _usernameController,
-          placeholder: tr('nameLabel'),
+          placeholder: tr('namePlaceholder'),
           icon: Icons.person_outline,
           enabled: !_otpSent,
         ),
         const SizedBox(height: 12),
 
         // Mobile No.
-        _buildInputField(
+        _buildLabeledInput(
+          label: tr('mobileLabel'),
           controller: _mobileController,
-          placeholder: '10-digit mobile number',
+          placeholder: tr('mobilePlaceholder'),
           icon: Icons.phone_outlined,
+          isPhone: true,
           keyboardType: TextInputType.phone,
           maxLength: 10,
           enabled: !_otpSent,
-          prefix: Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: Text(
-              '+91 ',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: textMain,
-              ),
-            ),
-          ),
         ),
         const SizedBox(height: 12),
 
         // Company Name (Optional)
-        _buildInputField(
+        _buildLabeledInput(
+          label: '${tr('companyNameLabel')} ${tr('optional')}',
           controller: _companyController,
-          placeholder: '${tr('companyNameLabel')} (Optional)',
+          placeholder: tr('companyPlaceholder'),
           icon: Icons.business_outlined,
           enabled: !_otpSent,
         ),
         const SizedBox(height: 12),
 
         // Password (Optional for mobile accounts)
-        _buildInputField(
+        _buildLabeledInput(
+          label: '${tr('password')} ${tr('optional')}',
           controller: _passwordController,
-          placeholder: 'Set Password (Optional)',
+          placeholder: tr('passwordPlaceholder'),
           icon: Icons.lock_outline,
           obscureText: _obscurePassword,
           enabled: !_otpSent,
@@ -600,9 +627,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
         if (_otpSent) ...[
           // OTP input
-          _buildInputField(
+          _buildLabeledInput(
+            label: tr('verify_otp'),
             controller: _otpController,
-            placeholder: 'Enter 4-digit OTP (Demo: 1234)',
+            placeholder: tr('enter4DigitOtp'),
             icon: Icons.lock_clock_outlined,
             keyboardType: TextInputType.number,
             maxLength: 6,
@@ -613,7 +641,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
           // Submit & Register
           _buildPrimaryButton(
-            text: 'Verify & Activate Account',
+            text: tr('verifyAndActivate'),
             isLoading: authState.isLoading,
             onPressed: () async {
               final otp = _otpController.text.trim();
@@ -621,14 +649,14 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               final name = _usernameController.text.trim();
 
               if (otp.isEmpty) {
-                _showToast('Please enter the OTP', isError: true);
+                _showToast(tr('pleaseEnterOtp'), isError: true);
                 return;
               }
 
               // Verify OTP
               final isOtpValid = await authNotifier.verifyOtp(mobile, otp);
               if (!isOtpValid) {
-                _showToast('Invalid OTP. Please check or use 1234 for demo.', isError: true);
+                _showToast(tr('invalid_otp'), isError: true);
                 return;
               }
 
@@ -642,7 +670,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               );
 
               if (success && mounted) {
-                _showToast('Account Created! 90-Day Free Trial Activated.');
+                _showToast(tr('accountCreatedSuccess'));
                 context.go('/home');
               }
             },
@@ -652,32 +680,32 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
             child: GestureDetector(
               onTap: () => setState(() => _otpSent = false),
               child: Text(
-                'Edit Details / Change Number',
-                style: GoogleFonts.inter(fontSize: 12, color: primaryDark, fontWeight: FontWeight.w600),
+                tr('changeNumber'),
+                style: GoogleFonts.inter(fontSize: 12, color: primaryDark, fontWeight: FontWeight.w700),
               ),
             ),
           ),
         ] else ...[
           _buildPrimaryButton(
-            text: 'Get OTP & Register',
+            text: tr('getOtpAndRegister'),
             isLoading: authState.isLoading,
             onPressed: () async {
               final name = _usernameController.text.trim();
               final mobile = _mobileController.text.trim();
 
               if (name.isEmpty) {
-                _showToast('Please enter your name', isError: true);
+                _showToast(tr('pleaseEnterName'), isError: true);
                 return;
               }
               if (mobile.length != 10) {
-                _showToast('Please enter a valid 10-digit mobile number', isError: true);
+                _showToast(tr('pleaseEnterMobile'), isError: true);
                 return;
               }
 
               final success = await authNotifier.sendOtp(mobile);
               if (success && mounted) {
                 setState(() => _otpSent = true);
-                _showToast('OTP sent successfully (Demo: 1234)');
+                _showToast(tr('otpSentSuccess'));
               }
             },
           ),
@@ -691,8 +719,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               _otpSent = false;
             }),
             child: Text(
-              'Already have an account? Login',
-              style: GoogleFonts.inter(fontSize: 13, color: textMuted),
+              tr('alreadyHaveAccount'),
+              style: GoogleFonts.inter(fontSize: 13, color: textMuted, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -709,9 +737,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildHeader('Login with Email', () => setState(() => _view = 'login')),
+        _buildHeader(tr('loginWithEmail'), () => setState(() => _view = 'login')),
 
-        _buildInputField(
+        _buildLabeledInput(
+          label: tr('email'),
           controller: _emailController,
           placeholder: tr('email'),
           icon: Icons.email_outlined,
@@ -719,9 +748,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         ),
         const SizedBox(height: 16),
 
-        _buildInputField(
+        _buildLabeledInput(
+          label: tr('password'),
           controller: _passwordController,
-          placeholder: tr('password'),
+          placeholder: tr('passwordPlaceholder'),
           icon: Icons.lock_outline,
           obscureText: _obscurePassword,
           suffixIcon: GestureDetector(
@@ -755,7 +785,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           isLoading: authState.isLoading,
           onPressed: () async {
             if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-              _showToast('Please enter email and password', isError: true);
+              _showToast(tr('fillAllFields'), isError: true);
               return;
             }
             final success = await authNotifier.login(
@@ -763,7 +793,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               _passwordController.text,
             );
             if (success && mounted) {
-              _showToast('Login Successful!');
+              _showToast(tr('successMessage'));
               context.go('/home');
             }
           },
@@ -774,8 +804,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           child: GestureDetector(
             onTap: () => setState(() => _view = 'login'),
             child: Text(
-              'Back to Mobile Login',
-              style: GoogleFonts.inter(fontSize: 13, color: primaryDark, fontWeight: FontWeight.w600),
+              tr('backToMobileLogin'),
+              style: GoogleFonts.inter(fontSize: 13, color: primaryDark, fontWeight: FontWeight.w700),
             ),
           ),
         ),
@@ -856,7 +886,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           style: GoogleFonts.inter(fontSize: 12, color: textMuted, height: 1.5),
         ),
         const SizedBox(height: 20),
-        _buildInputField(
+        _buildLabeledInput(
+          label: tr('email'),
           controller: _emailController,
           placeholder: tr('enterYourEmail'),
           icon: Icons.email_outlined,
