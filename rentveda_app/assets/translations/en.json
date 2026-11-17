@@ -346,6 +346,7 @@
   "eodTotalIncome": "Total Income",
   "eodExpenses": "Total Expenses",
   "eodPendingDues": "Pending Dues",
+  "eodPendingFollowup": "Pending Follow-up",
   "eodNetProfit": "Net Profit",
   "eodBreakdown": "Detailed Report",
   "eodTotalBilled": "Total Billed",

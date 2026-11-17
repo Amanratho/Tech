@@ -225,9 +225,9 @@ class _EodDashboardScreenState extends ConsumerState<EodDashboardScreen> {
           crossAxisCount: 2,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1.1,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 1.4,
           children: [
             _buildMetricCard(
               title: tr('eodTotalIncome'),
@@ -251,7 +251,7 @@ class _EodDashboardScreenState extends ConsumerState<EodDashboardScreen> {
               icon: Icons.access_time,
               color: Colors.orange.shade600,
               bgLight: Colors.orange.shade50,
-              subtitle: 'Requires follow-up',
+              subtitle: tr('eodPendingFollowup'),
             ),
             _buildProfitCard(summary['netProfit']),
           ],
@@ -346,12 +346,12 @@ class _EodDashboardScreenState extends ConsumerState<EodDashboardScreen> {
 
   Widget _buildMetricCard({required String title, required dynamic value, required IconData icon, required Color color, required Color bgLight, required String subtitle}) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE2E2E2)),
-        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.08), blurRadius: 10, offset: const Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,16 +360,45 @@ class _EodDashboardScreenState extends ConsumerState<EodDashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: Text(title.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF4F4633)))),
-              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: bgLight, borderRadius: BorderRadius.circular(12)), child: Icon(icon, color: color, size: 18)),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF2D2F30),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(color: bgLight, borderRadius: BorderRadius.circular(10)),
+                child: Icon(icon, color: color, size: 18),
+              ),
             ],
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text('₹${value ?? 0}', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color)),
-              const SizedBox(height: 4),
-              Text(subtitle, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: color)),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '₹${value ?? 0}',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: color),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           )
         ],
@@ -379,12 +408,16 @@ class _EodDashboardScreenState extends ConsumerState<EodDashboardScreen> {
 
   Widget _buildProfitCard(dynamic value) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Colors.white, Color(0xFFFFFBEB), Color(0x40FBC02D)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+        gradient: const LinearGradient(
+          colors: [Colors.white, Color(0xFFFFFBEB), Color(0x33FBC02D)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFBC02D), width: 2),
-        boxShadow: const [BoxShadow(color: Color(0x40FBC02D), blurRadius: 20, offset: Offset(0, 4))],
+        border: Border.all(color: const Color(0xFFFBC02D), width: 1.5),
+        boxShadow: const [BoxShadow(color: Color(0x33FBC02D), blurRadius: 12, offset: Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,16 +426,45 @@ class _EodDashboardScreenState extends ConsumerState<EodDashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: Text(tr('eodNetProfit').toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Color(0xFF6C5000), letterSpacing: 1))),
-              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFFFBC02D), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.trending_up, color: Color(0xFF6C5000), size: 18)),
+              Expanded(
+                child: Text(
+                  tr('eodNetProfit'),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF5D4037),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(color: const Color(0xFFFBC02D), borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.trending_up, color: Color(0xFF6C5000), size: 18),
+              ),
             ],
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text('₹${value ?? 0}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF6C5000))),
-              const SizedBox(height: 4),
-              Text(tr('eodNetProfit'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6C5000))),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '₹${value ?? 0}',
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF6C5000)),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                tr('eodNetProfit'),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6C5000)),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           )
         ],
