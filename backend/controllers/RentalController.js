@@ -174,6 +174,9 @@ exports.editRental = async (req, res) => {
         reminderDate,
         reminderStatus,
         customerMobile,
+        isEdited: true,
+        $inc: { editCount: 1 },
+        updatedAt: new Date(),
       },
       { new: true }
     );

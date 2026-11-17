@@ -18,6 +18,9 @@ const RentalSchema = new mongoose.Schema({
   customerMobile: { type: String },
   uid: { type: String, required: true, },
   machineId: { type: String, required: true,  },
+  isEdited: { type: Boolean, default: false },
+  editCount: { type: Number, default: 0 },
+  updatedAt: { type: Date },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -128,6 +128,28 @@ class FormalInvoiceTemplate extends StatelessWidget {
                       Text('#INV-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}', style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
                     ],
                   ),
+                  if (entry['isEdited'] == true || (entry['editCount'] != null && (entry['editCount'] as num) > 0)) ...[
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF7ED),
+                        border: Border.all(color: const Color(0xFFEA580C), width: 1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        (entry['editCount'] != null && (entry['editCount'] as num) > 1)
+                            ? 'EDITED (v${entry['editCount']})'
+                            : 'EDITED INVOICE',
+                        style: const TextStyle(
+                          color: Color(0xFFC2410C),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ],
