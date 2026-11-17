@@ -33,7 +33,8 @@ class _EditReminderModalState extends ConsumerState<EditReminderModal> {
   Future<void> _selectDate(BuildContext context) async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final initialDate = _selectedDate != null && !_selectedDate!.isBefore(today)
+    final maxDate = DateTime(now.year + 1, now.month, now.day);
+    final initialDate = _selectedDate != null && !_selectedDate!.isBefore(today) && !_selectedDate!.isAfter(maxDate)
         ? DateTime(_selectedDate!.year, _selectedDate!.month, _selectedDate!.day)
         : today;
 
@@ -41,7 +42,7 @@ class _EditReminderModalState extends ConsumerState<EditReminderModal> {
       context: context,
       initialDate: initialDate,
       firstDate: today, // Cannot select past dates
-      lastDate: DateTime(2101),
+      lastDate: maxDate, // Strictly restricted: Cannot select more than 1 year ahead
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -66,6 +67,17 @@ class _EditReminderModalState extends ConsumerState<EditReminderModal> {
   Future<void> _handleSave() async {
     if (_selectedDate == null) {
       Fluttertoast.showToast(msg: tr('reminderSelectValidDate'), backgroundColor: AppColors.warningDark);
+      return;
+    }
+
+    final maxAllowed = DateTime.now().add(const Duration(days: 366));
+    if (_selectedDate!.isAfter(maxAllowed)) {
+      Fluttertoast.showToast(
+        msg: tr('reminderDateMaxOneYear') == 'reminderDateMaxOneYear'
+            ? 'Reminder date cannot be more than 1 year ahead'
+            : tr('reminderDateMaxOneYear'),
+        backgroundColor: AppColors.warningDark,
+      );
       return;
     }
 

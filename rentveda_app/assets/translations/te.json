@@ -194,6 +194,7 @@
   "otpSentSuccess": "మీ మొబైల్ నంబర్‌కు OTP పంపబడింది!",
   "otpSentMobileSuccess": "మీ మొబైల్ నంబర్‌కు OTP పంపబడింది!",
   "otpSentEmailSuccess": "మీ ఇమెయిల్‌కి OTP పంపబడింది!",
+  "reminderDateMaxOneYear": "రిమైండర్ తేదీ 1 సంవత్సరం కంటే ఎక్కువ ఉండకూడదు!",
   "otpSendFail": "OTPని పంపడంలో విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.",
   "invalidOtp": "చెల్లని OTP. దయచేసి మళ్లీ ప్రయత్నించండి.",
   "verificationError": "OTPని ధృవీకరించడంలో లోపం. దయచేసి మళ్లీ ప్రయత్నించండి.",

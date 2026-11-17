@@ -185,6 +185,7 @@
   "otpSentSuccess": "OTP sent to your mobile number!",
   "otpSentMobileSuccess": "OTP sent to your mobile number!",
   "otpSentEmailSuccess": "OTP sent to your email!",
+  "reminderDateMaxOneYear": "Reminder date cannot be more than 1 year ahead!",
   "otpSendFail": "Failed to send OTP. Please try again.",
   "invalidOtp": "Invalid OTP. Please try again.",
   "verificationError": "Error verifying OTP. Please try again.",

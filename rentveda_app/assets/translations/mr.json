@@ -189,6 +189,7 @@
   "otpSentSuccess": "तुमच्या मोबाईल नंबरवर OTP पाठवला!",
   "otpSentMobileSuccess": "तुमच्या मोबाईल नंबरवर OTP पाठवला!",
   "otpSentEmailSuccess": "तुमच्या ईमेलवर OTP पाठवला!",
+  "reminderDateMaxOneYear": "स्मरणपत्र तारीख 1 वर्षापेक्षा जास्त असू शकत नाही!",
   "otpSendFail": "OTP पाठवण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.",
   "invalidOtp": "अवैध OTP. कृपया पुन्हा प्रयत्न करा.",
   "verificationError": "OTP सत्यापित करताना त्रुटी. कृपया पुन्हा प्रयत्न करा.",

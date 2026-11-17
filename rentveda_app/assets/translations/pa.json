@@ -194,6 +194,7 @@
   "otpSentSuccess": "ਤੁਹਾਡੇ ਮੋਬਾਈਲ ਨੰਬਰ 'ਤੇ OTP ਭੇਜਿਆ ਗਿਆ!",
   "otpSentMobileSuccess": "ਤੁਹਾਡੇ ਮੋਬਾਈਲ ਨੰਬਰ 'ਤੇ OTP ਭੇਜਿਆ ਗਿਆ!",
   "otpSentEmailSuccess": "ਤੁਹਾਡੀ ਈਮੇਲ 'ਤੇ OTP ਭੇਜਿਆ ਗਿਆ!",
+  "reminderDateMaxOneYear": "ਰਿਮਾਈਂਡਰ ਦੀ ਮਿਤੀ 1 ਸਾਲ ਤੋਂ ਵੱਧ ਨਹੀਂ ਹੋ ਸਕਦੀ!",
   "otpSendFail": "OTP ਭੇਜਣਾ ਅਸਫਲ ਰਿਹਾ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
   "invalidOtp": "ਅਵੈਧ OTP। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
   "verificationError": "OTP ਦੀ ਪੁਸ਼ਟੀ ਕਰਨ ਵਿੱਚ ਤਰੁੱਟੀ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",

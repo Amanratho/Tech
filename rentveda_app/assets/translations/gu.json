@@ -189,6 +189,7 @@
   "otpSentSuccess": "તમારા મોબાઇલ નંબર પર OTP મોકલવામાં આવ્યો છે!",
   "otpSentMobileSuccess": "તમારા મોબાઇલ નંબર પર OTP મોકલવામાં આવ્યો છે!",
   "otpSentEmailSuccess": "તમારા ઇમેઇલ પર OTP મોકલવામાં આવ્યો છે!",
+  "reminderDateMaxOneYear": "રીમાઇન્ડર તારીખ 1 વર્ષથી વધુ આગળની ન હોઈ શકે!",
   "otpSendFail": "OTP મોકલવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.",
   "invalidOtp": "અમાન્ય OTP. કૃપા કરીને ફરી પ્રયાસ કરો.",
   "verificationError": "OTP ચકાસવામાં ભૂલ. કૃપા કરીને ફરી પ્રયાસ કરો.",

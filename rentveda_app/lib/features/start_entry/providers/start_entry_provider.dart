@@ -1,11 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
+import '../../home/providers/home_provider.dart';
+import '../../reminders/providers/reminders_provider.dart';
 
 class StartEntryNotifier extends StateNotifier<bool> {
   final ApiClient apiClient;
+  final Ref ref;
 
-  StartEntryNotifier(this.apiClient) : super(false);
+  StartEntryNotifier(this.apiClient, this.ref) : super(false);
 
   Future<Map<String, dynamic>?> fetchCustomerByMobile(String mobile) async {
     try {
@@ -43,7 +46,13 @@ class StartEntryNotifier extends StateNotifier<bool> {
       );
       
       state = false;
-      return response.statusCode == 200 || response.statusCode == 201;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Immediately reload Home dashboard and Reminders in background
+        ref.read(homeProvider.notifier).loadDashboardData(isSilent: true);
+        ref.read(remindersProvider.notifier).loadReminders();
+        return true;
+      }
+      return false;
     } catch (e) {
       debugPrint('Error saving entry: $e');
       state = false;
@@ -54,5 +63,5 @@ class StartEntryNotifier extends StateNotifier<bool> {
 
 final startEntryProvider = StateNotifierProvider<StartEntryNotifier, bool>((ref) {
   final apiClient = ref.watch(apiClientProvider);
-  return StartEntryNotifier(apiClient);
+  return StartEntryNotifier(apiClient, ref);
 });

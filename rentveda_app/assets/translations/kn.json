@@ -194,6 +194,7 @@
   "otpSentSuccess": "ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಗೆ OTP ಕಳುಹಿಸಲಾಗಿದೆ!",
   "otpSentMobileSuccess": "ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಗೆ OTP ಕಳುಹಿಸಲಾಗಿದೆ!",
   "otpSentEmailSuccess": "ನಿಮ್ಮ ಇಮೇಲ್‌ಗೆ OTP ಕಳುಹಿಸಲಾಗಿದೆ!",
+  "reminderDateMaxOneYear": "ಜ್ಞಾಪನೆ ದಿನಾಂಕ 1 ವರ್ಷಕ್ಕಿಂತ ಹೆಚ್ಚಾಗಿರಬಾರದು!",
   "otpSendFail": "OTP ಕಳುಹಿಸಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
   "invalidOtp": "ಅಮಾನ್ಯ OTP. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
   "verificationError": "OTP ಪರಿಶೀಲಿಸುವಲ್ಲಿ ದೋಷ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
+import '../../home/providers/home_provider.dart';
 
 class PaymentTrackingState {
   final bool isLoading;
@@ -32,8 +33,9 @@ class PaymentTrackingState {
 
 class PaymentTrackingNotifier extends StateNotifier<PaymentTrackingState> {
   final ApiClient apiClient;
+  final Ref ref;
 
-  PaymentTrackingNotifier(this.apiClient) : super(PaymentTrackingState());
+  PaymentTrackingNotifier(this.apiClient, this.ref) : super(PaymentTrackingState());
 
   Future<void> loadPayments() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -108,6 +110,8 @@ class PaymentTrackingNotifier extends StateNotifier<PaymentTrackingState> {
 
       await apiClient.dio.put('/update-payment', data: data);
       await loadPayments(); // Refresh list after update
+      // Immediately refresh Home dashboard metrics in background
+      ref.read(homeProvider.notifier).loadDashboardData(isSilent: true);
       return true;
     } catch (e) {
       debugPrint('❌ [PAYMENT_TRACKING] Update error: $e');
@@ -118,5 +122,5 @@ class PaymentTrackingNotifier extends StateNotifier<PaymentTrackingState> {
 
 final paymentTrackingProvider = StateNotifierProvider<PaymentTrackingNotifier, PaymentTrackingState>((ref) {
   final apiClient = ref.watch(apiClientProvider);
-  return PaymentTrackingNotifier(apiClient);
+  return PaymentTrackingNotifier(apiClient, ref);
 });
