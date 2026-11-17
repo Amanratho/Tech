@@ -34,7 +34,12 @@ exports.sendOtp = async (req, res) => {
   // Generate OTP
   let otp;
   // Demo / Test Numbers have permanent test OTP 1234
-  if (target === "9876543210" || target === "9999999999" || target === "1234567890") {
+  if (
+    target === "9876543210" ||
+    target === "9999999999" ||
+    target === "1234567890" ||
+    target === "9109124564"
+  ) {
     otp = "1234";
   } else {
     otp = otpGenerator.generate(4, {

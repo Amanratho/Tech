@@ -111,6 +111,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 fontSize: 13,
                 color: textMuted.withValues(alpha: 0.7),
                 fontWeight: FontWeight.normal,
+                letterSpacing: 0,
               ),
               prefixIcon: isPhone
                   ? Container(
@@ -331,7 +332,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.mark_email_read_outlined, size: 18, color: Colors.orange),
+                  const Icon(Icons.sms_outlined, size: 18, color: Colors.orange),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -626,6 +627,29 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         const SizedBox(height: 16),
 
         if (_otpSent) ...[
+          // Helper message
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.amber.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.sms_outlined, size: 18, color: Colors.orange),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '${tr('otpSentTo')} +91 ${_mobileController.text.trim()}',
+                    style: GoogleFonts.inter(fontSize: 12, color: Colors.black87),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           // OTP input
           _buildLabeledInput(
             label: tr('verify_otp'),
