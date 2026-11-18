@@ -202,4 +202,72 @@ const processReminders = async () => {
   return { processed, skipped, failed, errors };
 };
 
-module.exports = { processReminders };
+/** Send direct test push notification to all users with registered FCM tokens */
+const sendTestPushToAllUsers = async (customMessage) => {
+  try {
+    const users = await User.find({
+      $or: [
+        { fcmToken: { $ne: null, $exists: true } },
+        { "fcmTokens.0": { $exists: true } },
+      ],
+    });
+
+    console.log(`📢 [Test Push] Found ${users.length} users with FCM tokens in DB.`);
+
+    let totalSent = 0;
+    const details = [];
+
+    for (const user of users) {
+      const tokens = [];
+      if (user.fcmToken) tokens.push(user.fcmToken);
+      if (Array.isArray(user.fcmTokens)) {
+        for (const t of user.fcmTokens) {
+          if (t && !tokens.includes(t)) tokens.push(t);
+        }
+      }
+
+      const payload = {
+        notification: {
+          title: "🔔 RentVeda टेस्ट रिमाइंडर (8:35 AM)",
+          body: customMessage || `नमस्ते ${user.username || "यूजर"}, आपका RentVeda नोटिफिकेशन सिस्टम सफलतापूर्वक काम कर रहा है!`,
+        },
+        data: {
+          route: "/reminders",
+          test: "true",
+          timestamp: new Date().toISOString(),
+        },
+        android: {
+          priority: "high",
+          notification: {
+            channelId: "rentveda_reminders",
+            sound: "default",
+            color: "#FFCC00",
+            clickAction: "FLUTTER_NOTIFICATION_CLICK",
+          },
+        },
+      };
+
+      for (const token of tokens) {
+        try {
+          await admin.messaging().send({
+            token,
+            ...payload,
+          });
+          totalSent++;
+          console.log(`✅ [Test Push] Push sent to user ${user.uid || user.username} (${token.substring(0, 15)}...)`);
+          details.push({ uid: user.uid, status: "sent", tokenPrefix: token.substring(0, 15) });
+        } catch (err) {
+          console.warn(`❌ [Test Push] Failed sending to token ${token.substring(0, 15)}... :`, err.message);
+          details.push({ uid: user.uid, status: "error", error: err.message });
+        }
+      }
+    }
+
+    return { usersFound: users.length, totalSent, details };
+  } catch (err) {
+    console.error("[Test Push] Error:", err.message);
+    return { error: err.message };
+  }
+};
+
+module.exports = { processReminders, sendTestPushToAllUsers, sendPushNotification };
