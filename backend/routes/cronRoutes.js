@@ -1,7 +1,37 @@
 const express = require("express");
 const router = express.Router();
 const { verifyCronSecret } = require("../middlewares/verifyCronSecret");
-const { processReminders } = require("../services/reminderService");
+const { processReminders, sendTestPushToAllUsers } = require("../services/reminderService");
+
+/**
+ * GET /api/cron/test-push
+ *
+ * Manual instant test endpoint: Sends an immediate push notification
+ * to all registered FCM devices and returns device details in JSON.
+ */
+router.get("/test-push", async (req, res) => {
+  console.log("🔔 [Manual Trigger] /api/cron/test-push called.");
+  try {
+    const pushResult = await sendTestPushToAllUsers(
+      "🔔 तुरंत टेस्ट: यह RentVeda का इंस्टेंट टेस्ट नोटिफिकेशन है!"
+    );
+    const dbResult = await processReminders();
+
+    return res.status(200).json({
+      success: true,
+      message: "Test push sent successfully to all registered devices!",
+      pushResult,
+      dbResult,
+    });
+  } catch (error) {
+    console.error("❌ [Manual Trigger] Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error sending test push.",
+      error: error.message,
+    });
+  }
+});
 
 /**
  * GET /api/cron/send-reminders
