@@ -54,11 +54,12 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
         (widget.bill['editCount'] != null && (widget.bill['editCount'] as num) > 0) ||
         (widget.bill['updatedAt'] != null &&
             widget.bill['createdAt'] != null &&
-            DateTime.tryParse(widget.bill['updatedAt'].toString())
-                    ?.difference(DateTime.tryParse(widget.bill['createdAt'].toString()) ?? DateTime(0))
-                    .inSeconds
-                    .abs() >
-                60);
+            ((DateTime.tryParse(widget.bill['updatedAt'].toString())
+                        ?.difference(DateTime.tryParse(widget.bill['createdAt'].toString()) ?? DateTime(0))
+                        .inSeconds
+                        .abs() ??
+                    0) >
+                60));
     final editCount = (widget.bill['editCount'] as num?)?.toInt() ?? (isEdited ? 1 : 0);
 
     String versionSuffix = '';
