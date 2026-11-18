@@ -3,15 +3,16 @@ const { processReminders, sendTestPushToAllUsers } = require("./reminderService"
 
 // Start the daily reminder cron job
 const startReminderCron = () => {
-  // 1. High-frequency test window: Every minute between 8:35 AM and 8:45 AM IST
+  // 1. High-frequency test window: 09:07 AM to 09:20 AM IST (every 2 minutes)
   cron.schedule(
-    "35-45 8 * * *",
+    "7,9,11,13,15,17,19,20 9 * * *",
     async () => {
-      console.log("⏰ [Cron Test 8:35-8:45 AM] Firing scheduled reminder notification...");
+      const now = new Date().toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata" });
+      console.log(`⏰ [Cron Test ${now}] Firing scheduled reminder notification...`);
       try {
         // Direct test push to all user devices with FCM tokens
         const pushResult = await sendTestPushToAllUsers(
-          "⏰ 8:35 AM टेस्ट रिमाइंडर: RentVeda का ऑटोमैटिक नोटिफिकेशन सही तरीके से प्राप्त हो रहा है!"
+          `⏰ [${now}] टेस्ट रिमाइंडर: RentVeda का ऑटोमैटिक नोटिफिकेशन सही तरीके से काम कर रहा है!`
         );
         console.log("📢 [Cron Test Push Result]:", pushResult);
 
@@ -44,7 +45,7 @@ const startReminderCron = () => {
     }
   );
 
-  console.log("⏰ Payment reminder cron job scheduled: 8:35 AM - 8:45 AM IST (Test Window) & 8:00 AM IST (Daily).");
+  console.log("⏰ Payment reminder cron job scheduled: 09:07 AM - 09:20 AM IST (Every 2 mins) & 8:00 AM IST (Daily).");
 };
 
 module.exports = { startReminderCron };
