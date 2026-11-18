@@ -21,6 +21,19 @@ exports.addRentalEntry = async (req, res) => {
       reminderStatus,
       customerMobile,
     } = req.body;
+    // Validate reminderDate: cannot be more than 1 year ahead
+    if (reminderDate) {
+      const remDate = new Date(reminderDate);
+      const maxAllowedDate = new Date();
+      maxAllowedDate.setFullYear(maxAllowedDate.getFullYear() + 1);
+      maxAllowedDate.setDate(maxAllowedDate.getDate() + 1); // 1 day grace for timezone diffs
+      if (remDate > maxAllowedDate) {
+        return res.status(400).json({
+          message: "Reminder date cannot be more than 1 year in the future",
+        });
+      }
+    }
+
     const totalAmount = price * quantity;
     const newRental = new Rental({
       customerName,
@@ -130,6 +143,19 @@ exports.editRental = async (req, res) => {
       return res.status(400).json({ message: "Rental ID is required" });
     }
 
+    // Validate reminderDate: cannot be more than 1 year ahead
+    if (reminderDate) {
+      const remDate = new Date(reminderDate);
+      const maxAllowedDate = new Date();
+      maxAllowedDate.setFullYear(maxAllowedDate.getFullYear() + 1);
+      maxAllowedDate.setDate(maxAllowedDate.getDate() + 1); // 1 day grace for timezone diffs
+      if (remDate > maxAllowedDate) {
+        return res.status(400).json({
+          message: "Reminder date cannot be more than 1 year in the future",
+        });
+      }
+    }
+
     const totalAmount = price * quantity;
 
     const updatedRental = await Rental.findByIdAndUpdate(
@@ -148,6 +174,9 @@ exports.editRental = async (req, res) => {
         reminderDate,
         reminderStatus,
         customerMobile,
+        isEdited: true,
+        $inc: { editCount: 1 },
+        updatedAt: new Date(),
       },
       { new: true }
     );
@@ -256,7 +285,20 @@ exports.updateReminderDetails = async (req, res) => {
     }
 
     const updateFields = {};
-    if (reminderDate !== undefined) updateFields.reminderDate = reminderDate;
+    if (reminderDate !== undefined) {
+      if (reminderDate) {
+        const remDate = new Date(reminderDate);
+        const maxAllowedDate = new Date();
+        maxAllowedDate.setFullYear(maxAllowedDate.getFullYear() + 1);
+        maxAllowedDate.setDate(maxAllowedDate.getDate() + 1);
+        if (remDate > maxAllowedDate) {
+          return res.status(400).json({
+            message: "Reminder date cannot be more than 1 year in the future",
+          });
+        }
+      }
+      updateFields.reminderDate = reminderDate;
+    }
     if (pendingAmount !== undefined) updateFields.pendingAmount = pendingAmount;
 
     const updatedRental = await Rental.findByIdAndUpdate(

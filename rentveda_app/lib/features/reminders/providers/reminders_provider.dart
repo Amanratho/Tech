@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
+import '../../home/providers/home_provider.dart';
 
 class RemindersState {
   final bool isLoading;
@@ -28,8 +29,9 @@ class RemindersState {
 
 class RemindersNotifier extends StateNotifier<RemindersState> {
   final ApiClient apiClient;
+  final Ref ref;
 
-  RemindersNotifier(this.apiClient) : super(RemindersState());
+  RemindersNotifier(this.apiClient, this.ref) : super(RemindersState());
 
   Future<void> loadReminders() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -62,6 +64,8 @@ class RemindersNotifier extends StateNotifier<RemindersState> {
         'reminderDate': newDate,
       });
       await loadReminders(); // Refresh list after update
+      // Immediately refresh Home dashboard metrics in background
+      ref.read(homeProvider.notifier).loadDashboardData(isSilent: true);
       return true;
     } catch (e) {
       debugPrint('❌ [REMINDERS] Update error: $e');
@@ -77,6 +81,8 @@ class RemindersNotifier extends StateNotifier<RemindersState> {
         'action': action,
       });
       await loadReminders(); // Refresh list after deletion/completion
+      // Immediately refresh Home dashboard metrics in background
+      ref.read(homeProvider.notifier).loadDashboardData(isSilent: true);
       return true;
     } catch (e) {
       debugPrint('❌ [REMINDERS] Action error: $e');
@@ -87,5 +93,5 @@ class RemindersNotifier extends StateNotifier<RemindersState> {
 
 final remindersProvider = StateNotifierProvider<RemindersNotifier, RemindersState>((ref) {
   final apiClient = ref.watch(apiClientProvider);
-  return RemindersNotifier(apiClient);
+  return RemindersNotifier(apiClient, ref);
 });

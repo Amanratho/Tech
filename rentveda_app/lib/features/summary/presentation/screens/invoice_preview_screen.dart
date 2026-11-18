@@ -39,6 +39,36 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
     });
   }
 
+  String _buildFileName() {
+    final customer = widget.bill['customerName']?.toString().trim();
+    final cleanCustomer = (customer != null && customer.isNotEmpty)
+        ? customer.replaceAll(RegExp(r'[\\/:*?"<>|]'), '').replaceAll(RegExp(r'\s+'), '_')
+        : 'Customer';
+
+    // Parse date (dd-MM-yyyy)
+    final dateRaw = widget.bill['createdAt'] ?? widget.bill['date'];
+    final date = dateRaw != null ? DateTime.tryParse(dateRaw.toString()) ?? DateTime.now() : DateTime.now();
+    final dateStr = DateFormat('dd-MM-yyyy').format(date);
+
+    final isEdited = widget.bill['isEdited'] == true ||
+        (widget.bill['editCount'] != null && (widget.bill['editCount'] as num) > 0) ||
+        (widget.bill['updatedAt'] != null &&
+            widget.bill['createdAt'] != null &&
+            DateTime.tryParse(widget.bill['updatedAt'].toString())
+                    ?.difference(DateTime.tryParse(widget.bill['createdAt'].toString()) ?? DateTime(0))
+                    .inSeconds
+                    .abs() >
+                60);
+    final editCount = (widget.bill['editCount'] as num?)?.toInt() ?? (isEdited ? 1 : 0);
+
+    String versionSuffix = '';
+    if (isEdited) {
+      versionSuffix = editCount > 1 ? '_Edited_v$editCount' : '_Edited';
+    }
+
+    return '${cleanCustomer}_$dateStr$versionSuffix.png';
+  }
+
   Future<File?> _generateImageFile() async {
     try {
       RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
@@ -50,7 +80,7 @@ class _InvoicePreviewScreenState extends ConsumerState<InvoicePreviewScreen> {
       Uint8List pngBytes = byteData.buffer.asUint8List();
 
       final directory = await getTemporaryDirectory();
-      final String fileName = 'Invoice_${widget.bill['customerName']?.toString().replaceAll(' ', '_') ?? 'RentVeda'}_${DateTime.now().millisecondsSinceEpoch}.png';
+      final String fileName = _buildFileName();
       File imgFile = File('${directory.path}/$fileName');
       await imgFile.writeAsBytes(pngBytes);
       return imgFile;

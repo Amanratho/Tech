@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/api_client.dart';
+import '../../home/providers/home_provider.dart';
 
 // Provider for ApiClient
 final machineApiClientProvider = Provider<ApiClient>((ref) {
@@ -105,8 +106,9 @@ class MachineMaintenanceState {
 // Notifier
 class MachineMaintenanceNotifier extends StateNotifier<MachineMaintenanceState> {
   final ApiClient _apiClient;
+  final Ref _ref;
 
-  MachineMaintenanceNotifier(this._apiClient) : super(MachineMaintenanceState()) {
+  MachineMaintenanceNotifier(this._apiClient, this._ref) : super(MachineMaintenanceState()) {
     fetchMachineSummary();
   }
 
@@ -179,6 +181,8 @@ class MachineMaintenanceNotifier extends StateNotifier<MachineMaintenanceState> 
       if (response.data['success'] == true) {
         // Refresh summary
         fetchMachineSummary();
+        // Immediately refresh Home dashboard metrics in background
+        _ref.read(homeProvider.notifier).loadDashboardData(isSilent: true);
         return true;
       }
       return false;
@@ -193,6 +197,8 @@ class MachineMaintenanceNotifier extends StateNotifier<MachineMaintenanceState> 
       if (response.data['success'] == true) {
         // Refresh summary
         fetchMachineSummary();
+        // Immediately refresh Home dashboard metrics in background
+        _ref.read(homeProvider.notifier).loadDashboardData(isSilent: true);
         return true;
       }
       return false;
@@ -204,5 +210,5 @@ class MachineMaintenanceNotifier extends StateNotifier<MachineMaintenanceState> 
 
 final machineMaintenanceProvider = StateNotifierProvider<MachineMaintenanceNotifier, MachineMaintenanceState>((ref) {
   final apiClient = ref.watch(machineApiClientProvider);
-  return MachineMaintenanceNotifier(apiClient);
+  return MachineMaintenanceNotifier(apiClient, ref);
 });

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
+import '../../features/home/providers/home_provider.dart';
 
-class BottomNavBar extends StatelessWidget {
+class BottomNavBar extends ConsumerWidget {
   final int currentIndex;
 
   const BottomNavBar({super.key, required this.currentIndex});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final items = [
       _NavItem(icon: Icons.home_rounded, label: tr('home'), path: '/home'),
       _NavItem(icon: Icons.bar_chart_rounded, label: tr('navSummary'), path: '/summary'),
@@ -42,6 +44,13 @@ class BottomNavBar extends StatelessWidget {
             onTap: () {
               if (!isActive) {
                 context.go(item.path);
+                if (index == 0) {
+                  // Switched to Home tab: sync latest data silently
+                  ref.read(homeProvider.notifier).loadDashboardData(isSilent: true);
+                }
+              } else if (index == 0) {
+                // Already on Home tab and tapped Home icon: pull-fresh data
+                ref.read(homeProvider.notifier).loadDashboardData(isSilent: true);
               }
             },
             behavior: HitTestBehavior.opaque,

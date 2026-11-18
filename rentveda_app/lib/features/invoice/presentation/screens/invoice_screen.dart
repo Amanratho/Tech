@@ -58,6 +58,29 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
     }
   }
 
+  String _buildFileName() {
+    final customer = _entryData['customerName']?.toString().trim();
+    final cleanCustomer = (customer != null && customer.isNotEmpty)
+        ? customer.replaceAll(RegExp(r'[\\/:*?"<>|]'), '').replaceAll(RegExp(r'\s+'), '_')
+        : 'Customer';
+
+    // Parse date (dd-MM-yyyy)
+    final dateRaw = _entryData['createdAt'] ?? _entryData['date'];
+    final date = dateRaw != null ? DateTime.tryParse(dateRaw.toString()) ?? DateTime.now() : DateTime.now();
+    final dateStr = DateFormat('dd-MM-yyyy').format(date);
+
+    final isEdited = _entryData['isEdited'] == true ||
+        (_entryData['editCount'] != null && (_entryData['editCount'] as num) > 0);
+    final editCount = (_entryData['editCount'] as num?)?.toInt() ?? (isEdited ? 1 : 0);
+
+    String versionSuffix = '';
+    if (isEdited) {
+      versionSuffix = editCount > 1 ? '_Edited_v$editCount' : '_Edited';
+    }
+
+    return '${cleanCustomer}_$dateStr$versionSuffix.png';
+  }
+
   Future<File?> _generateImageFile() async {
     try {
       RenderRepaintBoundary boundary = _invoiceKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
@@ -68,7 +91,8 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
       
       final pngBytes = byteData.buffer.asUint8List();
       final directory = await getTemporaryDirectory();
-      final imagePath = '${directory.path}/Invoice_${_entryData['customerName']?.toString().replaceAll(' ', '_') ?? 'Customer'}_${DateTime.now().millisecondsSinceEpoch}.png';
+      final fileName = _buildFileName();
+      final imagePath = '${directory.path}/$fileName';
       final file = File(imagePath);
       await file.writeAsBytes(pngBytes);
       return file;

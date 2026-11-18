@@ -17,12 +17,13 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver {
   bool _announcementShown = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Load dashboard and profile data when screen opens
     Future.microtask(() {
       if (mounted) {
@@ -30,6 +31,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ref.read(profileProvider.notifier).fetchProfile();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && mounted) {
+      // Refresh dashboard silently in background when returning to the app
+      ref.read(homeProvider.notifier).loadDashboardData(isSilent: true);
+      ref.read(profileProvider.notifier).fetchProfile();
+    }
   }
 
   void _checkAnnouncement(Map<String, dynamic>? userData) {

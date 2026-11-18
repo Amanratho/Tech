@@ -80,11 +80,38 @@ class BillCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        customerName,
-                        style: AppTypography.cardHeader.copyWith(fontSize: 14),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              customerName,
+                              style: AppTypography.cardHeader.copyWith(fontSize: 14),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (bill['isEdited'] == true || (bill['editCount'] != null && (bill['editCount'] as num) > 0)) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: Colors.orange.withValues(alpha: 0.4), width: 0.8),
+                              ),
+                              child: Text(
+                                (bill['editCount'] != null && (bill['editCount'] as num) > 1)
+                                    ? 'v${bill['editCount']} (Edited)'
+                                    : 'Edited',
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  color: Colors.deepOrange,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Row(

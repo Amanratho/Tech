@@ -134,6 +134,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
   Future<void> _handleSave() async {
     setState(() => _isSaving = true);
     
+    final currentEditCount = (widget.bill['editCount'] as num?)?.toInt() ?? 0;
     final formData = {
       '_id': widget.bill['_id'],
       'customerName': _nameController.text,
@@ -145,6 +146,8 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
       'paidAmount': double.tryParse(_paidController.text) ?? 0,
       'pendingAmount': double.tryParse(_pendingController.text) ?? 0,
       'jobWork': _jobWorkController.text,
+      'isEdited': true,
+      'editCount': currentEditCount + 1,
     };
 
     final success = await ref.read(billingHistoryProvider.notifier).editBill(formData);

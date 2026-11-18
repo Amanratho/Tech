@@ -44,8 +44,11 @@ class HomeNotifier extends StateNotifier<HomeState> {
 
   HomeNotifier(this.apiClient) : super(HomeState());
 
-  Future<void> loadDashboardData() async {
-    state = state.copyWith(isLoading: true, error: null);
+  Future<void> loadDashboardData({bool isSilent = false}) async {
+    // Only show full loading spinner if not silent AND data is empty
+    if (!isSilent && state.machines.isEmpty && state.payments.isEmpty) {
+      state = state.copyWith(isLoading: true, error: null);
+    }
 
     try {
       final uid = await apiClient.secureStorage.read(key: 'uid');

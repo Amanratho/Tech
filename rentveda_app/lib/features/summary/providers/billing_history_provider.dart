@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
+import '../../home/providers/home_provider.dart';
 
 class BillingHistoryState {
   final bool isLoading;
@@ -28,8 +29,9 @@ class BillingHistoryState {
 
 class BillingHistoryNotifier extends StateNotifier<BillingHistoryState> {
   final ApiClient apiClient;
+  final Ref ref;
 
-  BillingHistoryNotifier(this.apiClient) : super(BillingHistoryState());
+  BillingHistoryNotifier(this.apiClient, this.ref) : super(BillingHistoryState());
 
   Future<void> loadBills() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -66,6 +68,8 @@ class BillingHistoryNotifier extends StateNotifier<BillingHistoryState> {
     try {
       await apiClient.dio.put('/edit-rental', data: formData);
       await loadBills(); // Refresh list after update
+      // Immediately refresh Home dashboard metrics in background
+      ref.read(homeProvider.notifier).loadDashboardData(isSilent: true);
       return true;
     } catch (e) {
       debugPrint('❌ [BILLING_HISTORY] Edit error: $e');
@@ -79,6 +83,8 @@ class BillingHistoryNotifier extends StateNotifier<BillingHistoryState> {
         'ids': [id]
       });
       await loadBills(); // Refresh list after deletion
+      // Immediately refresh Home dashboard metrics in background
+      ref.read(homeProvider.notifier).loadDashboardData(isSilent: true);
       return true;
     } catch (e) {
       debugPrint('❌ [BILLING_HISTORY] Delete error: $e');
@@ -89,5 +95,5 @@ class BillingHistoryNotifier extends StateNotifier<BillingHistoryState> {
 
 final billingHistoryProvider = StateNotifierProvider<BillingHistoryNotifier, BillingHistoryState>((ref) {
   final apiClient = ref.watch(apiClientProvider);
-  return BillingHistoryNotifier(apiClient);
+  return BillingHistoryNotifier(apiClient, ref);
 });

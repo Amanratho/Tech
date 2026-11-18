@@ -389,11 +389,18 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
   }
 
   Future<void> _selectReminderDate() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final maxDate = DateTime(now.year + 1, now.month, now.day);
+    final initialDate = _reminderDate != null && !_reminderDate!.isBefore(today) && !_reminderDate!.isAfter(maxDate)
+        ? _reminderDate!
+        : today;
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2101),
+      initialDate: initialDate,
+      firstDate: today,
+      lastDate: maxDate, // Strictly restricted: Cannot select more than 1 year ahead
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -452,6 +459,16 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
     };
 
     if (pendingAmount > 0 && _setReminder && _reminderDate != null) {
+      final maxAllowed = DateTime.now().add(const Duration(days: 366));
+      if (_reminderDate!.isAfter(maxAllowed)) {
+        Fluttertoast.showToast(
+          msg: tr('reminderDateMaxOneYear') == 'reminderDateMaxOneYear'
+              ? 'Reminder date cannot be more than 1 year ahead'
+              : tr('reminderDateMaxOneYear'),
+          backgroundColor: AppColors.warningDark,
+        );
+        return;
+      }
       entryData['reminderDate'] = DateFormat('yyyy-MM-dd').format(_reminderDate!);
       entryData['reminderStatus'] = 'PENDING';
       entryData['customerMobile'] = _smsMobileController.text.isNotEmpty ? _smsMobileController.text : _mobileController.text;
