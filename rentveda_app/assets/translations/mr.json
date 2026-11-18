@@ -70,7 +70,7 @@
   "kuldeepRole": "सह-संस्थापक आणि CTO",
   "azharName": "अझहर अली श्री",
   "azharRole": "गुरू",
-  "copyright": "© {year} रेंटवेडा. सर्व हक्क राखीव.",
+  "copyright": "© {year} रेंट वेदा. सर्व हक्क राखीव.",
   "contactUs": "आमच्याशी संपर्क साधा",
   "successMessage1": "तुमचा संदेश यशस्वीरीत्या पाठवला गेला आहे!",
   "errorMessage1": "संदेश पाठवण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.",
@@ -752,4 +752,4 @@
   "bighaRegionPunjabHaryana": "पंजाब / हरियाणा किल्ला",
   "gpsSphericalBadge": "जीपीएस अचूक मोजणी",
   "cancel": "रद्द करा"
-}
+}

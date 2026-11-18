@@ -413,6 +413,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ),
                           const SizedBox(height: 4),
                           _buildMenuItem(Icons.settings, tr('editProfileButton'), () => context.push('/edit-profile'), iconColor: AppColors.textSubtle),
+                          _buildMenuItem(
+                            Icons.lock_outline,
+                            user['hasPassword'] == true ? tr('changePassword') : tr('setPassword'),
+                            () => context.push('/edit-profile'),
+                            iconColor: Colors.teal.shade600,
+                          ),
                           _buildMenuItem(Icons.edit_note, tr('updateMachineryButton'), () => context.push('/update-machinery'), iconColor: Colors.blue.shade500),
                           _buildMenuItem(Icons.language, tr('changeLanguage'), _showLanguageBottomSheet, iconColor: Colors.orange.shade500),
                           _buildMenuItem(Icons.support_agent, tr('contactSupport'), () => context.push('/contact'), iconColor: Colors.green.shade500),

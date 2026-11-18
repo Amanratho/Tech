@@ -22,6 +22,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _companyController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   
   File? _qrImage;
   final ImagePicker _picker = ImagePicker();
@@ -42,6 +47,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _usernameController.dispose();
     _mobileController.dispose();
     _companyController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -59,11 +66,26 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   void _saveProfile() async {
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+
+    if (password.isNotEmpty) {
+      if (password.length < 4) {
+        Fluttertoast.showToast(msg: tr('passwordTooShort'), backgroundColor: AppColors.danger);
+        return;
+      }
+      if (password != confirmPassword) {
+        Fluttertoast.showToast(msg: tr('passwordMismatch'), backgroundColor: AppColors.danger);
+        return;
+      }
+    }
+
     await ref.read(profileProvider.notifier).updateProfile(
       username: _usernameController.text.trim(),
       mobileNo: _mobileController.text.trim(),
       companyName: _companyController.text.trim(),
       qrImage: _qrImage,
+      password: password.isNotEmpty ? password : null,
     );
 
     if (!mounted) return;
@@ -258,6 +280,47 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 24),
+
+                const Divider(color: AppColors.border),
+                const SizedBox(height: 16),
+
+                // Password & Security Section
+                Row(
+                  children: [
+                    const Icon(Icons.shield_outlined, color: AppColors.primary, size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      user != null && user['hasPassword'] == true
+                          ? tr('changePassword')
+                          : '${tr('setPassword')} ${tr('optional')}',
+                      style: AppTypography.cardHeader.copyWith(fontSize: 14),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  tr('setPasswordHint'),
+                  style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 11),
+                ),
+                const SizedBox(height: 16),
+
+                _buildInputLabel(user != null && user['hasPassword'] == true ? tr('newPassword') : tr('password')),
+                _buildPasswordField(
+                  _passwordController,
+                  tr('newPasswordPlaceholder'),
+                  _obscurePassword,
+                  () => setState(() => _obscurePassword = !_obscurePassword),
+                ),
+                const SizedBox(height: 14),
+
+                _buildInputLabel(tr('confirm_password')),
+                _buildPasswordField(
+                  _confirmPasswordController,
+                  tr('confirmPasswordPlaceholder'),
+                  _obscureConfirmPassword,
+                  () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                ),
                 const SizedBox(height: 32),
 
                 // Save Button
@@ -327,6 +390,33 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         hintText: hint,
         hintStyle: AppTypography.bodySecondary,
         prefixIcon: Icon(icon, color: AppColors.textSubtle, size: 16),
+        filled: true,
+        fillColor: AppColors.bgMain,
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.border)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.primary, width: 2)),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField(TextEditingController controller, String hint, bool obscureText, VoidCallback onToggle) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      style: AppTypography.bodyMain.copyWith(fontSize: 13, fontWeight: FontWeight.w600),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: AppTypography.bodySecondary,
+        prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSubtle, size: 16),
+        suffixIcon: GestureDetector(
+          onTap: onToggle,
+          child: Icon(
+            obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+            color: AppColors.textSubtle,
+            size: 18,
+          ),
+        ),
         filled: true,
         fillColor: AppColors.bgMain,
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),

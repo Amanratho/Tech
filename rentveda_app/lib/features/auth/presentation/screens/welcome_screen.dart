@@ -605,25 +605,6 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           icon: Icons.business_outlined,
           enabled: !_otpSent,
         ),
-        const SizedBox(height: 12),
-
-        // Password (Optional for mobile accounts)
-        _buildLabeledInput(
-          label: '${tr('password')} ${tr('optional')}',
-          controller: _passwordController,
-          placeholder: tr('passwordPlaceholder'),
-          icon: Icons.lock_outline,
-          obscureText: _obscurePassword,
-          enabled: !_otpSent,
-          suffixIcon: GestureDetector(
-            onTap: () => setState(() => _obscurePassword = !_obscurePassword),
-            child: Icon(
-              _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-              size: 18,
-              color: textMuted,
-            ),
-          ),
-        ),
         const SizedBox(height: 16),
 
         if (_otpSent) ...[
@@ -689,7 +670,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 mobileNo: mobile,
                 username: name,
                 companyName: _companyController.text.trim(),
-                password: _passwordController.text.trim(),
+                password: '',
                 otp: otp,
               );
 
