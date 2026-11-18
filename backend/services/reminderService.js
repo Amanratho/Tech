@@ -15,15 +15,15 @@ const sendPushNotification = async (rental) => {
     if (!user) return;
 
     // Collect all unique FCM tokens registered for this user
-    const tokens = [];
-    if (user.fcmToken) tokens.push(user.fcmToken);
+    const tokens = new Set();
+    if (user.fcmToken) tokens.add(user.fcmToken);
     if (Array.isArray(user.fcmTokens)) {
       for (const t of user.fcmTokens) {
-        if (t && !tokens.includes(t)) tokens.push(t);
+        if (t) tokens.add(t);
       }
     }
 
-    if (tokens.length === 0) {
+    if (tokens.size === 0) {
       console.log(`[Push Notification] Owner ${ownerUid} has no FCM token registered.`);
       return;
     }
@@ -212,54 +212,55 @@ const sendTestPushToAllUsers = async (customMessage) => {
       ],
     });
 
-    console.log(`📢 [Test Push] Found ${users.length} users with FCM tokens in DB.`);
+    // Collect unique tokens across all users so each device receives exactly 1 notification
+    const uniqueTokens = new Set();
+    for (const user of users) {
+      if (user.fcmToken) uniqueTokens.add(user.fcmToken);
+      if (Array.isArray(user.fcmTokens)) {
+        for (const t of user.fcmTokens) {
+          if (t) uniqueTokens.add(t);
+        }
+      }
+    }
+
+    console.log(`📢 [Test Push] Found ${users.length} users with ${uniqueTokens.size} unique device tokens.`);
 
     let totalSent = 0;
     const details = [];
 
-    for (const user of users) {
-      const tokens = [];
-      if (user.fcmToken) tokens.push(user.fcmToken);
-      if (Array.isArray(user.fcmTokens)) {
-        for (const t of user.fcmTokens) {
-          if (t && !tokens.includes(t)) tokens.push(t);
-        }
-      }
-
-      const payload = {
+    const payload = {
+      notification: {
+        title: "🔔 RentVeda टेस्ट रिमाइंडर",
+        body: customMessage || "नमस्ते, आपका RentVeda नोटिफिकेशन सिस्टम सफलतापूर्वक काम कर रहा है!",
+      },
+      data: {
+        route: "/reminders",
+        test: "true",
+        timestamp: new Date().toISOString(),
+      },
+      android: {
+        priority: "high",
         notification: {
-          title: "🔔 RentVeda टेस्ट रिमाइंडर (8:35 AM)",
-          body: customMessage || `नमस्ते ${user.username || "यूजर"}, आपका RentVeda नोटिफिकेशन सिस्टम सफलतापूर्वक काम कर रहा है!`,
+          channelId: "rentveda_reminders",
+          sound: "default",
+          color: "#FFCC00",
+          clickAction: "FLUTTER_NOTIFICATION_CLICK",
         },
-        data: {
-          route: "/reminders",
-          test: "true",
-          timestamp: new Date().toISOString(),
-        },
-        android: {
-          priority: "high",
-          notification: {
-            channelId: "rentveda_reminders",
-            sound: "default",
-            color: "#FFCC00",
-            clickAction: "FLUTTER_NOTIFICATION_CLICK",
-          },
-        },
-      };
+      },
+    };
 
-      for (const token of tokens) {
-        try {
-          await admin.messaging().send({
-            token,
-            ...payload,
-          });
-          totalSent++;
-          console.log(`✅ [Test Push] Push sent to user ${user.uid || user.username} (${token.substring(0, 15)}...)`);
-          details.push({ uid: user.uid, status: "sent", tokenPrefix: token.substring(0, 15) });
-        } catch (err) {
-          console.warn(`❌ [Test Push] Failed sending to token ${token.substring(0, 15)}... :`, err.message);
-          details.push({ uid: user.uid, status: "error", error: err.message });
-        }
+    for (const token of uniqueTokens) {
+      try {
+        await admin.messaging().send({
+          token,
+          ...payload,
+        });
+        totalSent++;
+        console.log(`✅ [Test Push] Push sent to unique device token (${token.substring(0, 15)}...)`);
+        details.push({ status: "sent", tokenPrefix: token.substring(0, 15) });
+      } catch (err) {
+        console.warn(`❌ [Test Push] Failed sending to token ${token.substring(0, 15)}... :`, err.message);
+        details.push({ status: "error", error: err.message });
       }
     }
 
