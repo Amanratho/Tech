@@ -661,7 +661,7 @@
   "dueFrom": "इस तारीख से देय है:",
   "toCollect": "इकट्ठा करने के लिए:",
   "viewAllPendingDues": "सभी लंबित बकाया देखें",
-  "welcomeTitle": "रेंटवेडा में आपका स्वागत है!",
+  "welcomeTitle": "रेंट वेदा में आपका स्वागत है!",
   "loginToContinue": "जारी रखने के लिए लॉगिन करें",
   "dontHaveAccount": "कोई खाता नहीं है?",
   "alreadyHaveAccount": "क्या आपके पास पहले से एक खाता मौजूद है?",
@@ -783,5 +783,12 @@
   "pleaseEnterMobile": "कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें",
   "pleaseEnterOtp": "कृपया ओटीपी दर्ज करें",
   "pleaseEnterName": "कृपया अपना नाम दर्ज करें",
-  "accountCreatedSuccess": "खाता बन गया! 90 दिनों का फ्री ट्रायल शुरू हुआ।"
-}
+  "accountCreatedSuccess": "खाता बन गया! 90 दिनों का फ्री ट्रायल शुरू हुआ।",
+  "changePassword": "पासवर्ड बदलें",
+  "setPassword": "पासवर्ड सेट करें",
+  "setPasswordHint": "बिना OTP के इंतज़ार किए सीधे मोबाइल और पासवर्ड से लॉगिन करने के लिए पासवर्ड सेट करें।",
+  "newPassword": "नया पासवर्ड",
+  "newPasswordPlaceholder": "नया पासवर्ड दर्ज करें (कम से कम 4 अक्षर)",
+  "confirmPasswordPlaceholder": "नया पासवर्ड पुनः दर्ज करें",
+  "passwordTooShort": "पासवर्ड कम से कम 4 अक्षरों का होना चाहिए"
+}

@@ -70,6 +70,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     required String mobileNo,
     required String companyName,
     File? qrImage,
+    String? password,
   }) async {
     state = state.copyWith(isLoading: true, error: null, isSuccess: false);
     try {
@@ -84,6 +85,10 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
         'mobileNo': mobileNo,
         'companyName': companyName,
       };
+
+      if (password != null && password.trim().isNotEmpty) {
+        formDataMap['password'] = password.trim();
+      }
 
       if (qrImage != null) {
         formDataMap['qrImage'] = await MultipartFile.fromFile(qrImage.path);

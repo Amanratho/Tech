@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../providers/auth_provider.dart';
+import '../../../../core/services/notification_service.dart';
 
 class WelcomeScreen extends ConsumerStatefulWidget {
   const WelcomeScreen({super.key});
@@ -57,6 +58,15 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       textColor: Colors.white,
       toastLength: Toast.LENGTH_LONG,
     );
+  }
+
+  void _navigateAfterAuth() {
+    final pending = NotificationService.consumePendingRoute();
+    if (pending != null && pending.isNotEmpty) {
+      context.go(pending);
+    } else {
+      context.go('/home');
+    }
   }
 
   // ─── Labeled Input field builder with clear title above box ───
@@ -381,7 +391,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 final success = await authNotifier.loginWithPhone(mobileNo: mobile, otp: otp);
                 if (success && mounted) {
                   _showToast(tr('successMessage'));
-                  context.go('/home');
+                  _navigateAfterAuth();
                 }
               },
             ),
@@ -485,7 +495,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               );
               if (success && mounted) {
                 _showToast(tr('successMessage'));
-                context.go('/home');
+                _navigateAfterAuth();
               }
             },
           ),
@@ -605,25 +615,6 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           icon: Icons.business_outlined,
           enabled: !_otpSent,
         ),
-        const SizedBox(height: 12),
-
-        // Password (Optional for mobile accounts)
-        _buildLabeledInput(
-          label: '${tr('password')} ${tr('optional')}',
-          controller: _passwordController,
-          placeholder: tr('passwordPlaceholder'),
-          icon: Icons.lock_outline,
-          obscureText: _obscurePassword,
-          enabled: !_otpSent,
-          suffixIcon: GestureDetector(
-            onTap: () => setState(() => _obscurePassword = !_obscurePassword),
-            child: Icon(
-              _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-              size: 18,
-              color: textMuted,
-            ),
-          ),
-        ),
         const SizedBox(height: 16),
 
         if (_otpSent) ...[
@@ -689,13 +680,13 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 mobileNo: mobile,
                 username: name,
                 companyName: _companyController.text.trim(),
-                password: _passwordController.text.trim(),
+                password: '',
                 otp: otp,
               );
 
               if (success && mounted) {
                 _showToast(tr('accountCreatedSuccess'));
-                context.go('/home');
+                _navigateAfterAuth();
               }
             },
           ),
@@ -818,7 +809,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
             );
             if (success && mounted) {
               _showToast(tr('successMessage'));
-              context.go('/home');
+              _navigateAfterAuth();
             }
           },
         ),

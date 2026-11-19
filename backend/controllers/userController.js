@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const { v2: cloudinary } = require("cloudinary");
 const fs = require("fs");
+const bcrypt = require("bcryptjs");
+const admin = require("../config/firebase");
 
 // @desc    Get user profile by UID (including subscription status and daysLeft)
 // @route   GET /api/users/:uid
@@ -47,6 +49,10 @@ const getUserProfile = async (req, res) => {
       userData.daysLeft = 90;
     }
 
+    // Flag whether user has set a password (without exposing the hash)
+    userData.hasPassword = !!user.password;
+    delete userData.password;
+
     res.json(userData);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -61,10 +67,22 @@ const updateUserProfile = async (req, res) => {
     const user = await User.findOne({ uid: req.params.uid });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const { username, mobileNo, companyName } = req.body;
+    const { username, mobileNo, companyName, password } = req.body;
     user.username = username || user.username;
     user.mobileNo = mobileNo || user.mobileNo;
     user.companyName = companyName || user.companyName;
+
+    // Optional: Set or update password from profile
+    if (password && password.trim().length >= 4) {
+      user.password = await bcrypt.hash(password.trim(), 10);
+      try {
+        await admin.auth().updateUser(user.uid, {
+          password: password.trim(),
+        });
+      } catch (fbErr) {
+        console.log("Firebase auth password update notice:", fbErr.message);
+      }
+    }
 
     if (req.file) {
       const uploadResult = await cloudinary.uploader.upload(req.file.path);
@@ -77,10 +95,14 @@ const updateUserProfile = async (req, res) => {
     }
 
     const updatedUser = await user.save();
+    const returnUser = updatedUser.toObject();
+    returnUser.hasPassword = !!updatedUser.password;
+    delete returnUser.password;
+
     res.json({
       success: true,
       message: "Profile updated successfully!",
-      user: updatedUser,
+      user: returnUser,
     });
   } catch (error) {
     console.error("Error updating user profile:", error);

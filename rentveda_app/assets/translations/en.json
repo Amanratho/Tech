@@ -780,5 +780,12 @@
   "pleaseEnterMobile": "Please enter a valid 10-digit mobile number",
   "pleaseEnterOtp": "Please enter OTP",
   "pleaseEnterName": "Please enter your name",
-  "accountCreatedSuccess": "Account Created! 90-Day Free Trial Activated."
+  "accountCreatedSuccess": "Account Created! 90-Day Free Trial Activated.",
+  "changePassword": "Change Password",
+  "setPassword": "Set Password",
+  "setPasswordHint": "Set a password to log in directly using mobile & password without waiting for OTP.",
+  "newPassword": "New Password",
+  "newPasswordPlaceholder": "Enter new password (min. 4 characters)",
+  "confirmPasswordPlaceholder": "Re-enter new password",
+  "passwordTooShort": "Password must be at least 4 characters"
 }

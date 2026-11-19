@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../../../core/services/notification_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -28,8 +30,25 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller.forward();
 
-    // After animation, navigate to welcome (router will redirect appropriately)
-    Future.delayed(const Duration(milliseconds: 2500), () {
+    // After animation, check if app was opened by a notification click
+    Future.delayed(const Duration(milliseconds: 2500), () async {
+      if (!mounted) return;
+
+      final pending = NotificationService.consumePendingRoute();
+      if (pending != null && pending.isNotEmpty) {
+        const storage = FlutterSecureStorage();
+        final token = await storage.read(key: 'token');
+        if (token != null && token.isNotEmpty) {
+          if (mounted) {
+            context.go(pending);
+            return;
+          }
+        } else {
+          // Keep pendingRoute saved so user can be redirected after login
+          NotificationService.pendingRoute = pending;
+        }
+      }
+
       if (mounted) {
         context.go('/welcome');
       }

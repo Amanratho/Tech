@@ -9,6 +9,7 @@ import '../../utils/reminder_whatsapp_helper.dart';
 import '../widgets/edit_reminder_modal.dart';
 import '../widgets/confirm_reminder_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../../../../core/services/notification_service.dart';
 
 class RemindersScreen extends ConsumerStatefulWidget {
   const RemindersScreen({super.key});
@@ -30,10 +31,19 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         ref.read(remindersProvider.notifier).loadReminders();
       }
     });
+
+    NotificationService.onReminderRefreshNeeded = () {
+      if (mounted) {
+        ref.read(remindersProvider.notifier).loadReminders();
+      }
+    };
   }
 
   @override
   void dispose() {
+    if (NotificationService.onReminderRefreshNeeded != null) {
+      NotificationService.onReminderRefreshNeeded = null;
+    }
     _searchController.dispose();
     super.dispose();
   }
