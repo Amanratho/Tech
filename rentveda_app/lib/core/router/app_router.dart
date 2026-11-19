@@ -28,10 +28,10 @@ import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/tracker/presentation/screens/area_tracker_map_screen.dart';
 
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
-
 class AppRouter {
+  static final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>();
+
   static void initialize() {
     ApiClient.onAuthExpired = () {
       router.go('/welcome');
@@ -39,7 +39,7 @@ class AppRouter {
   }
 
   static final router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
     redirect: (context, state) async {
       final isGoingToSplash = state.uri.toString() == '/splash';
@@ -141,7 +141,7 @@ class AppRouter {
         builder: (context, state) => const AreaTrackerMapScreen(),
       ),
       ShellRoute(
-        navigatorKey: _shellNavigatorKey,
+        navigatorKey: AppRouter.shellNavigatorKey,
         builder: (context, state, child) {
           int currentIndex = -1;
           if (state.uri.path == '/home') currentIndex = 0;
@@ -152,14 +152,14 @@ class AppRouter {
 
           final isHome = state.uri.path == '/home';
           final isTopLevelTab = currentIndex != -1;
-          final canShellPop = _shellNavigatorKey.currentState?.canPop() ?? false;
+          final canShellPop = AppRouter.shellNavigatorKey.currentState?.canPop() ?? false;
 
           return PopScope(
             canPop: isHome && !canShellPop,
             onPopInvokedWithResult: (didPop, result) {
               if (didPop) return;
-              if (_shellNavigatorKey.currentState?.canPop() ?? false) {
-                _shellNavigatorKey.currentState?.pop();
+              if (AppRouter.shellNavigatorKey.currentState?.canPop() ?? false) {
+                AppRouter.shellNavigatorKey.currentState?.pop();
                 return;
               }
               if (!isHome) {
@@ -170,8 +170,8 @@ class AppRouter {
               appBar: RentVedaAppBar(
                 showBackButton: !isTopLevelTab,
                 onBackTap: () {
-                  if (_shellNavigatorKey.currentState?.canPop() ?? false) {
-                    _shellNavigatorKey.currentState?.pop();
+                  if (AppRouter.shellNavigatorKey.currentState?.canPop() ?? false) {
+                    AppRouter.shellNavigatorKey.currentState?.pop();
                   } else {
                     context.go('/home');
                   }
