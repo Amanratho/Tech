@@ -110,7 +110,16 @@ class AppRouter {
       GoRoute(
         path: '/edit-profile',
         name: 'edit-profile',
-        builder: (context, state) => const EditProfileScreen(),
+        builder: (context, state) {
+          final extra = state.extra;
+          String? focusSection;
+          if (extra is Map<String, dynamic>) {
+            focusSection = extra['focusSection'] as String?;
+          } else if (extra is String) {
+            focusSection = extra;
+          }
+          return EditProfileScreen(focusSection: focusSection);
+        },
       ),
       GoRoute(
         path: '/about',
