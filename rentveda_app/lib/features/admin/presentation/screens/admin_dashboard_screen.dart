@@ -4,8 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../models/admin_models.dart';
-import '../providers/admin_provider.dart';
+import '../../models/admin_models.dart';
+import '../../providers/admin_provider.dart';
 
 class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -1014,7 +1014,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen>
           value: _showPopupCheck,
           title: const Text('Show In-App Popup on Open', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
           subtitle: const Text('Shows an alert dialog when users open the app', style: TextStyle(fontSize: 11)),
-          activeColor: AppColors.primaryGold,
+          activeThumbColor: AppColors.primaryGold,
           onChanged: (val) => setState(() => _showPopupCheck = val),
         ),
 
@@ -1022,7 +1022,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen>
           value: _sendPushCheck,
           title: const Text('Send Push Notification (FCM)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
           subtitle: const Text('Rings all user phones in notification bar', style: TextStyle(fontSize: 11)),
-          activeColor: AppColors.primaryGold,
+          activeThumbColor: AppColors.primaryGold,
           onChanged: (val) => setState(() => _sendPushCheck = val),
         ),
 

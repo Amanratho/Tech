@@ -6,7 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/top_app_bar.dart';
-import '../../machine_maintenance/providers/machine_maintenance_provider.dart';
+import '../../../machine_maintenance/providers/machine_maintenance_provider.dart';
 import '../../providers/update_machinery_provider.dart';
 
 class UpdateMachineryScreen extends ConsumerStatefulWidget {
