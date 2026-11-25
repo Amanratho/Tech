@@ -751,5 +751,24 @@
   "bighaRegionGujarat": "ਗੁਜਰਾਤ ਵਿੱਘਾ",
   "bighaRegionPunjabHaryana": "ਪੰਜਾਬ / ਹਰਿਆਣਾ ਕਿੱਲਾ",
   "gpsSphericalBadge": "ਜੀਪੀਐਸ ਸਹੀ ਮਿਣਤੀ",
-  "cancel": "ਰੱਦ ਕਰੋ"
-}
+  "cancel": "ਰੱਦ ਕਰੋ",
+  "archiveDialogTitle": "ਮਸ਼ੀਨ ਆਰਕਾਈਵ ਕਰੋ",
+  "archiveSettlementQuestion": "ਕੀ ਇਸ ਮਸ਼ੀਨ ਨੂੰ ਵੇਚਣ ਜਾਂ ਹਟਾਉਣ 'ਤੇ ਕੋਈ ਆਖਰੀ ਆਮਦਨ ਜਾਂ ਖਰਚ ਹੋਇਆ ਹੈ?",
+  "archiveAddSettlementCheckbox": "ਹਾਂ, ਆਖਰੀ ਹਿਸਾਬ (ਵਿਕਰੀ ਆਮਦਨ / ਆਖਰੀ ਖਰਚ) ਜੋੜੋ",
+  "archiveSaleIncomeOption": "+ ਵਿਕਰੀ ਆਮਦਨ (Sale)",
+  "archiveFinalExpenseOption": "- ਆਖਰੀ ਖਰਚ (Expense)",
+  "archiveAmountLabel": "ਰਕਮ (₹)",
+  "archiveDescLabel": "ਵੇਰਵਾ",
+  "archiveNotice": "ਆਰਕਾਈਵ ਕਰਨ ਤੋਂ ਬਾਅਦ ਪੁਰਾਣਾ ਰਿਕਾਰਡ ਸੁਰੱਖਿਅਤ ਰਹੇਗਾ, ਪਰ ਨਵੀਂ ਐਂਟਰੀ ਨਹੀਂ ਹੋ ਸਕੇਗੀ।",
+  "archiveAndSaveButton": "ਜੋੜੋ ਅਤੇ ਆਰਕਾਈਵ ਕਰੋ",
+  "archiveOnlyButton": "ਸਿੱਧਾ ਆਰਕਾਈਵ ਕਰੋ",
+  "enterValidAmountError": "ਕਿਰਪਾ ਕਰਕੇ ਸਹੀ ਰਕਮ ਦਰਜ ਕਰੋ",
+  "soldMachineDefault": "ਮਸ਼ੀਨ ਵੇਚੀ",
+  "finalExpenseDefault": "ਆਖਰੀ ਖਰਚਾ / ਕਬਾੜ",
+  "viewArchivedMachines": "ਆਰਕਾਈਵ ਕੀਤੀਆਂ ਮਸ਼ੀਨਾਂ ਦੇਖੋ",
+  "backToActiveMachines": "ਵਾਪਸ ਸਕਿਰਿਆ ਮਸ਼ੀਨਾਂ 'ਤੇ ਜਾਓ",
+  "archivedMachinesNotice": "ਆਰਕਾਈਵ ਕੀਤੀਆਂ ਮਸ਼ੀਨਾਂ ਸਿਰਫ਼ ਰਿਕਾਰਡ ਅਤੇ ਮੁਨਾਫ਼ਾ/ਨੁਕਸਾਨ ਦੇਖਣ ਲਈ ਹਨ (Read-only)।",
+  "noArchivedMachines": "ਕੋਈ ਆਰਕਾਈਵ ਕੀਤੀ ਮਸ਼ੀਨ ਨਹੀਂ ਮਿਲੀ",
+  "noActiveMachines": "ਕੋਈ ਸਕਿਰਿਆ ਮਸ਼ੀਨ ਨਹੀਂ ਮਿਲੀ",
+  "archivedMachineReadOnlyBanner": "ਆਰਕਾਈਵ ਕੀਤੀ ਮਸ਼ੀਨ (Read-Only) - ਨਵਾਂ ਖਰਚਾ ਜਾਂ ਆਮਦਨ ਨਹੀਂ ਜੋੜੀ ਜਾ ਸਕਦੀ।"
+}
