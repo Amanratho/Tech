@@ -12,22 +12,33 @@ import '../../../../core/widgets/top_app_bar.dart';
 import '../../providers/profile_provider.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
-  const EditProfileScreen({super.key});
+  final String? focusSection; // 'qr', 'password', 'profile'
+
+  const EditProfileScreen({super.key, this.focusSection});
 
   @override
   ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _profileKey = GlobalKey();
+  final GlobalKey _qrKey = GlobalKey();
+  final GlobalKey _passwordKey = GlobalKey();
+
+  final FocusNode _nameFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _companyController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  
+
+  String? _highlightedSection;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  
+
   File? _qrImage;
   final ImagePicker _picker = ImagePicker();
 
@@ -40,10 +51,55 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       _mobileController.text = user['mobileNo']?.toString() ?? '';
       _companyController.text = user['companyName'] ?? '';
     }
+
+    if (widget.focusSection != null) {
+      _highlightedSection = widget.focusSection;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _handleInitialFocus(widget.focusSection!);
+      });
+    }
+  }
+
+  void _handleInitialFocus(String section) {
+    Future.delayed(const Duration(milliseconds: 350), () {
+      if (!mounted) return;
+      if (section == 'qr' && _qrKey.currentContext != null) {
+        Scrollable.ensureVisible(
+          _qrKey.currentContext!,
+          duration: const Duration(milliseconds: 650),
+          curve: Curves.easeInOutCubic,
+          alignment: 0.15,
+        );
+      } else if (section == 'password' && _passwordKey.currentContext != null) {
+        Scrollable.ensureVisible(
+          _passwordKey.currentContext!,
+          duration: const Duration(milliseconds: 650),
+          curve: Curves.easeInOutCubic,
+          alignment: 0.15,
+        );
+        Future.delayed(const Duration(milliseconds: 700), () {
+          if (mounted) _passwordFocusNode.requestFocus();
+        });
+      } else if (section == 'profile') {
+        _nameFocusNode.requestFocus();
+      }
+
+      // Automatically fade highlight after 3.5 seconds
+      Future.delayed(const Duration(milliseconds: 3500), () {
+        if (mounted) {
+          setState(() {
+            _highlightedSection = null;
+          });
+        }
+      });
+    });
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
+    _nameFocusNode.dispose();
+    _passwordFocusNode.dispose();
     _usernameController.dispose();
     _mobileController.dispose();
     _companyController.dispose();
@@ -103,7 +159,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: AppColors.bgMain, // equivalent to bg-[var(--bg-main)]
+          backgroundColor: AppColors.bgMain,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(tr('deleteAccountButton'), style: AppTypography.cardHeader),
           content: Text(tr('confirmDelete'), style: AppTypography.bodyMain.copyWith(color: AppColors.textSubtle, fontSize: 13)),
@@ -143,11 +199,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final state = ref.watch(profileProvider);
     final user = state.userData;
 
+    final isQrFocused = _highlightedSection == 'qr';
+    final isPasswordFocused = _highlightedSection == 'password';
+
     return Scaffold(
       backgroundColor: AppColors.bgMain,
       appBar: const RentVedaAppBar(showBackButton: true),
       body: SafeArea(
         child: SingleChildScrollView(
+          controller: _scrollController,
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
           child: Container(
             padding: const EdgeInsets.all(24),
@@ -166,118 +226,23 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Input Fields
-                _buildInputLabel(tr('nameLabel')),
-                _buildTextField(_usernameController, Icons.person, tr('enterFullName')),
-                const SizedBox(height: 20),
+                // 1. Personal Details Section
+                Container(
+                  key: _profileKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildInputLabel(tr('nameLabel')),
+                      _buildTextField(_usernameController, Icons.person, tr('enterFullName'), focusNode: _nameFocusNode),
+                      const SizedBox(height: 20),
 
-                _buildInputLabel(tr('mobileLabel')),
-                _buildTextField(_mobileController, Icons.phone, tr('enterMobileNumber'), keyboardType: TextInputType.phone),
-                const SizedBox(height: 20),
+                      _buildInputLabel(tr('mobileLabel')),
+                      _buildTextField(_mobileController, Icons.phone, tr('enterMobileNumber'), keyboardType: TextInputType.phone),
+                      const SizedBox(height: 20),
 
-                _buildInputLabel(tr('companyNameLabel')),
-                _buildTextField(_companyController, Icons.business, tr('enterCompanyName')),
-                const SizedBox(height: 24),
-                
-                const Divider(color: AppColors.border),
-                const SizedBox(height: 16),
-
-                // QR Code Upload
-                Row(
-                  children: [
-                    const Icon(Icons.qr_code, color: AppColors.primary, size: 16),
-                    const SizedBox(width: 8),
-                    _buildInputLabel(tr('paymentQrTitle'), padBottom: false),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                GestureDetector(
-                  onTap: _pickQrCode,
-                  child: DottedBorder(
-                    options: const RoundedRectDottedBorderOptions(
-                      color: AppColors.border,
-                      strokeWidth: 2,
-                      dashPattern: [8, 4],
-                      radius: Radius.circular(16),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      height: 160,
-                      decoration: BoxDecoration(
-                        color: AppColors.bgMain,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: _qrImage != null
-                          ? Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(14),
-                                  child: Image.file(_qrImage!, fit: BoxFit.contain, width: double.infinity),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withValues(alpha: 0.8),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(Icons.edit, color: Colors.white, size: 12),
-                                        const SizedBox(width: 8),
-                                        Text(tr('changeQr'), style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          : (user != null && user['qrCodeUrl'] != null && user['qrCodeUrl'].isNotEmpty)
-                              ? Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(14),
-                                      child: Image.network(user['qrCodeUrl'], fit: BoxFit.contain, width: double.infinity),
-                                    ),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(14),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      width: 48,
-                                      height: 48,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: AppColors.border),
-                                        boxShadow: [
-                                          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2), blurStyle: BlurStyle.inner),
-                                        ],
-                                      ),
-                                      child: const Icon(Icons.cloud_upload_outlined, color: AppColors.textSubtle, size: 24),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(tr('tapToUploadQr'), style: AppTypography.bodySecondary.copyWith(fontWeight: FontWeight.bold, color: AppColors.textMain, fontSize: 13)),
-                                    const SizedBox(height: 4),
-                                    Text(tr('imageFormatHint'), style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 10)),
-                                  ],
-                                ),
-                    ),
+                      _buildInputLabel(tr('companyNameLabel')),
+                      _buildTextField(_companyController, Icons.business, tr('enterCompanyName')),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -285,41 +250,229 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 const Divider(color: AppColors.border),
                 const SizedBox(height: 16),
 
-                // Password & Security Section
-                Row(
-                  children: [
-                    const Icon(Icons.shield_outlined, color: AppColors.primary, size: 18),
-                    const SizedBox(width: 8),
-                    Text(
-                      user != null && user['hasPassword'] == true
-                          ? tr('changePassword')
-                          : '${tr('setPassword')} ${tr('optional')}',
-                      style: AppTypography.cardHeader.copyWith(fontSize: 14),
+                // 2. QR Code Upload Section
+                AnimatedContainer(
+                  key: _qrKey,
+                  duration: const Duration(milliseconds: 350),
+                  padding: EdgeInsets.all(isQrFocused ? 12 : 0),
+                  decoration: BoxDecoration(
+                    color: isQrFocused ? const Color(0xFFFEF3C7).withValues(alpha: 0.35) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isQrFocused ? const Color(0xFFF59E0B) : Colors.transparent,
+                      width: isQrFocused ? 2 : 0,
                     ),
-                  ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.qr_code, color: AppColors.primary, size: 18),
+                              const SizedBox(width: 8),
+                              _buildInputLabel(tr('paymentQrTitle'), padBottom: false),
+                            ],
+                          ),
+                          if (isQrFocused)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF59E0B),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.touch_app, size: 12, color: Colors.white),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    tr('tapToUploadQr'),
+                                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      GestureDetector(
+                        onTap: _pickQrCode,
+                        child: DottedBorder(
+                          options: RoundedRectDottedBorderOptions(
+                            color: isQrFocused ? const Color(0xFFF59E0B) : AppColors.border,
+                            strokeWidth: 2,
+                            dashPattern: const [8, 4],
+                            radius: const Radius.circular(16),
+                          ),
+                          child: Container(
+                            width: double.infinity,
+                            height: 160,
+                            decoration: BoxDecoration(
+                              color: AppColors.bgMain,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: _qrImage != null
+                                ? Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(14),
+                                        child: Image.file(_qrImage!, fit: BoxFit.contain, width: double.infinity),
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withValues(alpha: 0.2),
+                                          borderRadius: BorderRadius.circular(14),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withValues(alpha: 0.8),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(Icons.edit, color: Colors.white, size: 12),
+                                              const SizedBox(width: 8),
+                                              Text(tr('changeQr'), style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : (user != null && user['qrCodeUrl'] != null && user['qrCodeUrl'].isNotEmpty)
+                                    ? Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(14),
+                                            child: Image.network(user['qrCodeUrl'], fit: BoxFit.contain, width: double.infinity),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.black.withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(14),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            width: 48,
+                                            height: 48,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(color: AppColors.border),
+                                              boxShadow: [
+                                                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2), blurStyle: BlurStyle.inner),
+                                              ],
+                                            ),
+                                            child: const Icon(Icons.cloud_upload_outlined, color: AppColors.textSubtle, size: 24),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Text(tr('tapToUploadQr'), style: AppTypography.bodySecondary.copyWith(fontWeight: FontWeight.bold, color: AppColors.textMain, fontSize: 13)),
+                                          const SizedBox(height: 4),
+                                          Text(tr('imageFormatHint'), style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 10)),
+                                        ],
+                                      ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  tr('setPasswordHint'),
-                  style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 11),
-                ),
+                const SizedBox(height: 24),
+
+                const Divider(color: AppColors.border),
                 const SizedBox(height: 16),
 
-                _buildInputLabel(user != null && user['hasPassword'] == true ? tr('newPassword') : tr('password')),
-                _buildPasswordField(
-                  _passwordController,
-                  tr('newPasswordPlaceholder'),
-                  _obscurePassword,
-                  () => setState(() => _obscurePassword = !_obscurePassword),
-                ),
-                const SizedBox(height: 14),
+                // 3. Password & Security Section
+                AnimatedContainer(
+                  key: _passwordKey,
+                  duration: const Duration(milliseconds: 350),
+                  padding: EdgeInsets.all(isPasswordFocused ? 12 : 0),
+                  decoration: BoxDecoration(
+                    color: isPasswordFocused ? const Color(0xFFFEF3C7).withValues(alpha: 0.35) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isPasswordFocused ? const Color(0xFFF59E0B) : Colors.transparent,
+                      width: isPasswordFocused ? 2 : 0,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.shield_outlined, color: AppColors.primary, size: 18),
+                              const SizedBox(width: 8),
+                              Text(
+                                user != null && user['hasPassword'] == true
+                                    ? tr('changePassword')
+                                    : '${tr('setPassword')} ${tr('optional')}',
+                                style: AppTypography.cardHeader.copyWith(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          if (isPasswordFocused)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF59E0B),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.edit, size: 12, color: Colors.white),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    user != null && user['hasPassword'] == true ? tr('changePassword') : tr('setPassword'),
+                                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        tr('setPasswordHint'),
+                        style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 11),
+                      ),
+                      const SizedBox(height: 16),
 
-                _buildInputLabel(tr('confirm_password')),
-                _buildPasswordField(
-                  _confirmPasswordController,
-                  tr('confirmPasswordPlaceholder'),
-                  _obscureConfirmPassword,
-                  () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                      _buildInputLabel(user != null && user['hasPassword'] == true ? tr('newPassword') : tr('password')),
+                      _buildPasswordField(
+                        _passwordController,
+                        tr('newPasswordPlaceholder'),
+                        _obscurePassword,
+                        () => setState(() => _obscurePassword = !_obscurePassword),
+                        focusNode: _passwordFocusNode,
+                      ),
+                      const SizedBox(height: 14),
+
+                      _buildInputLabel(tr('confirm_password')),
+                      _buildPasswordField(
+                        _confirmPasswordController,
+                        tr('confirmPasswordPlaceholder'),
+                        _obscureConfirmPassword,
+                        () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 32),
 
@@ -381,9 +534,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, IconData icon, String hint, {TextInputType keyboardType = TextInputType.text}) {
+  Widget _buildTextField(TextEditingController controller, IconData icon, String hint, {TextInputType keyboardType = TextInputType.text, FocusNode? focusNode}) {
     return TextField(
       controller: controller,
+      focusNode: focusNode,
       keyboardType: keyboardType,
       style: AppTypography.bodyMain.copyWith(fontSize: 13, fontWeight: FontWeight.w600),
       decoration: InputDecoration(
@@ -400,9 +554,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildPasswordField(TextEditingController controller, String hint, bool obscureText, VoidCallback onToggle) {
+  Widget _buildPasswordField(TextEditingController controller, String hint, bool obscureText, VoidCallback onToggle, {FocusNode? focusNode}) {
     return TextField(
       controller: controller,
+      focusNode: focusNode,
       obscureText: obscureText,
       style: AppTypography.bodyMain.copyWith(fontSize: 13, fontWeight: FontWeight.w600),
       decoration: InputDecoration(

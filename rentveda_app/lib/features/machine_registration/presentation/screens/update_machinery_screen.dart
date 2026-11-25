@@ -487,27 +487,46 @@ class _UpdateMachineryScreenState extends ConsumerState<UpdateMachineryScreen> {
                                 ),
                               ),
 
-                              // Pricing Badge (Top Left)
+                              // Rent Type Badge (Top Left)
                               Positioned(
                                 top: 12,
                                 left: 12,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                   decoration: BoxDecoration(
-                                    color: AppColors.primaryGold,
+                                    color: const Color(0xFF0F172A).withValues(alpha: 0.85),
                                     borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1),
                                     boxShadow: [
-                                      BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 2, offset: const Offset(0, 1)),
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.25),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
                                     ],
                                   ),
-                                  child: Text(
-                                    rentType.toUpperCase(),
-                                    style: const TextStyle(
-                                      color: Color(0xFF6C5000),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: 0.5,
-                                    ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.handyman_outlined, size: 12, color: Color(0xFFFBBF24)),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        '${tr('rentType')}: ',
+                                        style: TextStyle(
+                                          color: Colors.white.withValues(alpha: 0.75),
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Text(
+                                        rentType,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),

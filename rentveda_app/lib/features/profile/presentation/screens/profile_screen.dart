@@ -334,7 +334,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         children: [
                           // QR Code Card
                           GestureDetector(
-                            onTap: () => context.push('/edit-profile'),
+                            onTap: () => context.push('/edit-profile', extra: {'focusSection': 'qr'}),
                             child: Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
@@ -426,11 +426,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             _buildAdminConsoleCard(context),
                             const SizedBox(height: 12),
                           ],
-                          _buildMenuItem(Icons.settings, tr('editProfileButton'), () => context.push('/edit-profile'), iconColor: AppColors.textSubtle),
+                          _buildMenuItem(
+                            Icons.settings,
+                            tr('editProfileButton'),
+                            () => context.push('/edit-profile', extra: {'focusSection': 'profile'}),
+                            iconColor: AppColors.textSubtle,
+                          ),
                           _buildMenuItem(
                             Icons.lock_outline,
                             user['hasPassword'] == true ? tr('changePassword') : tr('setPassword'),
-                            () => context.push('/edit-profile'),
+                            () => context.push('/edit-profile', extra: {'focusSection': 'password'}),
                             iconColor: Colors.teal.shade600,
                           ),
                           _buildMenuItem(Icons.edit_note, tr('updateMachineryButton'), () => context.push('/update-machinery'), iconColor: Colors.blue.shade500),
