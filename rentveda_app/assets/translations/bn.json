@@ -751,5 +751,24 @@
   "bighaRegionGujarat": "গুজরাট বিঘা",
   "bighaRegionPunjabHaryana": "পাঞ্জাব / হরিয়ানা কিল্লা",
   "gpsSphericalBadge": "জিপিএস সঠিক পরিমাপ",
-  "cancel": "বাতিল করুন"
-}
+  "cancel": "বাতিল করুন",
+  "archiveDialogTitle": "মেশিন সংরক্ষণ (আর্কাইভ) করুন",
+  "archiveSettlementQuestion": "এই মেশিন বিক্রি বা সরানোর সময় কি কোনো চূড়ান্ত আয় বা খরচ হয়েছে?",
+  "archiveAddSettlementCheckbox": "হ্যাঁ, চূড়ান্ত হিসাব (বিক্রয় আয় / চূড়ান্ত খরচ) যোগ করুন",
+  "archiveSaleIncomeOption": "+ বিক্রয় আয় (Sale)",
+  "archiveFinalExpenseOption": "- চূড়ান্ত খরচ (Expense)",
+  "archiveAmountLabel": "পরিমাণ (₹)",
+  "archiveDescLabel": "বিবরণ",
+  "archiveNotice": "আর্কাইভ করার পর পুরানো রেকর্ড সুরক্ষিত থাকবে, তবে নতুন এন্ট্রি যোগ করা যাবে না।",
+  "archiveAndSaveButton": "যোগ করুন এবং সংরক্ষণ করুন",
+  "archiveOnlyButton": "সরাসরি সংরক্ষণ করুন",
+  "enterValidAmountError": "অনুগ্রহ করে সঠিক পরিমাণ লিখুন",
+  "soldMachineDefault": "মেশিন বিক্রি করা হয়েছে",
+  "finalExpenseDefault": "চূড়ান্ত খরচ / স্ক্র্যাপ",
+  "viewArchivedMachines": "আর্কাইভ করা মেশিন দেখুন",
+  "backToActiveMachines": "সক্রিয় মেশিনে ফিরে যান",
+  "archivedMachinesNotice": "আর্কাইভ করা মেশিন শুধুমাত্র রেকর্ড এবং লাভ/ক্ষতি দেখার জন্য (Read-only)।",
+  "noArchivedMachines": "কোনো আর্কাইভ করা মেশিন পাওয়া যায়নি",
+  "noActiveMachines": "কোনো সক্রিয় মেশিন পাওয়া যায়নি",
+  "archivedMachineReadOnlyBanner": "আর্কাইভ করা মেশিন (Read-Only) - নতুন খরচ বা আয় যোগ করা যাবে না।"
+}

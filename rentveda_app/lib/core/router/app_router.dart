@@ -202,7 +202,10 @@ class AppRouter {
           GoRoute(
             path: '/reminders',
             name: 'reminders',
-            pageBuilder: (context, state) => const NoTransitionPage(child: RemindersScreen()),
+            pageBuilder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              return NoTransitionPage(child: RemindersScreen(extra: extra));
+            },
           ),
           GoRoute(
             path: '/statement',

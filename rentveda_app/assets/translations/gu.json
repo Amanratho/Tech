@@ -751,5 +751,24 @@
   "bighaRegionGujarat": "ગુજરાત વીઘા",
   "bighaRegionPunjabHaryana": "પંજાબ / હરિયાણા કિલ્લા",
   "gpsSphericalBadge": "જીપીએસ સચોટ માપ",
-  "cancel": "રદ કરો"
-}
+  "cancel": "રદ કરો",
+  "archiveDialogTitle": "મશીન આર્કાઇવ કરો",
+  "archiveSettlementQuestion": "શું આ મશીન વેચવા કે હટાવવા પર કોઈ અંતિમ આવક કે ખર્ચ થયો છે?",
+  "archiveAddSettlementCheckbox": "હા, અંતિમ હિસાબ (વેચાણ આવક / અંતિમ ખર્ચ) ઉમેરો",
+  "archiveSaleIncomeOption": "+ વેચાણ આવક (Sale)",
+  "archiveFinalExpenseOption": "- અંતિમ ખર્ચ (Expense)",
+  "archiveAmountLabel": "રકમ (₹)",
+  "archiveDescLabel": "વિગત",
+  "archiveNotice": "આર્કાઇવ કર્યા પછી જૂનો રેકોર્ડ સુરક્ષિત રહેશે, પરંતુ નવી એન્ટ્રી થઈ શકશે નહીં.",
+  "archiveAndSaveButton": "ઉમેરો અને આર્કાઇવ કરો",
+  "archiveOnlyButton": "સીધા આર્કાઇવ કરો",
+  "enterValidAmountError": "કૃપા કરીને માન્ય રકમ દાખલ કરો",
+  "soldMachineDefault": "મશીન વેચાઈ",
+  "finalExpenseDefault": "અંતિમ ખર્ચ / સ્ક્રેપ",
+  "viewArchivedMachines": "આર્કાઇવ કરેલ મશીન જુઓ",
+  "backToActiveMachines": "પાછા સક્રિય મશીનો પર જાઓ",
+  "archivedMachinesNotice": "આર્કાઇવ કરેલ મશીનો માત્ર રેકોર્ડ અને નફો/નુકસાન જોવા માટે છે (Read-only).",
+  "noArchivedMachines": "કોઈ આર્કાઇવ કરેલ મશીન મળ્યું નથી",
+  "noActiveMachines": "કોઈ સક્રિય મશીન મળ્યું નથી",
+  "archivedMachineReadOnlyBanner": "આર્કાઇવ કરેલ મશીન (Read-Only) - નવો ખર્ચ કે આવક ઉમેરી શકાતી નથી."
+}

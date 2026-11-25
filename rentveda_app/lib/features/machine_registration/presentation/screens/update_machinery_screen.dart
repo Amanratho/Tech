@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/top_app_bar.dart';
+import '../../machine_maintenance/providers/machine_maintenance_provider.dart';
 import '../../providers/update_machinery_provider.dart';
 
 class UpdateMachineryScreen extends ConsumerStatefulWidget {
@@ -26,39 +27,312 @@ class _UpdateMachineryScreenState extends ConsumerState<UpdateMachineryScreen> {
     });
   }
 
-  void _showArchiveConfirm(String machineId) {
+  void _showArchiveDialog(String machineId, String machineName) {
+    String transactionType = 'income'; // 'income' (sale/scrap) or 'expense'
+    final TextEditingController amountController = TextEditingController();
+    final TextEditingController descController = TextEditingController(text: tr('soldMachineDefault'));
+    bool addSettlement = false;
+    bool isSubmitting = false;
+
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: AppColors.bgMain, // bg-[#f9f9f9] equivalent
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(tr('archiveMachine'), style: AppTypography.cardHeader),
-          content: Text(tr('archiveConfirmMessage'), style: AppTypography.bodyMain.copyWith(color: AppColors.textSubtle, fontSize: 13)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(tr('cancelButton'), style: AppTypography.buttonText.copyWith(color: AppColors.textMain)),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.pop(dialogContext);
-                final success = await ref.read(updateMachineryProvider.notifier).archiveMachine(machineId);
-                if (success) {
-                  Fluttertoast.showToast(msg: tr('archiveSuccessToast'), backgroundColor: AppColors.successDark);
-                } else {
-                  final error = ref.read(updateMachineryProvider).error ?? "Failed to archive machine";
-                  Fluttertoast.showToast(msg: error, backgroundColor: AppColors.danger);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.danger,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+              contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF7ED),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFFFED7AA)),
+                    ),
+                    child: const Icon(Icons.archive_outlined, color: Color(0xFFC2410C), size: 24),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          tr('archiveDialogTitle'),
+                          style: AppTypography.cardHeader.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          machineName,
+                          style: AppTypography.caption.copyWith(color: AppColors.textSubtle, fontSize: 12),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              child: Text(tr('archiveMachine')),
-            ),
-          ],
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 8),
+                    Text(
+                      tr('archiveSettlementQuestion'),
+                      style: AppTypography.bodySecondary.copyWith(
+                        fontSize: 13,
+                        color: AppColors.textMain,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Settlement Toggle Option
+                    InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () {
+                        setDialogState(() {
+                          addSettlement = !addSettlement;
+                          if (addSettlement && descController.text.isEmpty) {
+                            descController.text = transactionType == 'income'
+                                ? tr('soldMachineDefault')
+                                : tr('finalExpenseDefault');
+                          }
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: addSettlement ? const Color(0xFFFEFCE8) : const Color(0xFFF9FAFB),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: addSettlement ? const Color(0xFFFACC15) : AppColors.border,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              addSettlement ? Icons.check_box : Icons.check_box_outline_blank,
+                              size: 20,
+                              color: addSettlement ? const Color(0xFFA16207) : AppColors.textSubtle,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                tr('archiveAddSettlementCheckbox'),
+                                style: AppTypography.bodyMain.copyWith(
+                                  fontSize: 13,
+                                  fontWeight: addSettlement ? FontWeight.bold : FontWeight.normal,
+                                  color: addSettlement ? const Color(0xFFA16207) : AppColors.textMain,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    if (addSettlement) ...[
+                      const SizedBox(height: 14),
+                      // Type Switcher: Income / Expense
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setDialogState(() {
+                                  transactionType = 'income';
+                                  descController.text = tr('soldMachineDefault');
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: transactionType == 'income' ? const Color(0xFFDCFCE7) : const Color(0xFFF3F4F6),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: transactionType == 'income' ? const Color(0xFF22C55E) : Colors.transparent,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    tr('archiveSaleIncomeOption'),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: transactionType == 'income' ? const Color(0xFF15803D) : AppColors.textSubtle,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setDialogState(() {
+                                  transactionType = 'expense';
+                                  descController.text = tr('finalExpenseDefault');
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: transactionType == 'expense' ? const Color(0xFFFEE2E2) : const Color(0xFFF3F4F6),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: transactionType == 'expense' ? const Color(0xFFEF4444) : Colors.transparent,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    tr('archiveFinalExpenseOption'),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: transactionType == 'expense' ? const Color(0xFFB91C1C) : AppColors.textSubtle,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Amount Input
+                      TextField(
+                        controller: amountController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.currency_rupee, size: 18),
+                          labelText: tr('archiveAmountLabel'),
+                          hintText: '50000',
+                          isDense: true,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Description Input
+                      TextField(
+                        controller: descController,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.notes, size: 18),
+                          labelText: tr('archiveDescLabel'),
+                          isDense: true,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: 14),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFFBEB),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFFDE68A)),
+                      ),
+                      child: Text(
+                        '💡 ${tr('archiveNotice')}',
+                        style: AppTypography.caption.copyWith(color: const Color(0xFF92400E), fontSize: 11),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              actions: [
+                if (isSubmitting)
+                  const Center(child: Padding(padding: EdgeInsets.all(8.0), child: CircularProgressIndicator()))
+                else ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(dialogContext),
+                          child: Text(
+                            tr('cancelButton'),
+                            style: AppTypography.buttonText.copyWith(color: AppColors.textSubtle),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final double? amount = double.tryParse(amountController.text.trim());
+                            if (addSettlement && (amount == null || amount <= 0)) {
+                              Fluttertoast.showToast(
+                                msg: tr('enterValidAmountError'),
+                                backgroundColor: AppColors.danger,
+                              );
+                              return;
+                            }
+
+                            setDialogState(() => isSubmitting = true);
+
+                            // If settlement is requested, record maintenance entry first
+                            if (addSettlement && amount != null && amount > 0) {
+                              try {
+                                final desc = descController.text.trim().isEmpty
+                                    ? (transactionType == 'income' ? tr('soldMachineDefault') : tr('finalExpenseDefault'))
+                                    : descController.text.trim();
+                                final today = DateTime.now().toIso8601String();
+                                await ref.read(machineMaintenanceProvider.notifier).addMaintenance(
+                                      type: transactionType,
+                                      amount: amount,
+                                      description: desc,
+                                      date: today,
+                                      machineId: machineId,
+                                    );
+                              } catch (_) {}
+                            }
+
+                            // Archive machine
+                            final success = await ref.read(updateMachineryProvider.notifier).archiveMachine(machineId);
+                            if (dialogContext.mounted) {
+                              Navigator.pop(dialogContext);
+                            }
+
+                            if (success) {
+                              Fluttertoast.showToast(
+                                msg: tr('archiveSuccessToast'),
+                                backgroundColor: AppColors.successDark,
+                              );
+                              ref.read(machineMaintenanceProvider.notifier).fetchMachineSummary();
+                            } else {
+                              final error = ref.read(updateMachineryProvider).error ?? tr('archiveErrorToast');
+                              Fluttertoast.showToast(msg: error, backgroundColor: AppColors.danger);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFC2410C),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          child: Text(
+                            addSettlement ? tr('archiveAndSaveButton') : tr('archiveOnlyButton'),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            );
+          },
         );
       },
     );
@@ -284,7 +558,7 @@ class _UpdateMachineryScreenState extends ConsumerState<UpdateMachineryScreen> {
                                     const SizedBox(width: 8),
                                     // Archive Button
                                     GestureDetector(
-                                      onTap: () => _showArchiveConfirm(machineId),
+                                      onTap: () => _showArchiveDialog(machineId, machineName),
                                       child: Container(
                                         width: 36,
                                         height: 36,
