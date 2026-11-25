@@ -339,6 +339,18 @@ const phoneLogin = async (req, res) => {
       userObj.daysLeft = 90;
     }
 
+    const adminMobiles = ["9109124564", "9876543210"];
+    const adminEmails = ["amanrathod407@gmail.com"];
+    const isAdmin =
+      dbUser.role === "admin" ||
+      adminMobiles.includes(dbUser.mobileNo) ||
+      adminEmails.includes((dbUser.email || "").toLowerCase());
+    userObj.isAdmin = isAdmin;
+    if (isAdmin && dbUser.role !== "admin") {
+      dbUser.role = "admin";
+      await dbUser.save();
+    }
+
     const token = createToken(dbUser._id);
     let customToken = null;
     try {

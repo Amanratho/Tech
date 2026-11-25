@@ -26,6 +26,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/tracker/presentation/screens/area_tracker_map_screen.dart';
+import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
 
 
 class AppRouter {
@@ -139,6 +140,11 @@ class AppRouter {
         path: '/area-tracker',
         name: 'area-tracker',
         builder: (context, state) => const AreaTrackerMapScreen(),
+      ),
+      GoRoute(
+        path: '/admin-dashboard',
+        name: 'admin-dashboard',
+        builder: (context, state) => const AdminDashboardScreen(),
       ),
       ShellRoute(
         navigatorKey: AppRouter.shellNavigatorKey,

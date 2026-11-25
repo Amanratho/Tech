@@ -3,6 +3,52 @@ const ReminderLog = require("../models/ReminderLogModel");
 const User = require("../models/User");
 const admin = require("../config/firebase");
 
+// ─── Multilingual Notification Templates ──────────────────────────────────────
+const getLocalizedReminder = (langCode, customerName, pendingAmount) => {
+  const lang = (langCode || "hi").toString().toLowerCase().trim();
+
+  const templates = {
+    hi: {
+      title: "रेंटवेदा रिमाइंडर (RentVeda)",
+      body: `${customerName} का ₹${pendingAmount} का भुगतान आज देय है।`,
+    },
+    en: {
+      title: "RentVeda Reminder",
+      body: `${customerName}'s payment of ₹${pendingAmount} is due today.`,
+    },
+    mr: {
+      title: "रेंटवेदा स्मरणपत्र (RentVeda)",
+      body: `${customerName} चे ₹${pendingAmount} चे देयक आज बाकी आहे.`,
+    },
+    gu: {
+      title: "રેન્ટવેદા રિમાઇન્ડર (RentVeda)",
+      body: `${customerName} નું ₹${pendingAmount} નું પેમેન્ટ આજે બાકી છે.`,
+    },
+    pa: {
+      title: "ਰੈਂਟਵੇਦਾ ਰੀਮਾਈਂਡਰ (RentVeda)",
+      body: `${customerName} ਦਾ ₹${pendingAmount} ਦਾ ਭੁਗਤਾਨ ਅੱਜ ਦੇਣਯੋਗ ਹੈ।`,
+    },
+    ta: {
+      title: "ரென்ட்வேதா நினைவூட்டல் (RentVeda)",
+      body: `${customerName} அவர்களின் ₹${pendingAmount} தொகை இன்று செலுத்தப்பட வேண்டும்.`,
+    },
+    te: {
+      title: "రెంట్‌వేదా రిమైండర్ (RentVeda)",
+      body: `${customerName} వారి ₹${pendingAmount} చెల్లింపు ఈరోజు గడువు ఉంది.`,
+    },
+    kn: {
+      title: "ರೆಂಟ್‌ವೇದ ಜ್ಞಾಪನೆ (RentVeda)",
+      body: `${customerName} ಅವರ ₹${pendingAmount} ಪಾವತಿ ಇಂದು ಬಾಕಿ ಇದೆ.`,
+    },
+    bn: {
+      title: "রেন্টভেদা রিমাইন্ডার (RentVeda)",
+      body: `${customerName} এর ₹${pendingAmount} এর পেমেন্ট আজ বাকি আছে।`,
+    },
+  };
+
+  return templates[lang] || templates["hi"];
+};
+
 // ─── Notification Handlers ───────────────────────────────────────────────────
 
 /** Send FCM Push Notification to machinery owner's phone */
@@ -28,19 +74,22 @@ const sendPushNotification = async (rental) => {
       return;
     }
 
-    const customerName = rental.customerName || "ग्राहक";
+    const customerName = rental.customerName || "Customer";
     const pendingAmount = rental.pendingAmount || 0;
+    const userLang = user.language || "hi";
+    const localized = getLocalizedReminder(userLang, customerName, pendingAmount);
 
     const payload = {
       notification: {
-        title: "रेंटवेदा रिमाइंडर (RentVeda)",
-        body: `${customerName} का ₹${pendingAmount} का भुगतान आज देय है।`,
+        title: localized.title,
+        body: localized.body,
       },
       data: {
         route: "/reminders",
         rentalId: rental._id ? rental._id.toString() : "",
         customerName: String(customerName),
         pendingAmount: String(pendingAmount),
+        language: userLang,
       },
       android: {
         priority: "high",
