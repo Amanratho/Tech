@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../providers/profile_provider.dart';
@@ -85,6 +86,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         isSelected: context.locale.languageCode == code,
         onTap: () {
           context.setLocale(Locale(code));
+          NotificationService().syncLanguage(code);
           Navigator.pop(bottomSheetContext);
         },
       ),
@@ -192,6 +194,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
       );
     }
+
+    final mobileNo = (user['mobileNo'] ?? '').toString().trim();
+    final email = (user['email'] ?? '').toString().toLowerCase().trim();
+    final isAdmin = user['isAdmin'] == true ||
+        user['role'] == 'admin' ||
+        mobileNo == '9109124564' ||
+        mobileNo == '9876543210' ||
+        email == 'amanrathod407@gmail.com';
 
     return Scaffold(
       backgroundColor: AppColors.bgMain,
@@ -324,7 +334,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         children: [
                           // QR Code Card
                           GestureDetector(
-                            onTap: () => context.push('/edit-profile'),
+                            onTap: () => context.push('/edit-profile', extra: {'focusSection': 'qr'}),
                             child: Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
@@ -411,12 +421,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          _buildMenuItem(Icons.settings, tr('editProfileButton'), () => context.push('/edit-profile'), iconColor: AppColors.textSubtle),
+                          const SizedBox(height: 8),
+                          if (isAdmin) ...[
+                            _buildAdminConsoleCard(context),
+                            const SizedBox(height: 12),
+                          ],
+                          _buildMenuItem(
+                            Icons.settings,
+                            tr('editProfileButton'),
+                            () => context.push('/edit-profile', extra: {'focusSection': 'profile'}),
+                            iconColor: AppColors.textSubtle,
+                          ),
                           _buildMenuItem(
                             Icons.lock_outline,
                             user['hasPassword'] == true ? tr('changePassword') : tr('setPassword'),
-                            () => context.push('/edit-profile'),
+                            () => context.push('/edit-profile', extra: {'focusSection': 'password'}),
                             iconColor: Colors.teal.shade600,
                           ),
                           _buildMenuItem(Icons.edit_note, tr('updateMachineryButton'), () => context.push('/update-machinery'), iconColor: Colors.blue.shade500),
@@ -475,6 +494,97 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         )
       ],
+    );
+  }
+
+  Widget _buildAdminConsoleCard(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push('/admin-dashboard'),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+                  ),
+                  child: const Center(
+                    child: Text('👑', style: TextStyle(fontSize: 20)),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            'Admin Console',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'OWNER',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        'यूज़र्स, मशीनें और सब्सक्रिप्शन कंट्रोल',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.primary),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 

@@ -53,6 +53,19 @@ const getUserProfile = async (req, res) => {
     userData.hasPassword = !!user.password;
     delete userData.password;
 
+    // Admin role check for owner
+    const adminMobiles = ["9109124564", "9876543210"];
+    const adminEmails = ["amanrathod407@gmail.com"];
+    const isAdmin =
+      user.role === "admin" ||
+      adminMobiles.includes(user.mobileNo) ||
+      adminEmails.includes((user.email || "").toLowerCase());
+    userData.isAdmin = isAdmin;
+    if (isAdmin && user.role !== "admin") {
+      user.role = "admin";
+      await user.save();
+    }
+
     res.json(userData);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -195,7 +208,7 @@ const deleteUserProfile = async (req, res) => {
 // @access  Private
 const updateFcmToken = async (req, res) => {
   try {
-    const { uid, fcmToken } = req.body;
+    const { uid, fcmToken, language } = req.body;
     const targetUid = uid || req.params.uid;
 
     if (!targetUid || !fcmToken) {
@@ -211,6 +224,9 @@ const updateFcmToken = async (req, res) => {
     if (!user.fcmTokens) user.fcmTokens = [];
     if (!user.fcmTokens.includes(fcmToken)) {
       user.fcmTokens.push(fcmToken);
+    }
+    if (language) {
+      user.language = language;
     }
 
     await user.save();
@@ -229,10 +245,37 @@ const updateFcmToken = async (req, res) => {
   }
 };
 
+// @desc    Update user preferred language
+// @route   PUT /api/users/language
+// @access  Private
+const updateUserLanguage = async (req, res) => {
+  try {
+    const { uid, language } = req.body;
+    if (!uid || !language) {
+      return res.status(400).json({ success: false, message: "UID and language are required" });
+    }
+    const user = await User.findOne({ uid });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    user.language = language;
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: "Language updated successfully",
+      language,
+    });
+  } catch (error) {
+    console.error("Error updating language:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getUserProfile,
   updateUserProfile,
   updateUserSubscription,
   deleteUserProfile,
   updateFcmToken,
+  updateUserLanguage,
 };

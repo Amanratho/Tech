@@ -13,6 +13,11 @@ const userSchema = new mongoose.Schema(
     password: { type: String },
     companyName: { type: String },
     uid: { type: String, required: true, unique: true },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
     qrCodeUrl: { type: String },
 
     // Subscription & Plan Status
@@ -66,6 +71,12 @@ const userSchema = new mongoose.Schema(
     showAnnouncementPopup: {
       type: Boolean,
       default: false,
+    },
+
+    // Preferred Language for Notifications & UI
+    language: {
+      type: String,
+      default: "hi", // 'en', 'hi', 'mr', 'gu', 'pa', 'ta', 'te', 'kn', 'bn'
     },
 
     // Push Notifications (FCM)

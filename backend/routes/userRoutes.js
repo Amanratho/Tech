@@ -6,9 +6,13 @@ const {
   updateUserSubscription,
   deleteUserProfile,
   updateFcmToken,
+  updateUserLanguage,
 } = require("../controllers/userController");
 
 const router = express.Router();
+
+// Update user preferred language
+router.put("/language", updateUserLanguage);
 
 // Update FCM Token for Push Notifications
 router.put("/fcm-token", updateFcmToken);

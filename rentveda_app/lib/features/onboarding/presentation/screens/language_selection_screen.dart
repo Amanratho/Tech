@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
@@ -15,6 +16,8 @@ class LanguageSelectionScreen extends StatelessWidget {
     // 2. Save preference so this screen isn't shown again
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('language_selected', true);
+    await prefs.setString('selected_language', langCode);
+    NotificationService().syncLanguage(langCode);
     
     if (!context.mounted) return;
     

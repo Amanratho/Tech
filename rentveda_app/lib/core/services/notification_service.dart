@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../network/api_client.dart';
 import '../router/app_router.dart';
 
@@ -224,14 +225,38 @@ class NotificationService {
       final uid = await _storage.read(key: 'uid');
       if (uid == null || uid.isEmpty) return;
 
+      final prefs = await SharedPreferences.getInstance();
+      final lang = prefs.getString('selected_language') ?? 'hi';
+
       final apiClient = ApiClient();
       await apiClient.dio.put('/users/fcm-token', data: {
         'uid': uid,
         'fcmToken': token,
+        'language': lang,
       });
-      debugPrint('FCM Token successfully synced with backend for UID: $uid');
+      debugPrint('FCM Token & language ($lang) successfully synced with backend for UID: $uid');
     } catch (e) {
       debugPrint('Failed to send FCM token to backend: $e');
+    }
+  }
+
+  /// Sync user language choice with backend so push notifications are received in their selected language
+  Future<void> syncLanguage(String langCode) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('selected_language', langCode);
+
+      final uid = await _storage.read(key: 'uid');
+      if (uid == null || uid.isEmpty) return;
+
+      final apiClient = ApiClient();
+      await apiClient.dio.put('/users/language', data: {
+        'uid': uid,
+        'language': langCode,
+      });
+      debugPrint('User language $langCode synced to backend for UID: $uid');
+    } catch (e) {
+      debugPrint('Failed to sync language to backend: $e');
     }
   }
 }

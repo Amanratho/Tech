@@ -26,6 +26,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/tracker/presentation/screens/area_tracker_map_screen.dart';
+import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
 
 
 class AppRouter {
@@ -109,7 +110,16 @@ class AppRouter {
       GoRoute(
         path: '/edit-profile',
         name: 'edit-profile',
-        builder: (context, state) => const EditProfileScreen(),
+        builder: (context, state) {
+          final extra = state.extra;
+          String? focusSection;
+          if (extra is Map<String, dynamic>) {
+            focusSection = extra['focusSection'] as String?;
+          } else if (extra is String) {
+            focusSection = extra;
+          }
+          return EditProfileScreen(focusSection: focusSection);
+        },
       ),
       GoRoute(
         path: '/about',
@@ -139,6 +149,11 @@ class AppRouter {
         path: '/area-tracker',
         name: 'area-tracker',
         builder: (context, state) => const AreaTrackerMapScreen(),
+      ),
+      GoRoute(
+        path: '/admin-dashboard',
+        name: 'admin-dashboard',
+        builder: (context, state) => const AdminDashboardScreen(),
       ),
       ShellRoute(
         navigatorKey: AppRouter.shellNavigatorKey,
@@ -196,7 +211,10 @@ class AppRouter {
           GoRoute(
             path: '/reminders',
             name: 'reminders',
-            pageBuilder: (context, state) => const NoTransitionPage(child: RemindersScreen()),
+            pageBuilder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              return NoTransitionPage(child: RemindersScreen(extra: extra));
+            },
           ),
           GoRoute(
             path: '/statement',

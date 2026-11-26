@@ -12,7 +12,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../core/services/notification_service.dart';
 
 class RemindersScreen extends ConsumerStatefulWidget {
-  const RemindersScreen({super.key});
+  final Map<String, dynamic>? extra;
+  const RemindersScreen({super.key, this.extra});
 
   @override
   ConsumerState<RemindersScreen> createState() => _RemindersScreenState();
@@ -22,10 +23,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _filterStatus = 'all'; // all, overdue, today, upcoming
+  String? _highlightRentalId;
 
   @override
   void initState() {
     super.initState();
+    _applyExtra(widget.extra);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         ref.read(remindersProvider.notifier).loadReminders();
@@ -37,6 +40,26 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         ref.read(remindersProvider.notifier).loadReminders();
       }
     };
+  }
+
+  @override
+  void didUpdateWidget(covariant RemindersScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.extra != oldWidget.extra) {
+      _applyExtra(widget.extra);
+    }
+  }
+
+  void _applyExtra(Map<String, dynamic>? extra) {
+    if (extra == null) return;
+    final name = extra['customerName']?.toString() ?? extra['search']?.toString();
+    if (name != null && name.trim().isNotEmpty) {
+      _searchController.text = name.trim();
+      _searchQuery = name.trim();
+    }
+    if (extra['rentalId'] != null) {
+      _highlightRentalId = extra['rentalId'].toString();
+    }
   }
 
   @override
@@ -236,14 +259,26 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                                     if (d != null) formattedDate = DateFormat('dd MMM yyyy').format(d);
                                   }
 
+                                  final isHighlighted = _highlightRentalId != null &&
+                                      rem['_id']?.toString() == _highlightRentalId;
+
                                   return Container(
                                     margin: const EdgeInsets.only(bottom: 12),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: isHighlighted ? const Color(0xFFFFFDF0) : Colors.white,
                                       borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(color: AppColors.border),
+                                      border: Border.all(
+                                        color: isHighlighted ? AppColors.primaryGold : AppColors.border,
+                                        width: isHighlighted ? 2 : 1,
+                                      ),
                                       boxShadow: [
-                                        BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 4, offset: const Offset(0, 2)),
+                                        BoxShadow(
+                                          color: isHighlighted
+                                              ? AppColors.primaryGold.withValues(alpha: 0.15)
+                                              : Colors.black.withValues(alpha: 0.02),
+                                          blurRadius: isHighlighted ? 8 : 4,
+                                          offset: const Offset(0, 2),
+                                        ),
                                       ],
                                     ),
                                     child: ClipRRect(
@@ -255,7 +290,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                                             // Visual Accent Glow Line
                                             Container(
                                               width: 6,
-                                              color: dateStatus['color'] as Color,
+                                              color: isHighlighted ? AppColors.primaryGold : dateStatus['color'] as Color,
                                             ),
                                             
                                             // Card Content
@@ -309,11 +344,28 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                                                           child: Column(
                                                             crossAxisAlignment: CrossAxisAlignment.start,
                                                             children: [
-                                                              Text(
-                                                                customerName,
-                                                                style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
-                                                                maxLines: 1,
-                                                                overflow: TextOverflow.ellipsis,
+                                                              Row(
+                                                                children: [
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                      customerName,
+                                                                      style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
+                                                                      maxLines: 1,
+                                                                      overflow: TextOverflow.ellipsis,
+                                                                    ),
+                                                                  ),
+                                                                  if (isHighlighted) ...[
+                                                                    const SizedBox(width: 6),
+                                                                    Container(
+                                                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                                      decoration: BoxDecoration(
+                                                                        color: AppColors.primary,
+                                                                        borderRadius: BorderRadius.circular(6),
+                                                                      ),
+                                                                      child: const Text('SELECTED', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Colors.black)),
+                                                                    ),
+                                                                  ],
+                                                                ],
                                                               ),
                                                               Text(
                                                                 mobile,
