@@ -135,16 +135,24 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
     setState(() => _isSaving = true);
     
     final currentEditCount = (widget.bill['editCount'] as num?)?.toInt() ?? 0;
+    final price = double.tryParse(_priceController.text) ?? 0;
+    final qty = double.tryParse(_quantityController.text) ?? 0;
+    final computedTotal = _computeTotal(price, qty, _quantityController.text);
+    final paid = double.tryParse(_paidController.text) ?? 0;
+    final pending = double.tryParse(_pendingController.text) ?? 0;
+
     final formData = {
       '_id': widget.bill['_id'],
       'customerName': _nameController.text,
       'mobileNumber': _mobileController.text,
       'address': _addressController.text,
       'operatorName': _operatorController.text,
-      'price': double.tryParse(_priceController.text) ?? 0,
-      'quantity': double.tryParse(_quantityController.text) ?? 0,
-      'paidAmount': double.tryParse(_paidController.text) ?? 0,
-      'pendingAmount': double.tryParse(_pendingController.text) ?? 0,
+      'price': price,
+      'quantity': qty,
+      'totalAmount': computedTotal,
+      'paidAmount': paid,
+      'pendingAmount': pending,
+      'rentType': widget.bill['rentType'],
       'jobWork': _jobWorkController.text,
       'isEdited': true,
       'editCount': currentEditCount + 1,

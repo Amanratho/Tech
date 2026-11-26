@@ -1,6 +1,31 @@
 const Rental = require("../models/RentalModel");
 const Maintenance = require("../models/machineMaintenanceModel");
 
+const calculateRentalTotal = (price, quantity, rentType, customTotal, paidAmount, pendingAmount) => {
+  if (customTotal != null && !isNaN(Number(customTotal)) && Number(customTotal) > 0) {
+    return Math.round(Number(customTotal) * 100) / 100;
+  }
+  const paid = Number(paidAmount) || 0;
+  const pending = Number(pendingAmount) || 0;
+  if (paid + pending > 0) {
+    return Math.round((paid + pending) * 100) / 100;
+  }
+  const p = Number(price) || 0;
+  const q = Number(quantity) || 0;
+  if (rentType && rentType.toString().toLowerCase().includes("hour")) {
+    const qtyStr = quantity != null ? quantity.toString().trim() : "0";
+    if (qtyStr.includes(".")) {
+      const parts = qtyStr.split(".");
+      const hours = parseFloat(parts[0]) || 0;
+      const minPart = parts[1].padEnd(2, "0").substring(0, 2);
+      const mins = parseFloat(minPart) || 0;
+      const totalHours = hours + (mins / 60.0);
+      return Math.round(p * totalHours * 100) / 100;
+    }
+  }
+  return Math.round(p * q * 100) / 100;
+};
+
 
 exports.addRentalEntry = async (req, res) => {
   try {
@@ -34,7 +59,14 @@ exports.addRentalEntry = async (req, res) => {
       }
     }
 
-    const totalAmount = price * quantity;
+    const totalAmount = calculateRentalTotal(
+      price,
+      quantity,
+      rentType,
+      req.body.totalAmount,
+      paidAmount,
+      pendingAmount
+    );
     const newRental = new Rental({
       customerName,
       mobileNumber,
@@ -133,6 +165,7 @@ exports.editRental = async (req, res) => {
       quantity,
       paidAmount,
       pendingAmount,
+      rentType,
       jobWork,
       reminderDate,
       reminderStatus,
@@ -156,7 +189,14 @@ exports.editRental = async (req, res) => {
       }
     }
 
-    const totalAmount = price * quantity;
+    const totalAmount = calculateRentalTotal(
+      price,
+      quantity,
+      rentType,
+      req.body.totalAmount,
+      paidAmount,
+      pendingAmount
+    );
 
     const updatedRental = await Rental.findByIdAndUpdate(
       _id,
@@ -170,6 +210,7 @@ exports.editRental = async (req, res) => {
         totalAmount,
         paidAmount,
         pendingAmount,
+        ...(rentType ? { rentType } : {}),
         jobWork,
         reminderDate,
         reminderStatus,
