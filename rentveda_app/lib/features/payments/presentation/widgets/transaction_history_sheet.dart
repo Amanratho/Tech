@@ -67,8 +67,11 @@ class TransactionHistorySheet extends StatelessWidget {
               itemBuilder: (context, index) {
                 final entry = entries[index] as Map<String, dynamic>;
                 final createdAt = DateTime.tryParse(entry['createdAt'] ?? '') ?? DateTime.now();
+                final paidAmount = (entry['paidAmount'] ?? 0).toDouble();
                 final pendingAmount = (entry['pendingAmount'] ?? 0).toDouble();
-                final totalAmount = (entry['totalAmount'] ?? 0).toDouble();
+                final totalAmount = (paidAmount + pendingAmount > 0)
+                    ? (paidAmount + pendingAmount)
+                    : (entry['totalAmount'] ?? 0).toDouble();
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),

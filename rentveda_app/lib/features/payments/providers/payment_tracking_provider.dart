@@ -70,7 +70,8 @@ class PaymentTrackingNotifier extends StateNotifier<PaymentTrackingState> {
 
       final paidAmt = double.tryParse(data['paidAmount']?.toString() ?? '') ?? 0.0;
       final pendingAmt = double.tryParse(data['pendingAmount']?.toString() ?? '') ?? 0.0;
-      final totalAmt = double.tryParse(data['totalAmount']?.toString() ?? '') ?? 0.0;
+      final rawTotal = double.tryParse(data['totalAmount']?.toString() ?? '') ?? 0.0;
+      final totalAmt = (paidAmt + pendingAmt > 0) ? (paidAmt + pendingAmt) : rawTotal;
 
       if (usersMap.containsKey(mobileNumber)) {
         usersMap[mobileNumber]!['paidAmount'] += paidAmt;

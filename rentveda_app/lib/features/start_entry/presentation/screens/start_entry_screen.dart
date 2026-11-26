@@ -451,6 +451,7 @@ class _StartEntryScreenState extends ConsumerState<StartEntryScreen> {
       'operatorName': _operatorController.text,
       'price': double.tryParse(_priceController.text) ?? 0,
       'quantity': double.tryParse(_qtyController.text) ?? 0,
+      'totalAmount': _totalAmount,
       'paidAmount': double.tryParse(_paidController.text) ?? 0,
       'pendingAmount': pendingAmount,
       'rentType': _rentType,

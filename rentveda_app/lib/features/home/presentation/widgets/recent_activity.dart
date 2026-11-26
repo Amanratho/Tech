@@ -48,8 +48,11 @@ class RecentActivity extends StatelessWidget {
           // Activity items
           ...recentEntries.map((entry) {
             final name = entry['customerName'] ?? 'Customer Entry';
-            final totalAmount = (entry['totalAmount'] ?? 0).toDouble();
+            final paidAmount = (entry['paidAmount'] ?? 0).toDouble();
             final pendingAmount = (entry['pendingAmount'] ?? 0).toDouble();
+            final totalAmount = (paidAmount + pendingAmount > 0)
+                ? (paidAmount + pendingAmount)
+                : (entry['totalAmount'] ?? 0).toDouble();
             final createdAt = DateTime.tryParse(entry['createdAt'] ?? '');
             final dateStr = createdAt != null
                 ? DateFormat('dd MMM yyyy • hh:mm a', context.locale.languageCode).format(createdAt)
