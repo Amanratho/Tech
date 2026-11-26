@@ -98,12 +98,18 @@ const updateUserProfile = async (req, res) => {
     }
 
     if (req.file) {
-      const uploadResult = await cloudinary.uploader.upload(req.file.path);
-      const qrImageUrl = uploadResult.secure_url;
-      user.qrCodeUrl = qrImageUrl;
-
-      if (fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
+      try {
+        const uploadResult = await cloudinary.uploader.upload(req.file.path);
+        const qrImageUrl = uploadResult.secure_url;
+        user.qrCodeUrl = qrImageUrl;
+      } finally {
+        if (fs.existsSync(req.file.path)) {
+          try {
+            fs.unlinkSync(req.file.path);
+          } catch (err) {
+            console.error("Error unlinking qr file:", err.message);
+          }
+        }
       }
     }
 

@@ -1,5 +1,6 @@
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 const { v2: cloudinary } = require("cloudinary");
 
 // Configure Cloudinary
@@ -8,6 +9,29 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
+
+// Ensure uploads directory exists
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) {
+  try {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  } catch (e) {
+    console.error("Error creating upload dir:", e.message);
+  }
+}
+
+// Helper to safely delete local temporary file
+const deleteLocalFile = (filePath) => {
+  if (!filePath) return;
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log("Local temporary file cleaned up:", filePath);
+    }
+  } catch (err) {
+    console.error("Error deleting local file:", err.message);
+  }
+};
 
 // Multer Storage for Temporary File Upload
 const storage = multer.diskStorage({
@@ -42,7 +66,7 @@ const handleMulterError = (err, req, res, next) => {
   next();
 };
 
-// Cloudinary Upload Function
+// Cloudinary Upload Function with automatic local cleanup
 const uploadOnCloudinary = async (filePath, transformations = {}) => {
   if (!filePath || typeof filePath !== "string") {
     console.error("Invalid file path provided.");
@@ -55,11 +79,13 @@ const uploadOnCloudinary = async (filePath, transformations = {}) => {
       ...transformations, 
     });
     console.log("File uploaded on Cloudinary: " + uploadResult.secure_url);
+    deleteLocalFile(filePath);
     return uploadResult.secure_url; // Returns the URL of the uploaded file
   } catch (error) {
     console.error("Failed to upload file to Cloudinary: ", error);
+    deleteLocalFile(filePath);
     return null;
   }
 };
 
-module.exports = { upload, handleMulterError, uploadOnCloudinary };
+module.exports = { upload, handleMulterError, uploadOnCloudinary, deleteLocalFile };

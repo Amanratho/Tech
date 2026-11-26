@@ -93,4 +93,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+// Performance Indexes (uid already indexed via unique: true)
+userSchema.index({ mobileNo: 1 });
+
 module.exports = mongoose.model.User || mongoose.model("User", userSchema);
