@@ -6,7 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../providers/statement_provider.dart';
-import '../../profile/providers/profile_provider.dart';
+import '../../../profile/providers/profile_provider.dart';
 import 'statement_pdf_preview_screen.dart';
 
 class StatementScreen extends ConsumerStatefulWidget {
