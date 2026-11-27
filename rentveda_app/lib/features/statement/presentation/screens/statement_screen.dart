@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../providers/statement_provider.dart';
+import '../../../profile/providers/profile_provider.dart';
+import 'statement_pdf_preview_screen.dart';
 
 class StatementScreen extends ConsumerStatefulWidget {
   const StatementScreen({super.key});
@@ -21,7 +21,6 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
   DateTime? _endDate;
   String _filterType = "All"; // All, Paid, Pending
   String _selectedMachineId = "ALL";
-  bool _isGenerating = false;
 
   String _getSelectedMachineName(List<dynamic> machines) {
     if (_selectedMachineId == "ALL") {
@@ -214,100 +213,67 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
     }
   }
 
-  // Generate Statement Export (CSV)
-  Future<void> _generatePDF() async {
+  // Open Full-screen Statement PDF Preview
+  void _openPdfPreview() {
     if (_startDate == null || _endDate == null) {
       Fluttertoast.showToast(msg: tr('errorSelectDates'), backgroundColor: AppColors.danger);
       return;
     }
 
-    setState(() => _isGenerating = true);
+    final state = ref.read(statementProvider);
+    final rentals = state.allRentals;
     
-    try {
-      final state = ref.read(statementProvider);
-      final rentals = state.allRentals;
-      
-      final end = DateTime(_endDate!.year, _endDate!.month, _endDate!.day, 23, 59, 59, 999);
-      final start = DateTime(_startDate!.year, _startDate!.month, _startDate!.day);
+    final end = DateTime(_endDate!.year, _endDate!.month, _endDate!.day, 23, 59, 59, 999);
+    final start = DateTime(_startDate!.year, _startDate!.month, _startDate!.day);
 
-      final filteredData = rentals.where((item) {
-        final dateStr = item['createdAt']?.toString();
-        if (dateStr == null || dateStr.isEmpty) return false;
-        final itemDate = DateTime.tryParse(dateStr);
-        if (itemDate == null) return false;
-        final isWithinDate = itemDate.isAfter(start.subtract(const Duration(milliseconds: 1))) && 
-                             itemDate.isBefore(end.add(const Duration(milliseconds: 1)));
-        if (!isWithinDate) return false;
-        if (_selectedMachineId != "ALL") {
-          final itemMachineId = (item['machineId'] ?? '').toString();
-          if (itemMachineId != _selectedMachineId) return false;
-        }
-        final pendingAmt = double.tryParse(item['pendingAmount']?.toString() ?? '') ?? 0.0;
-        if (_filterType == "Paid") return pendingAmt == 0;
-        if (_filterType == "Pending") return pendingAmt > 0;
-        return true;
-      }).toList();
-
-      final buffer = StringBuffer();
-      buffer.writeln('RentVeda - Statement Report');
-      buffer.writeln('Period: ${DateFormat('dd-MM-yyyy').format(start)} to ${DateFormat('dd-MM-yyyy').format(end)}');
-      buffer.writeln('Machine: ${_getSelectedMachineName(state.machines)}');
-      buffer.writeln('Filter: $_filterType');
-      buffer.writeln('');
-      buffer.writeln('Date,Customer Name,Mobile,Work,Rent Type,Rate,Qty,Total Amount,Paid Amount,Pending Amount');
-
-      double sumTotal = 0;
-      double sumPaid = 0;
-      double sumPending = 0;
-
-      for (final r in filteredData) {
-        final dStr = r['createdAt']?.toString() ?? '';
-        final d = DateTime.tryParse(dStr);
-        final dateFormatted = d != null ? DateFormat('dd-MM-yyyy').format(d) : dStr;
-        final name = (r['customerName']?.toString() ?? 'N/A').replaceAll(',', ' ');
-        final mobile = r['mobileNumber']?.toString() ?? '';
-        final job = (r['jobWork']?.toString() ?? 'N/A').replaceAll(',', ' ');
-        final rType = r['rentType']?.toString() ?? '';
-        final price = double.tryParse(r['price']?.toString() ?? '') ?? 0.0;
-        final qty = double.tryParse(r['quantity']?.toString() ?? '') ?? 0.0;
-        final total = double.tryParse(r['totalAmount']?.toString() ?? '') ?? (price * qty);
-        final paid = double.tryParse(r['paidAmount']?.toString() ?? '') ?? 0.0;
-        final pending = double.tryParse(r['pendingAmount']?.toString() ?? '') ?? 0.0;
-
-        sumTotal += total;
-        sumPaid += paid;
-        sumPending += pending;
-
-        buffer.writeln('$dateFormatted,$name,$mobile,$job,$rType,$price,$qty,$total,$paid,$pending');
+    final filteredData = rentals.where((item) {
+      final dateStr = item['createdAt']?.toString();
+      if (dateStr == null || dateStr.isEmpty) return false;
+      final itemDate = DateTime.tryParse(dateStr);
+      if (itemDate == null) return false;
+      final isWithinDate = itemDate.isAfter(start.subtract(const Duration(milliseconds: 1))) && 
+                           itemDate.isBefore(end.add(const Duration(milliseconds: 1)));
+      if (!isWithinDate) return false;
+      if (_selectedMachineId != "ALL") {
+        final itemMachineId = (item['machineId'] ?? '').toString();
+        if (itemMachineId != _selectedMachineId) return false;
       }
+      final pendingAmt = double.tryParse(item['pendingAmount']?.toString() ?? '') ?? 0.0;
+      if (_filterType == "Paid") return pendingAmt == 0;
+      if (_filterType == "Pending") return pendingAmt > 0;
+      return true;
+    }).map((e) => Map<String, dynamic>.from(e as Map)).toList();
 
-      buffer.writeln('');
-      buffer.writeln('TOTAL,,,,,,,${sumTotal.toStringAsFixed(2)},${sumPaid.toStringAsFixed(2)},${sumPending.toStringAsFixed(2)}');
-
-      Directory? dir;
-      if (Platform.isAndroid) {
-        dir = await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
-      } else {
-        dir = await getApplicationDocumentsDirectory();
-      }
-
-      final fileName = 'Statement_${DateFormat('yyyyMMdd').format(start)}_${DateFormat('yyyyMMdd').format(end)}.csv';
-      final file = File('${dir.path}/$fileName');
-      await file.writeAsString(buffer.toString());
-
-      if (!mounted) return;
-      setState(() => _isGenerating = false);
-
-      Fluttertoast.showToast(msg: tr('successStatementDownloaded'), backgroundColor: AppColors.successDark);
-
-      // ignore: deprecated_member_use
-      await Share.shareXFiles([XFile(file.path)], text: 'RentVeda Statement (${DateFormat('dd MMM').format(start)} - ${DateFormat('dd MMM').format(end)})');
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isGenerating = false);
-        Fluttertoast.showToast(msg: 'Failed to generate statement: $e', backgroundColor: AppColors.danger);
-      }
+    if (filteredData.isEmpty) {
+      Fluttertoast.showToast(
+        msg: 'चयनित अवधि में कोई एंट्री नहीं मिली!',
+        backgroundColor: AppColors.warningDark,
+      );
+      return;
     }
+
+    // Read user details from profileProvider
+    final profileState = ref.read(profileProvider);
+    final userData = profileState.userData;
+    final userName = userData?['username']?.toString();
+    final companyName = userData?['companyName']?.toString();
+    final userMobile = userData?['mobileNo']?.toString();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StatementPdfPreviewScreen(
+          startDate: _startDate!,
+          endDate: _endDate!,
+          machineName: _getSelectedMachineName(state.machines),
+          filterType: _filterType,
+          rentals: filteredData,
+          userName: userName,
+          companyName: companyName,
+          userMobile: userMobile,
+        ),
+      ),
+    );
   }
 
   Map<String, double> _calculateLiveSummary(List<dynamic> allRentals) {
@@ -581,7 +547,7 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
                 ],
               ),
               child: ElevatedButton(
-                onPressed: _isGenerating ? null : _generatePDF,
+                onPressed: _openPdfPreview,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.textMain,
@@ -590,16 +556,17 @@ class _StatementScreenState extends ConsumerState<StatementScreen> {
                   elevation: 2,
                   shadowColor: AppColors.primary.withValues(alpha: 0.3),
                 ),
-                child: _isGenerating
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryGold))
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.download, size: 18),
-                          const SizedBox(width: 8),
-                          Text(tr('downloadPdfBtn'), style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w700)),
-                        ],
-                      ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.picture_as_pdf_rounded, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      tr('previewPdfBtn') == 'previewPdfBtn' ? 'स्टेटमेंट देखें (Preview PDF)' : tr('previewPdfBtn'),
+                      style: AppTypography.bodyMain.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

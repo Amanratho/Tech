@@ -49,12 +49,14 @@ exports.addMachine = [
     }
 
     try {
-      // Upload image to Cloudinary
-      const uploadResult = await cloudinary.uploader.upload(localPath);
-      const image_filename = uploadResult.secure_url;
-
-      // Delete local file
-      deleteLocalFile(localPath);
+      // Upload image to Cloudinary and ensure local file cleanup
+      let image_filename = null;
+      try {
+        const uploadResult = await cloudinary.uploader.upload(localPath);
+        image_filename = uploadResult.secure_url;
+      } finally {
+        deleteLocalFile(localPath);
+      }
 
       // Save machine to the database
       const newMachine = await machineRegModel.create({
@@ -92,11 +94,13 @@ exports.updateMachine = async (req, res) => {
 
     
     if (localPath) {
-      const uploadResult = await cloudinary.uploader.upload(localPath);
-      image_filename = uploadResult.secure_url;
-
-      // Delete local file after uploading to Cloudinary
-      deleteLocalFile(localPath);
+      try {
+        const uploadResult = await cloudinary.uploader.upload(localPath);
+        image_filename = uploadResult.secure_url;
+      } finally {
+        // Always delete local file after uploading or on error
+        deleteLocalFile(localPath);
+      }
     }
 
     // Update machine details in the database
