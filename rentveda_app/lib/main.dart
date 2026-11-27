@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:phone_email_auth/phone_email_auth.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'core/services/notification_service.dart';
@@ -13,6 +14,11 @@ void main() async {
     await NotificationService().initialize();
   } catch (e) {
     debugPrint('Firebase initialization warning: $e');
+  }
+  try {
+    PhoneEmail.initializeApp(clientId: '17256383996208663558');
+  } catch (e) {
+    debugPrint('PhoneEmail initialization warning: $e');
   }
   await EasyLocalization.ensureInitialized();
   AppRouter.initialize();

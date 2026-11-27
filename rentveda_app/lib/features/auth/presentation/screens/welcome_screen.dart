@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:phone_email_auth/phone_email_auth.dart';
 import '../../providers/auth_provider.dart';
 import '../../../../core/services/notification_service.dart';
 
@@ -236,6 +237,42 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     );
   }
 
+  // ─── Phone.Email (Sign in with Phone) Button ───
+  Widget _buildPhoneEmailButton(AuthNotifier authNotifier) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Expanded(child: Divider(color: borderColor)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                'OR',
+                style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: textMuted),
+              ),
+            ),
+            const Expanded(child: Divider(color: borderColor)),
+          ],
+        ),
+        const SizedBox(height: 14),
+        PhoneLoginButton(
+          borderRadius: 12,
+          buttonColor: const Color(0xFF0F9D58),
+          label: 'Sign in with Phone (Free OTP)',
+          onSuccess: (String accessToken, String jwtToken) async {
+            if (accessToken.isNotEmpty) {
+              final success = await authNotifier.loginWithPhoneEmail(accessToken: accessToken);
+              if (success && mounted) {
+                _showToast(tr('successMessage'));
+                _navigateAfterAuth();
+              }
+            }
+          },
+        ),
+      ],
+    );
+  }
+
   // ═══════════════════════════════════════════════════════════════
   //  VIEW: WELCOME SCREEN
   // ═══════════════════════════════════════════════════════════════
@@ -290,6 +327,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
             _otpSent = false;
           }),
         ),
+        const SizedBox(height: 20),
+        _buildPhoneEmailButton(ref.read(authProvider.notifier)),
       ],
     );
   }
@@ -513,7 +552,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           ),
         ],
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
+        _buildPhoneEmailButton(authNotifier),
+
+        const SizedBox(height: 20),
         const Divider(color: borderColor),
         const SizedBox(height: 12),
 
@@ -724,6 +766,11 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               }
             },
           ),
+        ],
+
+        if (!_otpSent) ...[
+          const SizedBox(height: 16),
+          _buildPhoneEmailButton(authNotifier),
         ],
 
         const SizedBox(height: 20),

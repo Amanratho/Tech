@@ -155,6 +155,60 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  // ─── PHONE.EMAIL AUTH (1-Tap Verified Mobile Auth) ───
+  Future<bool> loginWithPhoneEmail({
+    String? accessToken,
+    String? userJsonUrl,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final response = await apiClient.dio.post('/auth/phone-email-login', data: {
+        if (accessToken != null && accessToken.isNotEmpty) 'accessToken': accessToken,
+        if (userJsonUrl != null && userJsonUrl.isNotEmpty) 'user_json_url': userJsonUrl,
+      });
+
+      if (response.statusCode == 200 && response.data?['success'] == true) {
+        final token = response.data['token'];
+        if (token != null) {
+          await apiClient.secureStorage.write(key: 'token', value: token);
+        }
+        final userData = response.data['user'];
+        if (userData != null && userData['uid'] != null) {
+          await apiClient.secureStorage.write(key: 'uid', value: userData['uid']);
+        }
+
+        NotificationService().syncFcmToken();
+
+        final customToken = response.data['customToken'];
+        if (customToken != null) {
+          try {
+            await FirebaseAuth.instance.signInWithCustomToken(customToken);
+          } catch (fbErr) {
+            debugPrint('Firebase custom token signin note: $fbErr');
+          }
+        }
+
+        state = state.copyWith(isLoading: false);
+        return true;
+      }
+
+      state = state.copyWith(
+        isLoading: false,
+        error: response.data?['error'] ?? 'Phone verification failed',
+      );
+      return false;
+    } on DioException catch (e) {
+      final errorMsg = e.response?.data is Map
+          ? (e.response?.data['error'] ?? 'Phone verification failed')
+          : 'Server error';
+      state = state.copyWith(isLoading: false, error: errorMsg);
+      return false;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
   // ─── PHONE SIGNUP (Name + Mobile + OTP + Company) ───
   Future<bool> signupWithPhone({
     required String mobileNo,
