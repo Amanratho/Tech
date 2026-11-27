@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema(
     },
     subscriptionEndsAt: {
       type: Date,
-      default: () => new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // Default 90 days (3 months) free trial
+      default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days (1 month) welcome bonus
     },
 
     // Account Access Control
@@ -92,5 +92,8 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Performance Indexes (uid already indexed via unique: true)
+userSchema.index({ mobileNo: 1 });
 
 module.exports = mongoose.model.User || mongoose.model("User", userSchema);

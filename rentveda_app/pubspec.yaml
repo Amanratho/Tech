@@ -58,10 +58,13 @@ dependencies:
   uuid: ^4.6.0
   dotted_border: ^3.1.0
   geolocator: ^14.0.2
+  phone_email_auth: ^0.0.5
   flutter_map: ^8.3.2
   latlong2: ^0.10.1
   maps_toolkit: ^3.1.0
   geocoding: ^5.0.0
+  pdf: ^3.13.1
+  printing: ^5.15.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -4,6 +4,7 @@ const {
   login,
   phoneLogin,
   phoneSignup,
+  phoneEmailLogin,
   verifyUser,
   completeSignup,
   signup,
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.post("/phone-login", phoneLogin);
 router.post("/phone-signup", phoneSignup);
+router.post("/phone-email-login", phoneEmailLogin);
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/verify", verifyUser);

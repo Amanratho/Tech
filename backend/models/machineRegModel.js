@@ -10,4 +10,7 @@ const machineSchema = new mongoose.Schema({
   archivedAt: { type: Date, default: null },
 });
 
-module.exports = mongoose.model("Machine", machineSchema)
+// Performance Indexes
+machineSchema.index({ uid: 1, isActive: 1 });
+
+module.exports = mongoose.model("Machine", machineSchema);

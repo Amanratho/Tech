@@ -57,7 +57,7 @@ exports.getAdminOverview = async (req, res) => {
         const diff = new Date(obj.subscriptionEndsAt).getTime() - now.getTime();
         obj.daysLeft = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
       } else {
-        obj.daysLeft = 90;
+        obj.daysLeft = 30;
       }
       return obj;
     });
@@ -137,7 +137,7 @@ exports.getAdminUsers = async (req, res) => {
           const diff = new Date(obj.subscriptionEndsAt).getTime() - now.getTime();
           obj.daysLeft = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
         } else {
-          obj.daysLeft = 90;
+          obj.daysLeft = 30;
         }
 
         const [machineCount, rentalCount] = await Promise.all([
@@ -186,7 +186,7 @@ exports.getUserDetails = async (req, res) => {
       const diff = new Date(userObj.subscriptionEndsAt).getTime() - now.getTime();
       userObj.daysLeft = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
     } else {
-      userObj.daysLeft = 90;
+      userObj.daysLeft = 30;
     }
 
     res.status(200).json({

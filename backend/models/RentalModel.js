@@ -27,6 +27,13 @@ const RentalSchema = new mongoose.Schema({
   },
 });
 
+// Performance Indexes: Prevents full-collection scans (COLLSCAN)
+RentalSchema.index({ uid: 1, createdAt: -1 });
+RentalSchema.index({ uid: 1, machineId: 1 });
+RentalSchema.index({ mobileNumber: 1, uid: 1 });
+RentalSchema.index({ uid: 1, reminderStatus: 1 });
+RentalSchema.index({ reminderDate: 1, reminderStatus: 1 });
+
 // Rental Model
 const Rental = mongoose.models.Rental || mongoose.model("Rental", RentalSchema);
 

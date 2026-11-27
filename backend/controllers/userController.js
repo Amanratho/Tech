@@ -16,14 +16,14 @@ const getUserProfile = async (req, res) => {
 
     // Auto-migrate older user documents without subscription dates
     if (!user.subscriptionEndsAt) {
-      const trialDays = 90;
+      const trialDays = 30;
       const trialEndDate = new Date(
         user.createdAt
           ? user.createdAt.getTime() + trialDays * 24 * 60 * 60 * 1000
           : Date.now() + trialDays * 24 * 60 * 60 * 1000
       );
       user.subscriptionStatus = user.subscriptionStatus || "trial";
-      user.subscriptionPlan = user.subscriptionPlan || "free_trial";
+      user.subscriptionPlan = user.subscriptionPlan || "welcome_bonus_30";
       user.trialStartDate = user.trialStartDate || user.createdAt || now;
       user.subscriptionEndsAt = trialEndDate;
       await user.save();
@@ -46,7 +46,7 @@ const getUserProfile = async (req, res) => {
       const diffTime = new Date(user.subscriptionEndsAt).getTime() - now.getTime();
       userData.daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
     } else {
-      userData.daysLeft = 90;
+      userData.daysLeft = 30;
     }
 
     // Flag whether user has set a password (without exposing the hash)
@@ -98,12 +98,18 @@ const updateUserProfile = async (req, res) => {
     }
 
     if (req.file) {
-      const uploadResult = await cloudinary.uploader.upload(req.file.path);
-      const qrImageUrl = uploadResult.secure_url;
-      user.qrCodeUrl = qrImageUrl;
-
-      if (fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
+      try {
+        const uploadResult = await cloudinary.uploader.upload(req.file.path);
+        const qrImageUrl = uploadResult.secure_url;
+        user.qrCodeUrl = qrImageUrl;
+      } finally {
+        if (fs.existsSync(req.file.path)) {
+          try {
+            fs.unlinkSync(req.file.path);
+          } catch (err) {
+            console.error("Error unlinking qr file:", err.message);
+          }
+        }
       }
     }
 
