@@ -261,6 +261,8 @@
   "fullyPaidOnly": "सिर्फ पूरा भुगतान",
   "pendingDuesOnly": "सिर्फ बकाया राशि",
   "downloadPdfBtn": "पीडीएफ विवरण डाउनलोड करें",
+  "previewPdfBtn": "स्टेटमेंट देखें (Preview PDF)",
+  "statementPreviewTitle": "स्टेटमेंट प्रीव्यू",
   "generatingPdf": "बन रहा है...",
   "errorSelectDates": "कृपया शुरू और अंतिम दोनों तारीखें चुनें।",
   "errorDateRange": "अंतिम तारीख शुरू तारीख से पहले की नहीं हो सकती।",

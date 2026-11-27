@@ -259,6 +259,8 @@
   "fullyPaidOnly": "Fully Paid Only",
   "pendingDuesOnly": "Pending Dues Only",
   "downloadPdfBtn": "Download PDF Statement",
+  "previewPdfBtn": "View Statement (Preview PDF)",
+  "statementPreviewTitle": "Statement Preview",
   "generatingPdf": "Generating...",
   "errorSelectDates": "Please select both Start and End dates.",
   "errorDateRange": "End date cannot be earlier than Start date.",
